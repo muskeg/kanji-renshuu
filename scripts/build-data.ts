@@ -9,8 +9,12 @@
 
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs'
 import { execSync } from 'child_process'
-import { join } from 'path'
+import { join, dirname } from 'path'
+import { fileURLToPath } from 'url'
 import { XMLParser } from 'fast-xml-parser'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 interface KanjiEntry {
   literal: string
