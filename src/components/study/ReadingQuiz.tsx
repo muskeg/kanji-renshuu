@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import type { ReviewItem, RatingValue } from '@/core/srs/types'
 import { matchesReading, normalizeReading } from '@/utils/japanese'
 import styles from './ReadingQuiz.module.css'
@@ -14,13 +14,6 @@ export function ReadingQuiz({ item, onRate }: ReadingQuizProps) {
   const [input, setInput] = useState('')
   const [answerState, setAnswerState] = useState<AnswerState>(null)
   const inputRef = useRef<HTMLInputElement>(null)
-
-  // Focus input on new card
-  useEffect(() => {
-    setInput('')
-    setAnswerState(null)
-    inputRef.current?.focus()
-  }, [item.kanji.literal])
 
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {

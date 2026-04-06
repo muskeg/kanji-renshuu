@@ -40,7 +40,7 @@ export function katakanaToHiragana(str: string): string {
  * e.g. "ひと.つ" → "ひとつ", "あ.う" → "あう"
  */
 export function normalizeReading(reading: string): string {
-  return reading.replace(/[.\-]/g, '')
+  return reading.replace(/[.-]/g, '')
 }
 
 /**

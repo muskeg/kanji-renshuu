@@ -59,7 +59,7 @@ export function WritingPracticeSession({ kanjiData }: WritingPracticeSessionProp
         </div>
       </div>
 
-      <WritingPractice item={currentItem} onRate={rateCard} />
+      <WritingPractice key={currentItem.kanji.literal} item={currentItem} onRate={rateCard} />
     </div>
   )
 }

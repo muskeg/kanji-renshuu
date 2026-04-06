@@ -59,7 +59,7 @@ export function MeaningQuizSession({ kanjiData }: MeaningQuizSessionProps) {
         </div>
       </div>
 
-      <MeaningQuiz item={currentItem} kanjiPool={kanjiData} onRate={rateCard} />
+      <MeaningQuiz key={currentItem.kanji.literal} item={currentItem} kanjiPool={kanjiData} onRate={rateCard} />
     </div>
   )
 }

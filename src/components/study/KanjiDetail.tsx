@@ -100,7 +100,7 @@ export function KanjiDetail({ kanji, onBack }: KanjiDetailProps) {
         {/* Stroke Order */}
         <section className={styles.section}>
           <h3 className={styles.sectionTitle}>Stroke Order</h3>
-          <StrokeOrder svgData={kanji.strokeOrderSvg} />
+          <StrokeOrder key={kanji.literal} svgData={kanji.strokeOrderSvg} />
         </section>
       </div>
     </div>

@@ -72,7 +72,7 @@ export function useProgress(kanjiData: KanjiEntry[]): ProgressData {
         const dateSet = new Set(sortedDates)
         if (dateSet.has(today) || dateSet.has(yesterdayStr)) {
           const startDate = dateSet.has(today) ? todayDate : yesterdayDate
-          let d = new Date(startDate)
+          const d = new Date(startDate)
           while (dateSet.has(d.toISOString().split('T')[0])) {
             currentStreak++
             d.setDate(d.getDate() - 1)

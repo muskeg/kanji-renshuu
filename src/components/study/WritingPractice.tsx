@@ -73,12 +73,6 @@ export function WritingPractice({ item, onRate }: WritingPracticeProps) {
 
   useEffect(() => { redraw() }, [redraw])
 
-  useEffect(() => {
-    setStrokes([])
-    setCurrentStroke(null)
-    setShowAnswer(false)
-  }, [item.kanji.literal])
-
   const getPoint = (e: React.MouseEvent | React.TouchEvent): Point => {
     const canvas = canvasRef.current!
     const rect = canvas.getBoundingClientRect()

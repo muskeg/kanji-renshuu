@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useRef, useEffect } from 'react'
+import { useCallback, useMemo, useReducer, useRef, useEffect } from 'react'
 import styles from './StrokeOrder.module.css'
 
 interface StrokeOrderProps {
@@ -27,50 +27,72 @@ function parseStrokes(svgData: string): string[] {
   return paths
 }
 
+interface StrokeState {
+  visibleStrokes: number
+  isPlaying: boolean
+}
+
+type StrokeAction =
+  | { type: 'play' }
+  | { type: 'reset' }
+  | { type: 'step' }
+  | { type: 'advance'; total: number }
+  | { type: 'init'; total: number }
+
+function strokeReducer(state: StrokeState, action: StrokeAction): StrokeState {
+  switch (action.type) {
+    case 'play':
+      return { visibleStrokes: 0, isPlaying: true }
+    case 'reset':
+      return { visibleStrokes: 0, isPlaying: false }
+    case 'step':
+      return { ...state, visibleStrokes: state.visibleStrokes + 1 }
+    case 'advance':
+      if (state.visibleStrokes >= action.total) {
+        return { ...state, isPlaying: false }
+      }
+      return { ...state, visibleStrokes: state.visibleStrokes + 1 }
+    case 'init':
+      return { visibleStrokes: action.total, isPlaying: false }
+  }
+}
+
 export function StrokeOrder({ svgData, size = 200 }: StrokeOrderProps) {
   const strokes = useMemo(() => parseStrokes(svgData), [svgData])
-  const [visibleStrokes, setVisibleStrokes] = useState(strokes.length)
-  const [isPlaying, setIsPlaying] = useState(false)
+  const [state, dispatch] = useReducer(strokeReducer, { visibleStrokes: strokes.length, isPlaying: false })
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const { visibleStrokes, isPlaying } = state
 
   const reset = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current)
-    setIsPlaying(false)
-    setVisibleStrokes(0)
+    timerRef.current = null
+    dispatch({ type: 'reset' })
   }, [])
 
   const stepForward = useCallback(() => {
-    setVisibleStrokes(prev => Math.min(prev + 1, strokes.length))
-  }, [strokes.length])
-
-  const play = useCallback(() => {
-    setIsPlaying(true)
-    setVisibleStrokes(0)
+    dispatch({ type: 'step' })
   }, [])
 
-  // Auto-advance during playback
-  useEffect(() => {
-    if (!isPlaying) return
+  const play = useCallback(() => {
+    dispatch({ type: 'play' })
+  }, [])
 
-    if (visibleStrokes >= strokes.length) {
-      setIsPlaying(false)
-      return
-    }
+  // Auto-advance during playback — setState is inside a timer callback (async), not synchronous
+  useEffect(() => {
+    if (!isPlaying || visibleStrokes >= strokes.length) return
 
     timerRef.current = setTimeout(() => {
-      setVisibleStrokes(prev => prev + 1)
+      dispatch({ type: 'advance', total: strokes.length })
     }, 600)
 
     return () => {
-      if (timerRef.current) clearTimeout(timerRef.current)
+      if (timerRef.current) {
+        clearTimeout(timerRef.current)
+        timerRef.current = null
+      }
     }
   }, [isPlaying, visibleStrokes, strokes.length])
-
-  // Reset visible strokes when svg data changes
-  useEffect(() => {
-    setVisibleStrokes(strokes.length)
-    setIsPlaying(false)
-  }, [strokes.length])
 
   if (strokes.length === 0) {
     return (
@@ -127,7 +149,7 @@ export function StrokeOrder({ svgData, size = 200 }: StrokeOrderProps) {
         </button>
         <button
           className={styles.controlButton}
-          onClick={isPlaying ? () => setIsPlaying(false) : play}
+          onClick={isPlaying ? reset : play}
           title={isPlaying ? 'Pause' : 'Play'}
           type="button"
           aria-label={isPlaying ? 'Pause animation' : 'Play animation'}

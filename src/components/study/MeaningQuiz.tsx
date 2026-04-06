@@ -3,6 +3,16 @@ import type { KanjiEntry, ReviewItem, RatingValue } from '@/core/srs/types'
 import { selectDistractors } from '@/core/learning/quiz-modes'
 import styles from './MeaningQuiz.module.css'
 
+/** Shuffle an array (called only during initial render via useMemo) */
+function shuffle(arr: KanjiEntry[]): KanjiEntry[] {
+  const result = [...arr]
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[result[i], result[j]] = [result[j], result[i]]
+  }
+  return result
+}
+
 interface MeaningQuizProps {
   item: ReviewItem
   kanjiPool: KanjiEntry[]
@@ -15,16 +25,12 @@ export function MeaningQuiz({ item, kanjiPool, onRate }: MeaningQuizProps) {
   const [selected, setSelected] = useState<string | null>(null)
   const [answerState, setAnswerState] = useState<AnswerState>(null)
 
+  // Safe: shuffle runs only once per mount (key-based remount resets this)
   const options = useMemo(() => {
     const distractors = selectDistractors(item.kanji, kanjiPool, 3)
-    const all = [item.kanji, ...distractors]
-    // Fisher-Yates shuffle
-    for (let i = all.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1))
-      ;[all[i], all[j]] = [all[j], all[i]]
-    }
-    return all
-  }, [item.kanji, kanjiPool])
+    return shuffle([item.kanji, ...distractors])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleSelect = useCallback(
     (literal: string) => {
