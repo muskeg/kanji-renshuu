@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import type { AppSettings, QuizMode } from '@/core/srs/types'
 import { DEFAULT_SETTINGS } from '@/core/srs/types'
 import { loadSettings, saveSettings } from '@/core/storage/settings'

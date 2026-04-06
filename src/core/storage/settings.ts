@@ -1,5 +1,5 @@
-import type { AppSettings } from '../srs/types'
-import { DEFAULT_SETTINGS } from '../srs/types'
+import type { AppSettings } from '@/core/srs/types'
+import { DEFAULT_SETTINGS } from '@/core/srs/types'
 
 const SETTINGS_KEY = 'kanji-renshuu-settings'
 

@@ -1,4 +1,4 @@
-import type { CardState, ReviewLogEntry, DailyStats, AppSettings } from '../srs/types'
+import type { CardState, DailyStats, AppSettings } from '@/core/srs/types'
 import { getAllCardStates, getAllDailyStats, putCardState, putDailyStats } from './db'
 import { loadSettings, saveSettings } from './settings'
 

@@ -1,5 +1,5 @@
 import { openDB, type IDBPDatabase } from 'idb'
-import type { CardState, ReviewLogEntry, DailyStats } from '../srs/types'
+import type { CardState, ReviewLogEntry, DailyStats } from '@/core/srs/types'
 
 const DB_NAME = 'kanji-renshuu'
 const DB_VERSION = 1
