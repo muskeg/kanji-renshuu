@@ -1,0 +1,58 @@
+/* Card flip animation */
+.card-flip-enter {
+  transform: rotateY(90deg);
+  opacity: 0;
+}
+
+.card-flip-enter-active {
+  transform: rotateY(0deg);
+  opacity: 1;
+  transition: transform var(--transition-slow), opacity var(--transition-normal);
+}
+
+/* Stroke draw animation */
+@keyframes stroke-draw {
+  from {
+    stroke-dashoffset: var(--stroke-length);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.stroke-animate {
+  animation: stroke-draw 0.6s ease-in-out forwards;
+}
+
+/* Fade in */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fade-in var(--transition-normal) ease-out;
+}
+
+/* Rating flash feedback */
+@keyframes flash-success {
+  0% { background-color: transparent; }
+  50% { background-color: rgba(63, 185, 80, 0.15); }
+  100% { background-color: transparent; }
+}
+
+@keyframes flash-error {
+  0% { background-color: transparent; }
+  50% { background-color: rgba(248, 81, 73, 0.15); }
+  100% { background-color: transparent; }
+}
+
+/* Slide up for session summary */
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-up {
+  animation: slide-up var(--transition-slow) ease-out;
+}

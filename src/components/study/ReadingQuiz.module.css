@@ -1,0 +1,102 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-lg);
+  width: 100%;
+  max-width: 400px;
+}
+
+.kanji {
+  font-family: var(--font-jp);
+  font-size: var(--text-kanji-lg);
+  color: var(--color-text);
+  line-height: 1;
+}
+
+.hint {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.form {
+  display: flex;
+  gap: var(--spacing-sm);
+  width: 100%;
+}
+
+.input {
+  flex: 1;
+  padding: var(--spacing-md);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  font-family: var(--font-jp);
+  font-size: var(--text-lg);
+  text-align: center;
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.input:focus {
+  border-color: var(--color-primary);
+}
+
+.input::placeholder {
+  color: var(--color-text-muted);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+}
+
+.inputCorrect {
+  border-color: var(--color-success) !important;
+  background: rgba(63, 185, 80, 0.1);
+}
+
+.inputWrong {
+  border-color: var(--color-error) !important;
+  background: rgba(248, 81, 73, 0.1);
+}
+
+.submit {
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--color-primary);
+  color: var(--color-bg);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+  white-space: nowrap;
+}
+
+.submit:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.submit:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.feedbackCorrect {
+  font-size: var(--text-lg);
+  color: var(--color-success);
+  font-weight: 600;
+}
+
+.feedbackWrong {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--color-error);
+  font-size: var(--text-sm);
+}
+
+.correctAnswer {
+  font-family: var(--font-jp);
+  font-size: var(--text-lg);
+  color: var(--color-text);
+}
