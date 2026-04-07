@@ -11,6 +11,7 @@ import { SearchBar } from '@/components/browse/SearchBar'
 import { Dashboard } from '@/components/progress/Dashboard'
 import { SettingsPage } from '@/components/settings/SettingsPage'
 import { useKanjiData } from '@/hooks/useKanjiData'
+import { useCardStatus } from '@/hooks/useCardStatus'
 import type { KanjiEntry } from '@/core/srs/types'
 import { katakanaToHiragana, normalizeReading } from '@/utils/japanese'
 
@@ -22,6 +23,7 @@ export function App() {
   const [searchQuery, setSearchQuery] = useState('')
   const [filter, setFilter] = useState<KanjiFilter>({ grades: [], jlptLevels: [], status: [] })
   const { kanji, loading, error } = useKanjiData()
+  const cardStatusMap = useCardStatus()
 
   const handleSelectKanji = useCallback((k: KanjiEntry) => {
     setSelectedKanji(k)
@@ -95,7 +97,7 @@ export function App() {
           <div style={{ width: '100%', maxWidth: '960px', display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)', alignItems: 'center' }}>
             <SearchBar value={searchQuery} onChange={setSearchQuery} />
             <FilterBar filter={filter} onChange={setFilter} />
-            <KanjiGrid kanji={filteredKanji} onSelect={handleSelectKanji} />
+            <KanjiGrid kanji={filteredKanji} onSelect={handleSelectKanji} statusMap={cardStatusMap} />
           </div>
         )}
 

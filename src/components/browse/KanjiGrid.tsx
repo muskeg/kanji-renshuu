@@ -1,13 +1,15 @@
 import { useMemo } from 'react'
 import type { KanjiEntry } from '@/core/srs/types'
+import type { CardSrsStatus } from '@/hooks/useCardStatus'
 import styles from './KanjiGrid.module.css'
 
 interface KanjiGridProps {
   kanji: KanjiEntry[]
   onSelect: (kanji: KanjiEntry) => void
+  statusMap?: Map<string, CardSrsStatus>
 }
 
-export function KanjiGrid({ kanji, onSelect }: KanjiGridProps) {
+export function KanjiGrid({ kanji, onSelect, statusMap }: KanjiGridProps) {
   const grouped = useMemo(() => {
     const groups = new Map<number, KanjiEntry[]>()
     for (const k of kanji) {
@@ -43,6 +45,12 @@ export function KanjiGrid({ kanji, onSelect }: KanjiGridProps) {
                 title={k.meanings[0]}
                 type="button"
               >
+                {statusMap && (
+                  <span
+                    className={styles.statusDot}
+                    data-status={statusMap.get(k.literal) ?? 'new'}
+                  />
+                )}
                 <span className={styles.literal}>{k.literal}</span>
                 <span className={styles.meaning}>{k.meanings[0]}</span>
               </button>

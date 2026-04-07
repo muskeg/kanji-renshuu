@@ -40,6 +40,7 @@
 }
 
 .tile {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -57,6 +58,31 @@
 .tile:hover {
   background: var(--color-surface-hover);
   border-color: var(--color-primary);
+}
+
+.statusDot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.statusDot[data-status='new'] {
+  background: var(--color-text-secondary);
+}
+
+.statusDot[data-status='learning'] {
+  background: var(--color-warning);
+}
+
+.statusDot[data-status='mature'] {
+  background: var(--color-success);
+}
+
+.statusDot[data-status='overdue'] {
+  background: var(--color-error);
 }
 
 .literal {
