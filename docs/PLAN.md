@@ -167,6 +167,25 @@ src/
 23. ~~**GitHub Pages deployment** — CI/CD via GitHub Actions~~
 24. **E2E tests** — Playwright tests for critical flows (deferred)
 
+### Phase 5: UX Improvements
+> See `docs/ux-improvements.md` for detailed spec.
+
+#### 5A — High Impact (Quick Wins)
+25. **Smart empty-state messaging** — Context-aware messages when no cards are available (daily limit reached, next review countdown, first-time user guidance)
+26. **Header status bar** — Persistent mini-stats strip showing due count, new cards today, and streak
+27. **Session summary: missed cards** — Collapsible list of cards rated Again/Hard with meanings
+
+#### 5B — Medium Impact
+28. **Post-session actions** — "Review Again cards" / "Start new session" / "Done" options after completing a session
+29. **Next review countdown** — Live countdown on idle screen showing when next card becomes due
+30. **Milestone toasts** — Lightweight notifications for achievements (50 kanji, 7-day streak, grade complete)
+31. **Browse: SRS status badges** — Colored dots on kanji tiles (gray=new, orange=learning, green=mature, red=overdue)
+
+#### 5C — Lower Priority
+32. **Daily review forecast** — Predicted review counts for the next 7 days on the Progress page
+33. **Heatmap hover tooltips** — Date-specific stats on hover (reviews, accuracy)
+34. **Grade progress in Study dropdown** — Show completion fraction next to each study option
+
 ---
 
 ## SRS Configuration (FSRS Defaults)

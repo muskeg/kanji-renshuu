@@ -70,4 +70,4 @@ scripts/             # Build-time data pipeline (KanjiDic2 → JSON)
 
 ## Reference
 
-See PLAN.md for full project plan, phased delivery, and architecture details.
+See docs/PLAN.md for full project plan, phased delivery, and architecture details.
