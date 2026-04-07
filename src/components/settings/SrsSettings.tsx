@@ -98,7 +98,7 @@ export function SrsSettings() {
           value={settings.defaultQuizMode}
           onChange={e => handleChange('defaultQuizMode', e.target.value as QuizMode)}
         >
-          <option value="recognition">Recognition</option>
+          <option value="recognition">Flashcards</option>
           <option value="meaning">Meaning Quiz</option>
           <option value="reading">Reading Quiz</option>
           <option value="writing">Writing Practice</option>

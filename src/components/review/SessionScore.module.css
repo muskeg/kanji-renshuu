@@ -1,0 +1,66 @@
+.container {
+  width: 100%;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.total {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-sm);
+  justify-content: center;
+}
+
+.totalLabel {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.totalValue {
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.totalUnit {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--color-border);
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-xs);
+}
+
+.rowLabel {
+  color: var(--color-text-muted);
+}
+
+.rowValue {
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.personalBest {
+  text-align: center;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-warning);
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--color-border);
+}

@@ -1,10 +1,11 @@
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import type {
   ReviewItem,
   ReviewedCard,
   RatingValue,
   SessionPhase,
   SessionSummaryData,
+  QueueStatus,
   KanjiEntry,
   QuizMode,
 } from '@/core/srs/types'
@@ -22,6 +23,7 @@ interface QuizSessionState {
   newCardsCount: number
   sessionStartTime: number
   summary: SessionSummaryData | null
+  queueStatus: QueueStatus | null
 }
 
 export function useQuizSession(kanjiData: KanjiEntry[], mode: QuizMode) {
@@ -34,16 +36,29 @@ export function useQuizSession(kanjiData: KanjiEntry[], mode: QuizMode) {
     newCardsCount: 0,
     sessionStartTime: 0,
     summary: null,
+    queueStatus: null,
   })
 
   const cardStartTimeRef = useRef<number>(0)
+
+  // Prefetch queue status on mount so idle screen shows context
+  useEffect(() => {
+    if (kanjiData.length === 0) return
+    const settings = loadSettings()
+    buildReviewQueue(kanjiData, settings.dailyNewCards).then(queueStatus => {
+      setState(prev => {
+        if (prev.phase !== 'idle') return prev
+        return { ...prev, queueStatus }
+      })
+    })
+  }, [kanjiData])
 
   const startSession = useCallback(async () => {
     const settings = loadSettings()
     const queueStatus = await buildReviewQueue(kanjiData, settings.dailyNewCards)
 
     if (queueStatus.items.length === 0) {
-      setState(prev => ({ ...prev, phase: 'idle', summary: null }))
+      setState(prev => ({ ...prev, phase: 'idle', summary: null, queueStatus }))
       return
     }
 
@@ -58,6 +73,7 @@ export function useQuizSession(kanjiData: KanjiEntry[], mode: QuizMode) {
       newCardsCount: newCount,
       sessionStartTime: Date.now(),
       summary: null,
+      queueStatus,
     })
     cardStartTimeRef.current = Date.now()
   }, [kanjiData])
@@ -119,6 +135,7 @@ export function useQuizSession(kanjiData: KanjiEntry[], mode: QuizMode) {
       newCardsCount: 0,
       sessionStartTime: 0,
       summary: null,
+      queueStatus: null,
     })
   }, [])
 
@@ -130,6 +147,7 @@ export function useQuizSession(kanjiData: KanjiEntry[], mode: QuizMode) {
     currentIndex: state.currentIndex,
     totalCards: state.queue.length,
     summary: state.summary,
+    queueStatus: state.queueStatus,
     startSession,
     rateCard,
     endSession,

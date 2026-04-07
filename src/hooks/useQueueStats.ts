@@ -8,6 +8,7 @@ interface QueueStats {
   newLimit: number
   currentStreak: number
   activatedToday: boolean
+  nextDueDate: Date | null
 }
 
 async function fetchQueueStats(): Promise<QueueStats> {
@@ -21,11 +22,17 @@ async function fetchQueueStats(): Promise<QueueStats> {
     getAllDailyStats(),
   ])
 
-  // Count due cards
+  // Count due cards and find next due date
   let dueCount = 0
+  let nextDueDate: Date | null = null
   for (const card of cards) {
-    if (card.introduced && new Date(card.fsrsCard.due) <= now) {
-      dueCount++
+    if (card.introduced) {
+      const due = new Date(card.fsrsCard.due)
+      if (due <= now) {
+        dueCount++
+      } else if (!nextDueDate || due < nextDueDate) {
+        nextDueDate = due
+      }
     }
   }
 
@@ -59,6 +66,7 @@ async function fetchQueueStats(): Promise<QueueStats> {
     newLimit: settings.dailyNewCards,
     currentStreak: streak,
     activatedToday,
+    nextDueDate,
   }
 }
 
@@ -69,6 +77,7 @@ export function useQueueStats() {
     newLimit: 10,
     currentStreak: 0,
     activatedToday: false,
+    nextDueDate: null,
   })
 
   const refresh = useCallback(() => {

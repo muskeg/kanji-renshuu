@@ -1,5 +1,9 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import type { SessionSummaryData } from '@/core/srs/types'
+import { computeSessionScore, recordScore } from '@/core/srs/scoring'
+import { useQueueStats } from '@/hooks/useQueueStats'
+import { useCountdown } from '@/hooks/useCountdown'
+import { SessionScoreCard } from './SessionScore'
 import styles from './SessionSummary.module.css'
 
 interface SessionSummaryProps {
@@ -20,14 +24,26 @@ function formatTime(ms: number): string {
 
 export function SessionSummary({ summary, onDone, onRetryStruggled, onNewSession }: SessionSummaryProps) {
   const [showStruggled, setShowStruggled] = useState(false)
+  const { currentStreak, dueCount, newToday, newLimit, nextDueDate } = useQueueStats()
+  const countdown = useCountdown(nextDueDate)
   const accuracy = summary.totalReviewed > 0
     ? Math.round((summary.correctCount / summary.totalReviewed) * 100)
     : 0
 
+  const scoreData = useMemo(() => {
+    const score = computeSessionScore(summary, currentStreak)
+    const record = recordScore(score.total)
+    return { score, ...record }
+  }, [summary, currentStreak])
+
   const struggled = summary.reviewedCards.filter(c => c.rating <= 2)
+  const queueEmpty = dueCount === 0
 
   return (
     <div className={styles.container}>
+      <div className={styles.checkmark}>
+        <span className={styles.checkmarkIcon}>✓</span>
+      </div>
       <h2 className={styles.title}>Session Complete</h2>
 
       <div className={styles.stats}>
@@ -73,6 +89,19 @@ export function SessionSummary({ summary, onDone, onRetryStruggled, onNewSession
         </div>
       </div>
 
+      <SessionScoreCard
+        score={scoreData.score}
+        isPersonalBest={scoreData.isPersonalBest}
+        previousBest={scoreData.previousBest}
+      />
+
+      {/* Daily progress update */}
+      <div className={styles.dailyProgress}>
+        <span>Today: {newToday}/{newLimit} new</span>
+        <span className={styles.dailySep}>·</span>
+        <span>{dueCount > 0 ? `${dueCount} reviews left` : 'Reviews done ✅'}</span>
+      </div>
+
       {/* Struggled cards section */}
       {struggled.length > 0 ? (
         <div className={styles.struggled}>
@@ -109,13 +138,18 @@ export function SessionSummary({ summary, onDone, onRetryStruggled, onNewSession
             Review Struggled Cards
           </button>
         )}
-        {onNewSession && (
-          <button className={styles.buttonSecondary} onClick={onNewSession}>
+        {!queueEmpty && onNewSession && (
+          <button className={styles.button} onClick={onNewSession}>
             Start New Session
           </button>
         )}
-        <button className={styles.button} onClick={onDone}>
-          Done
+        {queueEmpty && countdown && (
+          <p className={styles.ctaMessage}>
+            All done for today! Next review in {countdown}.
+          </p>
+        )}
+        <button className={queueEmpty ? styles.button : styles.buttonSecondary} onClick={onDone}>
+          {queueEmpty ? 'Done' : 'Back to Home'}
         </button>
       </div>
     </div>

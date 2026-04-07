@@ -2,6 +2,7 @@ import type { KanjiEntry } from '@/core/srs/types'
 import { useProgress } from '@/hooks/useProgress'
 import { StreakCalendar } from './StreakCalendar'
 import { ReviewForecast } from './ReviewForecast'
+import { GradeJourney } from './GradeJourney'
 import { LevelProgress } from './LevelProgress'
 import styles from './Dashboard.module.css'
 
@@ -104,6 +105,12 @@ export function Dashboard({ kanjiData }: DashboardProps) {
       <section className={styles.section}>
         <h3 className={styles.sectionTitle}>Activity</h3>
         <StreakCalendar dailyActivity={progress.dailyActivity} />
+      </section>
+
+      {/* Grade Journey */}
+      <section className={styles.section}>
+        <h3 className={styles.sectionTitle}>Grade Journey</h3>
+        <GradeJourney gradeProgress={progress.gradeProgress} />
       </section>
 
       {/* Level Progress */}

@@ -6,7 +6,7 @@ export const QUIZ_MODES: Record<
   { label: string; description: string }
 > = {
   recognition: {
-    label: 'Recognition',
+    label: 'Flashcards',
     description: 'See kanji, recall reading & meaning',
   },
   meaning: {

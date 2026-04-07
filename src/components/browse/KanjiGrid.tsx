@@ -30,6 +30,14 @@ export function KanjiGrid({ kanji, onSelect, statusMap }: KanjiGridProps) {
 
   return (
     <div className={styles.container}>
+      {statusMap && (
+        <div className={styles.legend}>
+          <span className={styles.legendItem}><span className={styles.legendDot} data-status="new" /> New</span>
+          <span className={styles.legendItem}><span className={styles.legendDot} data-status="learning" /> Learning</span>
+          <span className={styles.legendItem}><span className={styles.legendDot} data-status="mature" /> Mastered</span>
+          <span className={styles.legendItem}><span className={styles.legendDot} data-status="overdue" /> Overdue</span>
+        </div>
+      )}
       {grouped.map(([grade, entries]) => (
         <section key={grade} className={styles.section}>
           <h3 className={styles.gradeHeader}>

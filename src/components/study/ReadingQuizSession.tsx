@@ -2,6 +2,7 @@ import type { KanjiEntry } from '@/core/srs/types'
 import { useQuizSession } from '@/hooks/useQuizSession'
 import { ReadingQuiz } from './ReadingQuiz'
 import { SessionSummary } from '@/components/review/SessionSummary'
+import { EmptyState } from '@/components/review/EmptyState'
 import styles from './QuizSession.module.css'
 
 interface ReadingQuizSessionProps {
@@ -15,6 +16,7 @@ export function ReadingQuizSession({ kanjiData }: ReadingQuizSessionProps) {
     currentIndex,
     totalCards,
     summary,
+    queueStatus,
     startSession,
     rateCard,
     endSession,
@@ -25,6 +27,10 @@ export function ReadingQuizSession({ kanjiData }: ReadingQuizSessionProps) {
   }
 
   if (phase === 'idle' || !currentItem) {
+    if (queueStatus) {
+      return <EmptyState status={queueStatus} onStart={startSession} modeName="Reading Quiz" />
+    }
+
     return (
       <div className={styles.empty}>
         <div className={styles.emptyIcon}>読</div>

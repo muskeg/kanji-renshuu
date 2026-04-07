@@ -59,7 +59,7 @@ export function Header({ currentView, onNavigate }: HeaderProps) {
                 className={`${styles.dropdownItem} ${currentView === 'review' ? styles.dropdownItemActive : ''}`}
                 onClick={() => { onNavigate('review'); setStudyOpen(false) }}
               >
-                Recognition
+                Flashcards
               </button>
               <button
                 className={`${styles.dropdownItem} ${currentView === 'meaning-quiz' ? styles.dropdownItemActive : ''}`}

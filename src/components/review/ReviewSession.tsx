@@ -4,6 +4,7 @@ import { FlashCard } from './FlashCard'
 import { RatingButtons } from './RatingButtons'
 import { SessionSummary } from './SessionSummary'
 import { EmptyState } from './EmptyState'
+import { RatingTooltip } from '@/components/onboarding/RatingTooltip'
 import styles from './ReviewSession.module.css'
 
 interface ReviewSessionProps {
@@ -89,10 +90,13 @@ export function ReviewSession({ kanjiData }: ReviewSessionProps) {
         />
 
         {isFlipped && (
-          <RatingButtons
-            card={currentItem.cardState.fsrsCard}
-            onRate={rateCard}
-          />
+          <>
+            <RatingTooltip />
+            <RatingButtons
+              card={currentItem.cardState.fsrsCard}
+              onRate={rateCard}
+            />
+          </>
         )}
       </div>
     </div>
