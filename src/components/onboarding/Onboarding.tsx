@@ -58,7 +58,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
               >
                 <span className={styles.optionLabel}>{opt.label}</span>
                 <span className={styles.optionDesc}>{opt.desc}</span>
-                {opt.recommended && <span className={styles.badge}>Recommended</span>}
+                {'recommended' in opt && <span className={styles.badge}>Recommended</span>}
               </button>
             ))}
           </div>
