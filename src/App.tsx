@@ -1,5 +1,7 @@
 import { useState, useMemo, useCallback } from 'react'
 import { Header } from '@/components/layout/Header'
+import { ToastContainer } from '@/components/ui/Toast'
+import { useToastListener } from '@/hooks/useToast'
 import { ReviewSession } from '@/components/review/ReviewSession'
 import { MeaningQuizSession } from '@/components/study/MeaningQuizSession'
 import { ReadingQuizSession } from '@/components/study/ReadingQuizSession'
@@ -24,6 +26,7 @@ export function App() {
   const [filter, setFilter] = useState<KanjiFilter>({ grades: [], jlptLevels: [], status: [] })
   const { kanji, loading, error } = useKanjiData()
   const cardStatusMap = useCardStatus()
+  const { toasts, dismissToast } = useToastListener()
 
   const handleSelectKanji = useCallback((k: KanjiEntry) => {
     setSelectedKanji(k)
@@ -113,6 +116,7 @@ export function App() {
           <SettingsPage />
         )}
       </main>
+      <ToastContainer toasts={toasts} onDismiss={dismissToast} />
     </>
   )
 }

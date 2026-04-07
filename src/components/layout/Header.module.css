@@ -44,6 +44,13 @@
   min-height: 44px;
   display: flex;
   align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.gradeProgress {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
 }
 
 .navButton:hover {

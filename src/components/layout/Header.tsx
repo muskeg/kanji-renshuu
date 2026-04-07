@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { StatusBar } from './StatusBar'
+import { useActiveGrade } from '@/hooks/useActiveGrade'
 import styles from './Header.module.css'
 
 interface HeaderProps {
@@ -24,6 +25,7 @@ export function Header({ currentView, onNavigate }: HeaderProps) {
   }, [])
 
   const isStudyView = STUDY_VIEWS.includes(currentView)
+  const activeGrade = useActiveGrade()
 
   return (
     <>
@@ -45,6 +47,11 @@ export function Header({ currentView, onNavigate }: HeaderProps) {
             aria-haspopup="true"
           >
             Study ▾
+            {activeGrade && (
+              <span className={styles.gradeProgress}>
+                G{activeGrade.grade}: {activeGrade.introduced}/{activeGrade.total}
+              </span>
+            )}
           </button>
           {studyOpen && (
             <div className={styles.dropdownMenu}>

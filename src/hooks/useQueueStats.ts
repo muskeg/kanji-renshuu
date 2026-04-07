@@ -84,8 +84,18 @@ export function useQueueStats() {
         fetchQueueStats().then(setStats)
       }
     }
+
+    // Re-query after any review/quiz session completes
+    function handleReviewComplete() {
+      fetchQueueStats().then(setStats)
+    }
+
     document.addEventListener('visibilitychange', handleVisibility)
-    return () => document.removeEventListener('visibilitychange', handleVisibility)
+    window.addEventListener('kanji-review-complete', handleReviewComplete)
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibility)
+      window.removeEventListener('kanji-review-complete', handleReviewComplete)
+    }
   }, [])
 
   return { ...stats, refresh }

@@ -1,6 +1,7 @@
 import type { KanjiEntry } from '@/core/srs/types'
 import { useProgress } from '@/hooks/useProgress'
 import { StreakCalendar } from './StreakCalendar'
+import { ReviewForecast } from './ReviewForecast'
 import { LevelProgress } from './LevelProgress'
 import styles from './Dashboard.module.css'
 
@@ -56,6 +57,12 @@ export function Dashboard({ kanjiData }: DashboardProps) {
             <span className={styles.statLabel}>Time</span>
           </div>
         </div>
+      </section>
+
+      {/* Upcoming Reviews Forecast */}
+      <section className={styles.section}>
+        <h3 className={styles.sectionTitle}>Upcoming Reviews</h3>
+        <ReviewForecast />
       </section>
 
       {/* Streak */}

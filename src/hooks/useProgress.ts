@@ -14,7 +14,7 @@ export interface ProgressData {
   notStarted: number
   gradeProgress: { grade: number; total: number; introduced: number }[]
   jlptProgress: { level: number; total: number; introduced: number }[]
-  dailyActivity: { date: string; count: number }[]
+  dailyActivity: { date: string; count: number; correct: number }[]
   retentionRate: number
   loading: boolean
 }
@@ -137,7 +137,7 @@ export function useProgress(kanjiData: KanjiEntry[]): ProgressData {
         .sort((a, b) => b.level - a.level) // N5 first (5, 4, 3, 2, 1)
 
       // Daily activity
-      const dailyActivity = allStats.map(s => ({ date: s.date, count: s.reviewsCompleted }))
+      const dailyActivity = allStats.map(s => ({ date: s.date, count: s.reviewsCompleted, correct: s.correctCount }))
 
       if (!cancelled) {
         setData({

@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import styles from './StreakCalendar.module.css'
 
 interface StreakCalendarProps {
-  dailyActivity: { date: string; count: number }[]
+  dailyActivity: { date: string; count: number; correct: number }[]
 }
 
 function getColorLevel(count: number): string {
@@ -13,12 +13,20 @@ function getColorLevel(count: number): string {
   return styles.level4
 }
 
+function formatTooltip(date: string, count: number, correct: number): string {
+  const d = new Date(date + 'T00:00:00')
+  const formatted = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  if (count === 0) return `${formatted}\nNo reviews`
+  const accuracy = Math.round((correct / count) * 100)
+  return `${formatted}\n${count} reviews · ${accuracy}% accuracy`
+}
+
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 const DAYS = ['', 'M', '', 'W', '', 'F', '']
 
 export function StreakCalendar({ dailyActivity }: StreakCalendarProps) {
   const { weeks, monthLabels } = useMemo(() => {
-    const activityMap = new Map(dailyActivity.map(a => [a.date, a.count]))
+    const activityMap = new Map(dailyActivity.map(a => [a.date, { count: a.count, correct: a.correct }]))
 
     const today = new Date()
     today.setHours(0, 0, 0, 0)
@@ -33,9 +41,9 @@ export function StreakCalendar({ dailyActivity }: StreakCalendarProps) {
       start.setDate(start.getDate() - startDay)
     }
 
-    const weeks: { date: string; count: number; dayOfWeek: number }[][] = []
+    const weeks: { date: string; count: number; correct: number; dayOfWeek: number }[][] = []
     const monthLabels: { label: string; weekIndex: number }[] = []
-    let currentWeek: { date: string; count: number; dayOfWeek: number }[] = []
+    let currentWeek: { date: string; count: number; correct: number; dayOfWeek: number }[] = []
     let lastMonth = -1
 
     const d = new Date(start)
@@ -50,9 +58,11 @@ export function StreakCalendar({ dailyActivity }: StreakCalendarProps) {
         lastMonth = month
       }
 
+      const activity = activityMap.get(dateStr)
       currentWeek.push({
         date: dateStr,
-        count: activityMap.get(dateStr) ?? 0,
+        count: activity?.count ?? 0,
+        correct: activity?.correct ?? 0,
         dayOfWeek: d.getDay(),
       })
 
@@ -99,7 +109,7 @@ export function StreakCalendar({ dailyActivity }: StreakCalendarProps) {
                   <div
                     key={di}
                     className={`${styles.cell} ${getColorLevel(day.count)}`}
-                    title={`${day.date}: ${day.count} reviews`}
+                    data-tooltip={formatTooltip(day.date, day.count, day.correct)}
                     style={{ gridRow: day.dayOfWeek + 1 }}
                   />
                 ))}

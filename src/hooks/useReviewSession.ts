@@ -9,6 +9,8 @@ import type {
   KanjiEntry,
 } from '@/core/srs/types'
 import { buildReviewQueue, processReview, computeSessionSummary } from '@/core/srs/session'
+import { checkMilestones } from '@/core/srs/milestones'
+import { showToast } from '@/hooks/useToast'
 import { loadSettings } from '@/core/storage/settings'
 
 interface ReviewSessionState {
@@ -109,6 +111,12 @@ export function useReviewSession(kanjiData: KanjiEntry[]) {
       // Session complete
       const totalTimeMs = Date.now() - state.sessionStartTime
       const summary = computeSessionSummary(newRatings, newReviewedCards, state.newCardsCount, totalTimeMs)
+      window.dispatchEvent(new Event('kanji-review-complete'))
+      checkMilestones(kanjiData).then(events => {
+        for (const event of events) {
+          showToast({ title: event.title, body: event.body, icon: event.icon })
+        }
+      })
       setState(prev => ({
         ...prev,
         phase: 'summary',
@@ -127,7 +135,7 @@ export function useReviewSession(kanjiData: KanjiEntry[]) {
       }))
       cardStartTimeRef.current = Date.now()
     }
-  }, [state])
+  }, [state, kanjiData])
 
   const endSession = useCallback(() => {
     setState({
