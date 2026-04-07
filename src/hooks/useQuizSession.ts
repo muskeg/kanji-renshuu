@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef } from 'react'
 import type {
   ReviewItem,
+  ReviewedCard,
   RatingValue,
   SessionPhase,
   SessionSummaryData,
@@ -15,6 +16,7 @@ interface QuizSessionState {
   queue: ReviewItem[]
   currentIndex: number
   ratings: RatingValue[]
+  reviewedCards: ReviewedCard[]
   newCardsCount: number
   sessionStartTime: number
   summary: SessionSummaryData | null
@@ -26,6 +28,7 @@ export function useQuizSession(kanjiData: KanjiEntry[], mode: QuizMode) {
     queue: [],
     currentIndex: 0,
     ratings: [],
+    reviewedCards: [],
     newCardsCount: 0,
     sessionStartTime: 0,
     summary: null,
@@ -35,20 +38,21 @@ export function useQuizSession(kanjiData: KanjiEntry[], mode: QuizMode) {
 
   const startSession = useCallback(async () => {
     const settings = loadSettings()
-    const queue = await buildReviewQueue(kanjiData, settings.dailyNewCards)
+    const queueStatus = await buildReviewQueue(kanjiData, settings.dailyNewCards)
 
-    if (queue.length === 0) {
+    if (queueStatus.items.length === 0) {
       setState(prev => ({ ...prev, phase: 'idle', summary: null }))
       return
     }
 
-    const newCount = queue.filter(item => !item.cardState.introduced).length
+    const newCount = queueStatus.items.filter(item => !item.cardState.introduced).length
 
     setState({
       phase: 'reviewing',
-      queue,
+      queue: queueStatus.items,
       currentIndex: 0,
       ratings: [],
+      reviewedCards: [],
       newCardsCount: newCount,
       sessionStartTime: Date.now(),
       summary: null,
@@ -65,15 +69,25 @@ export function useQuizSession(kanjiData: KanjiEntry[], mode: QuizMode) {
     await processReview(currentItem, rating, mode, responseTimeMs)
 
     const newRatings = [...state.ratings, rating]
+    const newReviewedCards: ReviewedCard[] = [...state.reviewedCards, {
+      kanjiLiteral: currentItem.kanji.literal,
+      rating,
+      meanings: currentItem.kanji.meanings,
+      readings: {
+        onYomi: currentItem.kanji.readings.onYomi,
+        kunYomi: currentItem.kanji.readings.kunYomi,
+      },
+    }]
     const nextIndex = state.currentIndex + 1
 
     if (nextIndex >= state.queue.length) {
       const totalTimeMs = Date.now() - state.sessionStartTime
-      const summary = computeSessionSummary(newRatings, state.newCardsCount, totalTimeMs)
+      const summary = computeSessionSummary(newRatings, newReviewedCards, state.newCardsCount, totalTimeMs)
       setState(prev => ({
         ...prev,
         phase: 'summary',
         ratings: newRatings,
+        reviewedCards: newReviewedCards,
         summary,
       }))
     } else {
@@ -81,6 +95,7 @@ export function useQuizSession(kanjiData: KanjiEntry[], mode: QuizMode) {
         ...prev,
         currentIndex: nextIndex,
         ratings: newRatings,
+        reviewedCards: newReviewedCards,
       }))
       cardStartTimeRef.current = Date.now()
     }
@@ -92,6 +107,7 @@ export function useQuizSession(kanjiData: KanjiEntry[], mode: QuizMode) {
       queue: [],
       currentIndex: 0,
       ratings: [],
+      reviewedCards: [],
       newCardsCount: 0,
       sessionStartTime: 0,
       summary: null,

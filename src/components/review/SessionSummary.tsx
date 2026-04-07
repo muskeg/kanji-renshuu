@@ -5,8 +5,8 @@ import styles from './SessionSummary.module.css'
 interface SessionSummaryProps {
   summary: SessionSummaryData
   onDone: () => void
-  onRetryStruggled: (() => void) | null
-  onNewSession: () => void
+  onRetryStruggled?: (() => void) | null
+  onNewSession?: () => void
 }
 
 function formatTime(ms: number): string {
@@ -109,9 +109,11 @@ export function SessionSummary({ summary, onDone, onRetryStruggled, onNewSession
             Review Struggled Cards
           </button>
         )}
-        <button className={styles.buttonSecondary} onClick={onNewSession}>
-          Start New Session
-        </button>
+        {onNewSession && (
+          <button className={styles.buttonSecondary} onClick={onNewSession}>
+            Start New Session
+          </button>
+        )}
         <button className={styles.button} onClick={onDone}>
           Done
         </button>
