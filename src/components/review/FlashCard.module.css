@@ -2,7 +2,6 @@
 .scene {
   width: 100%;
   max-width: 480px;
-  min-height: 320px;
   perspective: 1000px;
   cursor: pointer;
   user-select: none;
@@ -12,7 +11,6 @@
 .card {
   position: relative;
   width: 100%;
-  min-height: 320px;
   transform-style: preserve-3d;
   transition: transform 400ms ease-in-out, box-shadow 400ms ease-in-out;
 }
@@ -33,14 +31,13 @@
   transform: rotateY(180deg) scale(0.98);
 }
 
-/* Shared face styles */
+/* Front face — in normal flow to size the card */
 .face {
-  position: absolute;
-  inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  min-height: 320px;
   backface-visibility: hidden;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -48,10 +45,13 @@
   padding: var(--spacing-xl);
 }
 
-/* Back face — pre-rotated 180° */
+/* Back face — absolute overlay, pre-rotated 180° */
 .faceBack {
+  position: absolute;
+  inset: 0;
   transform: rotateY(180deg);
   gap: var(--spacing-md);
+  overflow-y: auto;
 }
 
 .kanji {
