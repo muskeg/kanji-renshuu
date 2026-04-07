@@ -102,21 +102,27 @@ export function EmptyState({ status, onStart, modeName }: EmptyStateProps) {
         </div>
       )
 
-    case 'has-cards':
+    case 'has-cards': {
+      const reviewCount = status.items.filter(i => i.cardState.introduced).length
+      const newCount = status.items.length - reviewCount
+      const description = [
+        reviewCount > 0 ? `${reviewCount} review${reviewCount === 1 ? '' : 's'} due` : '',
+        newCount > 0 ? `${newCount} new kanji to learn` : '',
+      ].filter(Boolean).join(' · ')
+
       return (
         <div className={styles.container}>
           {!modeName && <StreakRecovery />}
           <div className={styles.icon}>漢</div>
           <h2 className={styles.title}>{modeName ?? 'Ready to Study'}</h2>
-          <p className={styles.body}>
-            {status.items.length} card{status.items.length === 1 ? '' : 's'} waiting for you.
-          </p>
+          <p className={styles.body}>{description}</p>
           <button className={styles.action} onClick={onStart}>
-            {modeName ? `Start ${modeName}` : 'Start Review'}
+            {modeName ? `Start ${modeName}` : 'Start Session'}
           </button>
           {!modeName && <DailyGoal />}
           {!modeName && <StudySuggestions status={status} onStart={onStart} />}
         </div>
       )
+    }
   }
 }

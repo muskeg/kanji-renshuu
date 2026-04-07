@@ -33,12 +33,20 @@ export function useSuggestions(status: QueueStatus | null): Suggestion[] {
 
       if (cancelled) return
 
-      // 1. Due reviews — always first
-      const dueCount = status!.items.length
-      if (dueCount > 0) {
+      // 1. Cards ready — differentiate reviews vs new
+      const items = status!.items
+      const reviewCount = items.filter(i => i.cardState.introduced).length
+      const newCount = items.length - reviewCount
+      if (reviewCount > 0) {
         result.push({
           icon: '📋',
-          text: `${dueCount} review${dueCount === 1 ? '' : 's'} due — clear your queue first`,
+          text: `${reviewCount} review${reviewCount === 1 ? '' : 's'} due — clear your queue first`,
+          action: 'start',
+        })
+      } else if (newCount > 0) {
+        result.push({
+          icon: '✨',
+          text: `${newCount} new kanji ready to learn`,
           action: 'start',
         })
       }
@@ -56,22 +64,21 @@ export function useSuggestions(status: QueueStatus | null): Suggestion[] {
         })
       }
 
-      // 3. Grade completion proximity — infer from queue items
-      const gradeMap = new Map<number, number>()
-      for (const item of status!.items) {
-        const g = item.kanji.grade
-        gradeMap.set(g, (gradeMap.get(g) ?? 0) + 1)
-      }
+      // 3. Grade focus — only show if reviews span multiple grades
+      if (reviewCount > 0) {
+        const gradeMap = new Map<number, number>()
+        for (const item of items.filter(i => i.cardState.introduced)) {
+          const g = item.kanji.grade
+          gradeMap.set(g, (gradeMap.get(g) ?? 0) + 1)
+        }
 
-      if (gradeMap.size > 0) {
-        // Find the grade with the most items in the queue
-        const [topGrade, count] = [...gradeMap.entries()]
-          .sort((a, b) => b[1] - a[1])[0]!
-        if (count >= 3) {
+        if (gradeMap.size > 1) {
+          const [topGrade, count] = [...gradeMap.entries()]
+            .sort((a, b) => b[1] - a[1])[0]!
           const label = topGrade === 8 ? 'Secondary' : `Grade ${topGrade}`
           result.push({
             icon: '🏅',
-            text: `${label}: ${count} cards due — focus here to progress!`,
+            text: `${label}: ${count} reviews — your most active grade`,
           })
         }
       }

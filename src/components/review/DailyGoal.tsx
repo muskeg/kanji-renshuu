@@ -38,11 +38,11 @@ export function DailyGoal() {
         <div className={styles.barTrack}>
           <div
             className={`${styles.barFill} ${styles.barReview}`}
-            style={{ width: reviewsDone ? '100%' : dueCount > 0 ? '30%' : '0%' }}
+            style={{ width: reviewsDone ? '100%' : '0%' }}
           />
         </div>
         <span className={styles.count}>
-          {reviewsDone ? 'Done ✅' : `${dueCount} due`}
+          {reviewsDone ? 'Done ✅' : dueCount > 0 ? `${dueCount} due` : 'None due'}
         </span>
       </div>
 
