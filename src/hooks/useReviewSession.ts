@@ -4,6 +4,7 @@ import type {
   RatingValue,
   SessionPhase,
   SessionSummaryData,
+  QueueStatus,
   KanjiEntry,
 } from '@/core/srs/types'
 import { buildReviewQueue, processReview, computeSessionSummary } from '@/core/srs/session'
@@ -18,6 +19,7 @@ interface ReviewSessionState {
   newCardsCount: number
   sessionStartTime: number
   summary: SessionSummaryData | null
+  queueStatus: QueueStatus | null
 }
 
 export function useReviewSession(kanjiData: KanjiEntry[]) {
@@ -30,30 +32,44 @@ export function useReviewSession(kanjiData: KanjiEntry[]) {
     newCardsCount: 0,
     sessionStartTime: 0,
     summary: null,
+    queueStatus: null,
   })
 
   const cardStartTimeRef = useRef<number>(0)
 
+  // Prefetch queue status on mount so idle screen shows context
+  useEffect(() => {
+    if (kanjiData.length === 0) return
+    const settings = loadSettings()
+    buildReviewQueue(kanjiData, settings.dailyNewCards).then(queueStatus => {
+      setState(prev => {
+        if (prev.phase !== 'idle') return prev
+        return { ...prev, queueStatus }
+      })
+    })
+  }, [kanjiData])
+
   const startSession = useCallback(async () => {
     const settings = loadSettings()
-    const queue = await buildReviewQueue(kanjiData, settings.dailyNewCards)
+    const queueStatus = await buildReviewQueue(kanjiData, settings.dailyNewCards)
 
-    if (queue.length === 0) {
-      setState(prev => ({ ...prev, phase: 'idle', summary: null }))
+    if (queueStatus.items.length === 0) {
+      setState(prev => ({ ...prev, phase: 'idle', summary: null, queueStatus }))
       return
     }
 
-    const newCount = queue.filter(item => !item.cardState.introduced).length
+    const newCount = queueStatus.items.filter(item => !item.cardState.introduced).length
 
     setState({
       phase: 'reviewing',
-      queue,
+      queue: queueStatus.items,
       currentIndex: 0,
       isFlipped: false,
       ratings: [],
       newCardsCount: newCount,
       sessionStartTime: Date.now(),
       summary: null,
+      queueStatus,
     })
     cardStartTimeRef.current = Date.now()
   }, [kanjiData])
@@ -108,6 +124,7 @@ export function useReviewSession(kanjiData: KanjiEntry[]) {
       newCardsCount: 0,
       sessionStartTime: 0,
       summary: null,
+      queueStatus: null,
     })
   }, [])
 
@@ -144,6 +161,7 @@ export function useReviewSession(kanjiData: KanjiEntry[]) {
     totalCards: state.queue.length,
     isFlipped: state.isFlipped,
     summary: state.summary,
+    queueStatus: state.queueStatus,
     startSession,
     flipCard,
     rateCard,

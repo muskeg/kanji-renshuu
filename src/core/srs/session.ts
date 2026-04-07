@@ -5,6 +5,7 @@ import type {
   ReviewLogEntry,
   RatingValue,
   SessionSummaryData,
+  QueueStatus,
   KanjiEntry,
   DailyStats,
   QuizMode,
@@ -24,7 +25,7 @@ import {
 export async function buildReviewQueue(
   kanjiData: KanjiEntry[],
   dailyNewLimit: number,
-): Promise<ReviewItem[]> {
+): Promise<QueueStatus> {
   const now = new Date()
   const today = todayDateString()
   const todayStats = await getDailyStats(today)
@@ -33,12 +34,21 @@ export async function buildReviewQueue(
   const introduced = await getIntroducedCards()
   const dueItems: ReviewItem[] = []
 
+  // Track next due date across all introduced cards
+  let nextDueDate: Date | null = null
+
   // Gather due reviews
   for (const cardState of introduced) {
     if (isDue(cardState.fsrsCard, now)) {
       const kanji = kanjiData.find(k => k.literal === cardState.kanjiLiteral)
       if (kanji) {
         dueItems.push({ cardState, kanji })
+      }
+    } else {
+      // Not due yet — track nearest future due date
+      const due = new Date(cardState.fsrsCard.due)
+      if (due > now && (!nextDueDate || due < nextDueDate)) {
+        nextDueDate = due
       }
     }
   }
@@ -73,7 +83,33 @@ export async function buildReviewQueue(
     }
   }
 
-  return [...dueItems, ...newItems]
+  const items = [...dueItems, ...newItems]
+  const totalIntroduced = introduced.length
+  const totalKanji = kanjiData.length
+
+  // Determine reason for empty/non-empty queue
+  let reason: QueueStatus['reason']
+  if (items.length > 0) {
+    reason = 'has-cards'
+  } else if (totalIntroduced === 0) {
+    reason = 'no-cards'
+  } else if (totalIntroduced >= totalKanji && dueItems.length === 0) {
+    reason = 'all-mastered'
+  } else if (newCardsToday >= dailyNewLimit && dueItems.length === 0) {
+    reason = 'daily-limit'
+  } else {
+    reason = 'all-scheduled'
+  }
+
+  return {
+    items,
+    reason,
+    nextDueDate,
+    newCardsToday,
+    newCardsLimit: dailyNewLimit,
+    totalIntroduced,
+    totalKanji,
+  }
 }
 
 /** Process a single review rating and update storage */

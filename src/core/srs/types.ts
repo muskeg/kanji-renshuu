@@ -84,6 +84,17 @@ export interface ReviewItem {
   kanji: KanjiEntry
 }
 
+/** Queue build result with context about why the queue may be empty */
+export interface QueueStatus {
+  items: ReviewItem[]
+  reason: 'has-cards' | 'daily-limit' | 'all-scheduled' | 'no-cards' | 'all-mastered'
+  nextDueDate: Date | null
+  newCardsToday: number
+  newCardsLimit: number
+  totalIntroduced: number
+  totalKanji: number
+}
+
 /** Session summary after review completion */
 export interface SessionSummaryData {
   totalReviewed: number

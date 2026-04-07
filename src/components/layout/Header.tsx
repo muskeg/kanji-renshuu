@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { StatusBar } from './StatusBar'
 import styles from './Header.module.css'
 
 interface HeaderProps {
@@ -25,6 +26,7 @@ export function Header({ currentView, onNavigate }: HeaderProps) {
   const isStudyView = STUDY_VIEWS.includes(currentView)
 
   return (
+    <>
     <header className={styles.header}>
       <div className={styles.brand}>
         <span className={styles.logo}>漢</span>
@@ -93,5 +95,7 @@ export function Header({ currentView, onNavigate }: HeaderProps) {
         </button>
       </nav>
     </header>
+    <StatusBar />
+    </>
   )
 }

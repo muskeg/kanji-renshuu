@@ -3,6 +3,7 @@ import { useReviewSession } from '@/hooks/useReviewSession'
 import { FlashCard } from './FlashCard'
 import { RatingButtons } from './RatingButtons'
 import { SessionSummary } from './SessionSummary'
+import { EmptyState } from './EmptyState'
 import styles from './ReviewSession.module.css'
 
 interface ReviewSessionProps {
@@ -17,6 +18,7 @@ export function ReviewSession({ kanjiData }: ReviewSessionProps) {
     totalCards,
     isFlipped,
     summary,
+    queueStatus,
     startSession,
     flipCard,
     rateCard,
@@ -28,6 +30,10 @@ export function ReviewSession({ kanjiData }: ReviewSessionProps) {
   }
 
   if (phase === 'idle' || !currentItem) {
+    if (queueStatus) {
+      return <EmptyState status={queueStatus} onStart={startSession} />
+    }
+
     return (
       <div className={styles.empty}>
         <div className={styles.emptyKanji}>漢</div>
