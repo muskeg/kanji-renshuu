@@ -1,19 +1,21 @@
-import type { QueueStatus } from '@/core/srs/types'
+import type { QueueStatus, KanjiEntry } from '@/core/srs/types'
 import { useCountdown } from '@/hooks/useCountdown'
 import { Onboarding } from '@/components/onboarding/Onboarding'
 import { isOnboarded } from '@/core/storage/onboarding'
 import { DailyGoal } from './DailyGoal'
 import { StudySuggestions } from './StudySuggestions'
 import { StreakRecovery } from './StreakRecovery'
+import { KanjiOfTheDay } from './KanjiOfTheDay'
 import styles from './EmptyState.module.css'
 
 interface EmptyStateProps {
   status: QueueStatus
   onStart: () => void
   modeName?: string
+  kanjiData?: KanjiEntry[]
 }
 
-export function EmptyState({ status, onStart, modeName }: EmptyStateProps) {
+export function EmptyState({ status, onStart, modeName, kanjiData }: EmptyStateProps) {
   const { reason, nextDueDate, newCardsToday, newCardsLimit, totalIntroduced, totalKanji } = status
   const countdown = useCountdown(nextDueDate)
 
@@ -65,6 +67,7 @@ export function EmptyState({ status, onStart, modeName }: EmptyStateProps) {
           </p>
           {!modeName && <DailyGoal />}
           {!modeName && <StudySuggestions status={status} onStart={onStart} />}
+          {!modeName && kanjiData && <KanjiOfTheDay kanjiData={kanjiData} />}
           {queueHint}
         </div>
       )
@@ -81,6 +84,7 @@ export function EmptyState({ status, onStart, modeName }: EmptyStateProps) {
           </p>
           {!modeName && <DailyGoal />}
           {!modeName && <StudySuggestions status={status} onStart={onStart} />}
+          {!modeName && kanjiData && <KanjiOfTheDay kanjiData={kanjiData} />}
           {queueHint}
         </div>
       )

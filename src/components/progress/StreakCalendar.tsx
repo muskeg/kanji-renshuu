@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { getFrozenDates } from '@/core/srs/streakFreeze'
 import styles from './StreakCalendar.module.css'
 
@@ -26,6 +26,7 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 const DAYS = ['', 'M', '', 'W', '', 'F', '']
 
 export function StreakCalendar({ dailyActivity }: StreakCalendarProps) {
+  const [selected, setSelected] = useState<{ date: string; count: number; correct: number } | null>(null)
   const { weeks, monthLabels } = useMemo(() => {
     const activityMap = new Map(dailyActivity.map(a => [a.date, { count: a.count, correct: a.correct }]))
     const frozenDates = getFrozenDates()
@@ -43,9 +44,11 @@ export function StreakCalendar({ dailyActivity }: StreakCalendarProps) {
       start.setDate(start.getDate() - startDay)
     }
 
-    const weeks: { date: string; count: number; correct: number; dayOfWeek: number; frozen: boolean }[][] = []
+    const todayStr = today.toISOString().split('T')[0]
+
+    const weeks: { date: string; count: number; correct: number; dayOfWeek: number; frozen: boolean; isToday: boolean }[][] = []
     const monthLabels: { label: string; weekIndex: number }[] = []
-    let currentWeek: { date: string; count: number; correct: number; dayOfWeek: number; frozen: boolean }[] = []
+    let currentWeek: { date: string; count: number; correct: number; dayOfWeek: number; frozen: boolean; isToday: boolean }[] = []
     let lastMonth = -1
 
     const d = new Date(start)
@@ -67,6 +70,7 @@ export function StreakCalendar({ dailyActivity }: StreakCalendarProps) {
         correct: activity?.correct ?? 0,
         dayOfWeek: d.getDay(),
         frozen: frozenDates.has(dateStr),
+        isToday: dateStr === todayStr,
       })
 
       if (d.getDay() === 6) {
@@ -111,11 +115,14 @@ export function StreakCalendar({ dailyActivity }: StreakCalendarProps) {
                 {week.map((day, di) => (
                   <div
                     key={di}
-                    className={`${styles.cell} ${day.frozen ? styles.frozen : getColorLevel(day.count)}`}
+                    className={`${styles.cell} ${day.frozen ? styles.frozen : getColorLevel(day.count)} ${day.isToday ? styles.today : ''}`}
                     data-tooltip={day.frozen
                       ? `${new Date(day.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}\n❄️ Streak freeze used`
                       : formatTooltip(day.date, day.count, day.correct)}
                     style={{ gridRow: day.dayOfWeek + 1 }}
+                    onClick={() => setSelected(
+                      selected?.date === day.date ? null : { date: day.date, count: day.count, correct: day.correct },
+                    )}
                   >
                     {day.frozen && <span className={styles.frozenIcon}>❄️</span>}
                   </div>
@@ -125,6 +132,24 @@ export function StreakCalendar({ dailyActivity }: StreakCalendarProps) {
           </div>
         </div>
       </div>
+
+      {selected && (
+        <div className={styles.panel}>
+          <span className={styles.panelDate}>
+            {new Date(selected.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+          </span>
+          {selected.count > 0 ? (
+            <>
+              <span className={styles.panelStat}>{selected.count} reviews</span>
+              <span className={styles.panelStat}>
+                {Math.round((selected.correct / selected.count) * 100)}% accuracy
+              </span>
+            </>
+          ) : (
+            <span className={styles.panelStat}>No reviews</span>
+          )}
+        </div>
+      )}
     </div>
   )
 }

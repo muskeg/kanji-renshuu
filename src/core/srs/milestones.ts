@@ -8,7 +8,23 @@ export interface MilestoneEvent {
   icon: string
 }
 
+export interface AchievementDefinition {
+  id: string
+  title: string
+  description: string
+  icon: string
+  category: 'kanji' | 'grade' | 'streak'
+}
+
+export interface AchievementStatus extends AchievementDefinition {
+  earned: boolean
+  dateEarned: string | null
+  progress: number
+  target: number
+}
+
 const MILESTONES_KEY = 'kanji-renshuu-triggered-milestones'
+const MILESTONES_DATES_KEY = 'kanji-renshuu-milestone-dates'
 
 const KANJI_MILESTONES = [
   { count: 10, title: 'First 10 kanji!', body: "You're on your way." },
@@ -27,6 +43,30 @@ const STREAK_MILESTONES = [
   { days: 365, title: 'One full year!', body: '365 days of daily practice!' },
 ] as const
 
+export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
+  ...KANJI_MILESTONES.map(m => ({
+    id: `kanji-${m.count}`,
+    title: m.title.replace('!', ''),
+    description: m.body,
+    icon: '🎉',
+    category: 'kanji' as const,
+  })),
+  ...[1, 2, 3, 4, 5, 6].map(grade => ({
+    id: `grade-${grade}`,
+    title: `Grade ${grade} complete`,
+    description: `Learn all Grade ${grade} kanji`,
+    icon: '🏆',
+    category: 'grade' as const,
+  })),
+  ...STREAK_MILESTONES.map(m => ({
+    id: `streak-${m.days}`,
+    title: m.title.replace('!', ''),
+    description: m.body,
+    icon: '🔥',
+    category: 'streak' as const,
+  })),
+]
+
 function getTriggeredMilestones(): Set<string> {
   try {
     const raw = localStorage.getItem(MILESTONES_KEY)
@@ -41,6 +81,30 @@ function getTriggeredMilestones(): Set<string> {
 
 function saveTriggeredMilestones(milestones: Set<string>): void {
   localStorage.setItem(MILESTONES_KEY, JSON.stringify([...milestones]))
+}
+
+function getMilestoneDates(): Map<string, string> {
+  try {
+    const raw = localStorage.getItem(MILESTONES_DATES_KEY)
+    if (!raw) return new Map()
+    const parsed: unknown = JSON.parse(raw)
+    if (typeof parsed !== 'object' || parsed === null) return new Map()
+    const map = new Map<string, string>()
+    for (const [k, v] of Object.entries(parsed as Record<string, unknown>)) {
+      if (typeof v === 'string') map.set(k, v)
+    }
+    return map
+  } catch {
+    return new Map()
+  }
+}
+
+function saveMilestoneDates(dates: Map<string, string>): void {
+  localStorage.setItem(MILESTONES_DATES_KEY, JSON.stringify(Object.fromEntries(dates)))
+}
+
+export function getEarnedDates(): Map<string, string> {
+  return getMilestoneDates()
 }
 
 /** Check for newly crossed milestones after a review session */
@@ -115,12 +179,17 @@ export async function checkMilestones(kanjiData: KanjiEntry[]): Promise<Mileston
     }
   }
 
-  // Persist triggered milestones
+  // Persist triggered milestones with dates
   if (events.length > 0) {
+    const dates = getMilestoneDates()
     for (const event of events) {
       triggered.add(event.id)
+      if (!dates.has(event.id)) {
+        dates.set(event.id, today)
+      }
     }
     saveTriggeredMilestones(triggered)
+    saveMilestoneDates(dates)
   }
 
   return events

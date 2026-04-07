@@ -4,6 +4,7 @@ import { StreakCalendar } from './StreakCalendar'
 import { ReviewForecast } from './ReviewForecast'
 import { GradeJourney } from './GradeJourney'
 import { LevelProgress } from './LevelProgress'
+import { AchievementGallery } from './AchievementGallery'
 import styles from './Dashboard.module.css'
 
 interface DashboardProps {
@@ -119,6 +120,12 @@ export function Dashboard({ kanjiData }: DashboardProps) {
           gradeProgress={progress.gradeProgress}
           jlptProgress={progress.jlptProgress}
         />
+      </section>
+
+      {/* Achievements */}
+      <section className={styles.section}>
+        <h3 className={styles.sectionTitle}>Achievements</h3>
+        <AchievementGallery kanjiData={kanjiData} />
       </section>
     </div>
   )
