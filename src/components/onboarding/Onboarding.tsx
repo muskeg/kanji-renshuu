@@ -13,9 +13,12 @@ const PACE_OPTIONS = [
   { value: 20, label: '20 per day', desc: 'Intensive — about 4 months' },
 ] as const
 
+type GuidePhase = 'front' | 'back' | 'rated' | 'done'
+
 export function Onboarding({ onComplete }: OnboardingProps) {
   const [step, setStep] = useState(0)
   const [pace, setPace] = useState(10)
+  const [guidePhase, setGuidePhase] = useState<GuidePhase>('front')
 
   function handleFinish() {
     const settings = loadSettings()
@@ -71,34 +74,74 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
       {step === 2 && (
         <div className={styles.step}>
-          <h2 className={styles.title}>How studying works</h2>
-          <ol className={styles.steps}>
-            <li className={styles.stepItem}>
-              <span className={styles.stepNum}>1</span>
-              <span>See a kanji — try to recall its meaning and reading</span>
-            </li>
-            <li className={styles.stepItem}>
-              <span className={styles.stepNum}>2</span>
-              <span>Tap the card to reveal the answer</span>
-            </li>
-            <li className={styles.stepItem}>
-              <span className={styles.stepNum}>3</span>
-              <span>Rate how well you remembered (Again / Hard / Good / Easy)</span>
-            </li>
-          </ol>
-          <p className={styles.body}>
-            The app uses spaced repetition to show harder kanji more often
-            and easier ones less frequently.
-          </p>
-          <div className={styles.modes}>
-            <span className={styles.modeChip}>📖 Flashcards</span>
-            <span className={styles.modeChip}>意 Meaning Quiz</span>
-            <span className={styles.modeChip}>読 Reading Quiz</span>
-            <span className={styles.modeChip}>書 Writing Practice</span>
-          </div>
-          <button className={styles.primaryButton} onClick={handleFinish}>
-            Start Your First Session
-          </button>
+          <h2 className={styles.title}>Try your first card</h2>
+
+          {guidePhase === 'front' && (
+            <>
+              <p className={styles.coach}>
+                This is a kanji. Tap the card to see its reading and meaning.
+              </p>
+              <div
+                className={styles.demoCard}
+                onClick={() => setGuidePhase('back')}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === ' ' || e.key === 'Enter') setGuidePhase('back')
+                }}
+              >
+                <span className={styles.demoKanji}>一</span>
+                <span className={styles.demoHint}>Tap to reveal</span>
+              </div>
+            </>
+          )}
+
+          {guidePhase === 'back' && (
+            <>
+              <p className={styles.coach}>
+                Now rate how well you knew it. Don&apos;t worry — this is just practice!
+              </p>
+              <div className={styles.demoCardBack}>
+                <span className={styles.demoKanjiSmall}>一</span>
+                <span className={styles.demoReading}>イチ · ひと.つ</span>
+                <span className={styles.demoMeaning}>one</span>
+              </div>
+              <div className={styles.demoRatings}>
+                {['Again', 'Hard', 'Good', 'Easy'].map((label) => (
+                  <button
+                    key={label}
+                    className={`${styles.demoRating} ${styles[`demoRating${label}` as keyof typeof styles] ?? ''}`}
+                    onClick={() => setGuidePhase('rated')}
+                    type="button"
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+
+          {guidePhase === 'rated' && (
+            <>
+              <div className={styles.celebration}>🎉</div>
+              <p className={styles.body}>
+                Great! The app will show you this kanji again at the perfect time
+                for long-term memory.
+              </p>
+              <p className={styles.bodySmall}>
+                4 study modes available:
+              </p>
+              <div className={styles.modes}>
+                <span className={styles.modeChip}>📖 Flashcards</span>
+                <span className={styles.modeChip}>意 Meaning Quiz</span>
+                <span className={styles.modeChip}>読 Reading Quiz</span>
+                <span className={styles.modeChip}>書 Writing Practice</span>
+              </div>
+              <button className={styles.primaryButton} onClick={handleFinish}>
+                Start Learning
+              </button>
+            </>
+          )}
         </div>
       )}
 

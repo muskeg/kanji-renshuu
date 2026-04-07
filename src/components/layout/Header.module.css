@@ -35,6 +35,13 @@
   gap: var(--spacing-xs);
 }
 
+/* Hide desktop nav on mobile — BottomNav replaces it */
+@media (max-width: 640px) {
+  .nav {
+    display: none;
+  }
+}
+
 .navButton {
   padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--radius-md);

@@ -10,7 +10,7 @@ interface FlashCardProps {
 export function FlashCard({ kanji, isFlipped, onFlip }: FlashCardProps) {
   return (
     <div
-      className={styles.card}
+      className={styles.scene}
       onClick={onFlip}
       onKeyDown={(e) => {
         if (e.key === ' ' || e.key === 'Enter') {
@@ -22,13 +22,15 @@ export function FlashCard({ kanji, isFlipped, onFlip }: FlashCardProps) {
       tabIndex={0}
       aria-label={isFlipped ? `Kanji ${kanji.literal} details` : `Reveal kanji ${kanji.literal}`}
     >
-      {!isFlipped ? (
-        <>
+      <div className={`${styles.card} ${isFlipped ? styles.flipped : ''}`}>
+        {/* Front face */}
+        <div className={styles.face}>
           <div className={styles.kanji}>{kanji.literal}</div>
           <div className={styles.hint}>Tap to reveal</div>
-        </>
-      ) : (
-        <div className={styles.back} aria-live="polite">
+        </div>
+
+        {/* Back face */}
+        <div className={`${styles.face} ${styles.faceBack}`} aria-live="polite">
           <div className={styles.kanjiSmall}>{kanji.literal}</div>
 
           {kanji.readings.onYomi.length > 0 && (
@@ -67,7 +69,7 @@ export function FlashCard({ kanji, isFlipped, onFlip }: FlashCardProps) {
             )}
           </div>
         </div>
-      )}
+      </div>
     </div>
   )
 }

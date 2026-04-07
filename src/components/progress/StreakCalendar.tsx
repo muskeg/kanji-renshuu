@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { getFrozenDates } from '@/core/srs/streakFreeze'
 import styles from './StreakCalendar.module.css'
 
 interface StreakCalendarProps {
@@ -27,6 +28,7 @@ const DAYS = ['', 'M', '', 'W', '', 'F', '']
 export function StreakCalendar({ dailyActivity }: StreakCalendarProps) {
   const { weeks, monthLabels } = useMemo(() => {
     const activityMap = new Map(dailyActivity.map(a => [a.date, { count: a.count, correct: a.correct }]))
+    const frozenDates = getFrozenDates()
 
     const today = new Date()
     today.setHours(0, 0, 0, 0)
@@ -41,9 +43,9 @@ export function StreakCalendar({ dailyActivity }: StreakCalendarProps) {
       start.setDate(start.getDate() - startDay)
     }
 
-    const weeks: { date: string; count: number; correct: number; dayOfWeek: number }[][] = []
+    const weeks: { date: string; count: number; correct: number; dayOfWeek: number; frozen: boolean }[][] = []
     const monthLabels: { label: string; weekIndex: number }[] = []
-    let currentWeek: { date: string; count: number; correct: number; dayOfWeek: number }[] = []
+    let currentWeek: { date: string; count: number; correct: number; dayOfWeek: number; frozen: boolean }[] = []
     let lastMonth = -1
 
     const d = new Date(start)
@@ -64,6 +66,7 @@ export function StreakCalendar({ dailyActivity }: StreakCalendarProps) {
         count: activity?.count ?? 0,
         correct: activity?.correct ?? 0,
         dayOfWeek: d.getDay(),
+        frozen: frozenDates.has(dateStr),
       })
 
       if (d.getDay() === 6) {
@@ -108,10 +111,14 @@ export function StreakCalendar({ dailyActivity }: StreakCalendarProps) {
                 {week.map((day, di) => (
                   <div
                     key={di}
-                    className={`${styles.cell} ${getColorLevel(day.count)}`}
-                    data-tooltip={formatTooltip(day.date, day.count, day.correct)}
+                    className={`${styles.cell} ${day.frozen ? styles.frozen : getColorLevel(day.count)}`}
+                    data-tooltip={day.frozen
+                      ? `${new Date(day.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}\n❄️ Streak freeze used`
+                      : formatTooltip(day.date, day.count, day.correct)}
                     style={{ gridRow: day.dayOfWeek + 1 }}
-                  />
+                  >
+                    {day.frozen && <span className={styles.frozenIcon}>❄️</span>}
+                  </div>
                 ))}
               </div>
             ))}

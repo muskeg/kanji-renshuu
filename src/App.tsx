@@ -1,5 +1,7 @@
 import { useState, useMemo, useCallback } from 'react'
 import { Header } from '@/components/layout/Header'
+import { BottomNav } from '@/components/layout/BottomNav'
+import { PageTransition } from '@/components/layout/PageTransition'
 import { ToastContainer } from '@/components/ui/Toast'
 import { useToastListener } from '@/hooks/useToast'
 import { ReviewSession } from '@/components/review/ReviewSession'
@@ -68,6 +70,7 @@ export function App() {
     <>
       <Header currentView={currentView} onNavigate={(v) => setCurrentView(v as AppView)} />
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 'var(--spacing-lg)' }}>
+        <PageTransition viewKey={currentView}>
         {error && (
           <div role="alert" style={{ color: 'var(--color-error)', padding: 'var(--spacing-lg)' }}>
             Error: {error}
@@ -115,8 +118,10 @@ export function App() {
         {!loading && !error && currentView === 'settings' && (
           <SettingsPage />
         )}
+        </PageTransition>
       </main>
       <ToastContainer toasts={toasts} onDismiss={dismissToast} />
+      <BottomNav currentView={currentView} onNavigate={(v) => setCurrentView(v as AppView)} />
     </>
   )
 }

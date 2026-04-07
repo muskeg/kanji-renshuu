@@ -70,3 +70,10 @@ a:focus-visible,
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-text-muted);
 }
+
+/* Bottom nav spacing on mobile */
+@media (max-width: 640px) {
+  main {
+    padding-bottom: 72px !important;
+  }
+}

@@ -1,27 +1,57 @@
-.card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
+/* 3D flip scene — provides perspective */
+.scene {
   width: 100%;
   max-width: 480px;
   min-height: 320px;
+  perspective: 1000px;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Inner card — rotates on flip */
+.card {
+  position: relative;
+  width: 100%;
+  min-height: 320px;
+  transform-style: preserve-3d;
+  transition: transform 400ms ease-in-out, box-shadow 400ms ease-in-out;
+}
+
+.card.flipped {
+  transform: rotateY(180deg);
+}
+
+.scene:hover .card {
+  box-shadow: var(--shadow-md);
+}
+
+.scene:active .card {
+  transform: scale(0.98);
+}
+
+.scene:active .card.flipped {
+  transform: rotateY(180deg) scale(0.98);
+}
+
+/* Shared face styles */
+.face {
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  user-select: none;
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
-  perspective: 1000px;
+  backface-visibility: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
 }
 
-.card:hover {
-  box-shadow: var(--shadow-md);
-}
-
-.card:active {
-  transform: scale(0.98);
+/* Back face — pre-rotated 180° */
+.faceBack {
+  transform: rotateY(180deg);
+  gap: var(--spacing-md);
 }
 
 .kanji {
@@ -37,20 +67,6 @@
   font-size: var(--text-sm);
   color: var(--color-text-muted);
   margin-top: var(--spacing-sm);
-}
-
-.back {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-md);
-  width: 100%;
-  animation: fade-in var(--transition-normal) ease-out;
-}
-
-@keyframes fade-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 
 .kanjiSmall {

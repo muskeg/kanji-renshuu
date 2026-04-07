@@ -3,6 +3,8 @@ import { useCountdown } from '@/hooks/useCountdown'
 import { Onboarding } from '@/components/onboarding/Onboarding'
 import { isOnboarded } from '@/core/storage/onboarding'
 import { DailyGoal } from './DailyGoal'
+import { StudySuggestions } from './StudySuggestions'
+import { StreakRecovery } from './StreakRecovery'
 import styles from './EmptyState.module.css'
 
 interface EmptyStateProps {
@@ -62,6 +64,7 @@ export function EmptyState({ status, onStart, modeName }: EmptyStateProps) {
             )}
           </p>
           {!modeName && <DailyGoal />}
+          {!modeName && <StudySuggestions status={status} onStart={onStart} />}
           {queueHint}
         </div>
       )
@@ -77,6 +80,7 @@ export function EmptyState({ status, onStart, modeName }: EmptyStateProps) {
             {totalIntroduced} card{totalIntroduced === 1 ? '' : 's'} scheduled. Check back soon.
           </p>
           {!modeName && <DailyGoal />}
+          {!modeName && <StudySuggestions status={status} onStart={onStart} />}
           {queueHint}
         </div>
       )
@@ -101,6 +105,7 @@ export function EmptyState({ status, onStart, modeName }: EmptyStateProps) {
     case 'has-cards':
       return (
         <div className={styles.container}>
+          {!modeName && <StreakRecovery />}
           <div className={styles.icon}>漢</div>
           <h2 className={styles.title}>{modeName ?? 'Ready to Study'}</h2>
           <p className={styles.body}>
@@ -110,6 +115,7 @@ export function EmptyState({ status, onStart, modeName }: EmptyStateProps) {
             {modeName ? `Start ${modeName}` : 'Start Review'}
           </button>
           {!modeName && <DailyGoal />}
+          {!modeName && <StudySuggestions status={status} onStart={onStart} />}
         </div>
       )
   }

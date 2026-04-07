@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { getAllCardStates, getDailyStats, getAllDailyStats, todayDateString } from '@/core/storage/db'
 import { loadSettings } from '@/core/storage/settings'
+import { getFrozenDates, tryAutoFreeze, recordBrokenStreak, checkFreezeReward } from '@/core/srs/streakFreeze'
 
 interface QueueStats {
   dueCount: number
@@ -36,12 +37,13 @@ async function fetchQueueStats(): Promise<QueueStats> {
     }
   }
 
-  // Current streak: consecutive days with reviews starting from today/yesterday
+  // Current streak: consecutive days with reviews or freeze starting from today/yesterday
   const statsSet = new Set(
     allStats
       .filter(s => s.reviewsCompleted > 0)
       .map(s => s.date),
   )
+  const frozenDates = getFrozenDates()
 
   let streak = 0
   const d = new Date()
@@ -52,13 +54,32 @@ async function fetchQueueStats(): Promise<QueueStats> {
 
   while (true) {
     const dateStr = d.toISOString().split('T')[0]!
-    if (statsSet.has(dateStr)) {
+    if (statsSet.has(dateStr) || frozenDates.has(dateStr)) {
       streak++
       d.setDate(d.getDate() - 1)
     } else {
       break
     }
   }
+
+  // Auto-freeze: if yesterday had reviews but streak would break today
+  if (!activatedToday && streak > 0) {
+    const yesterday = new Date()
+    yesterday.setDate(yesterday.getDate() - 1)
+    const yesterdayStr = yesterday.toISOString().split('T')[0]!
+    if (!statsSet.has(yesterdayStr) && !frozenDates.has(yesterdayStr)) {
+      const frozen = tryAutoFreeze(yesterdayStr)
+      if (frozen) {
+        streak++ // The frozen day now counts
+      } else if (streak >= 3) {
+        // Streak broke and was significant — record it
+        recordBrokenStreak(streak)
+      }
+    }
+  }
+
+  // Award freezes at every 7-day milestone
+  checkFreezeReward(streak)
 
   return {
     dueCount,
