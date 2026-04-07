@@ -7,11 +7,12 @@
  * and outputs grade-split JSON files to src/data/.
  */
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs'
-import { execSync } from 'child_process'
-import { join, dirname } from 'path'
-import { fileURLToPath } from 'url'
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs'
+import { execSync } from 'node:child_process'
+import { join, dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { XMLParser } from 'fast-xml-parser'
+import { parseKanjiVG } from './parse-kanjivg.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -225,6 +226,21 @@ downloadKanjidic2()
 
 console.log('\nParsing KanjiDic2...')
 const entries = parseKanjidic2()
+
+console.log('\nParsing KanjiVG stroke data...')
+const { strokeSvgMap } = parseKanjiVG(CACHE_DIR)
+console.log(`  Found stroke data for ${strokeSvgMap.size} characters`)
+
+// Merge stroke order SVG data into kanji entries
+let strokeHits = 0
+for (const entry of entries) {
+  const svg = strokeSvgMap.get(entry.literal)
+  if (svg) {
+    entry.strokeOrderSvg = svg
+    strokeHits++
+  }
+}
+console.log(`  Matched ${strokeHits}/${entries.length} Jōyō kanji (${((strokeHits / entries.length) * 100).toFixed(1)}%)`)
 
 console.log('\nWriting grade files...')
 writeGradeFiles(entries)
