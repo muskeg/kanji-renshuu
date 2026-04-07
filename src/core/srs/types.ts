@@ -95,6 +95,14 @@ export interface QueueStatus {
   totalKanji: number
 }
 
+/** A reviewed card with its rating for post-session display */
+export interface ReviewedCard {
+  kanjiLiteral: string
+  rating: RatingValue
+  meanings: string[]
+  readings: { onYomi: string[]; kunYomi: string[] }
+}
+
 /** Session summary after review completion */
 export interface SessionSummaryData {
   totalReviewed: number
@@ -105,4 +113,5 @@ export interface SessionSummaryData {
   easyCount: number
   newCardsIntroduced: number
   totalTimeMs: number
+  reviewedCards: ReviewedCard[]
 }

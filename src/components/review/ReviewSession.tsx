@@ -23,10 +23,19 @@ export function ReviewSession({ kanjiData }: ReviewSessionProps) {
     flipCard,
     rateCard,
     endSession,
+    retryStruggled,
+    startNewSession,
   } = useReviewSession(kanjiData)
 
   if (phase === 'summary' && summary) {
-    return <SessionSummary summary={summary} onDone={endSession} />
+    return (
+      <SessionSummary
+        summary={summary}
+        onDone={endSession}
+        onRetryStruggled={retryStruggled}
+        onNewSession={startNewSession}
+      />
+    )
   }
 
   if (phase === 'idle' || !currentItem) {

@@ -1,9 +1,12 @@
+import { useState } from 'react'
 import type { SessionSummaryData } from '@/core/srs/types'
 import styles from './SessionSummary.module.css'
 
 interface SessionSummaryProps {
   summary: SessionSummaryData
   onDone: () => void
+  onRetryStruggled: (() => void) | null
+  onNewSession: () => void
 }
 
 function formatTime(ms: number): string {
@@ -15,10 +18,13 @@ function formatTime(ms: number): string {
   return `${minutes}m ${remainingSeconds}s`
 }
 
-export function SessionSummary({ summary, onDone }: SessionSummaryProps) {
+export function SessionSummary({ summary, onDone, onRetryStruggled, onNewSession }: SessionSummaryProps) {
+  const [showStruggled, setShowStruggled] = useState(false)
   const accuracy = summary.totalReviewed > 0
     ? Math.round((summary.correctCount / summary.totalReviewed) * 100)
     : 0
+
+  const struggled = summary.reviewedCards.filter(c => c.rating <= 2)
 
   return (
     <div className={styles.container}>
@@ -67,9 +73,49 @@ export function SessionSummary({ summary, onDone }: SessionSummaryProps) {
         </div>
       </div>
 
-      <button className={styles.button} onClick={onDone}>
-        Done
-      </button>
+      {/* Struggled cards section */}
+      {struggled.length > 0 ? (
+        <div className={styles.struggled}>
+          <button
+            className={styles.toggleButton}
+            onClick={() => setShowStruggled(s => !s)}
+            type="button"
+          >
+            {showStruggled ? '▾' : '▸'} Struggled Cards ({struggled.length})
+          </button>
+          {showStruggled && (
+            <div className={styles.struggledList}>
+              {struggled.map(card => (
+                <div key={card.kanjiLiteral} className={styles.struggledCard}>
+                  <span className={styles.struggledKanji}>{card.kanjiLiteral}</span>
+                  <span className={styles.struggledReading}>
+                    {card.readings.onYomi[0] ?? card.readings.kunYomi[0] ?? ''}
+                  </span>
+                  <span className={styles.struggledMeaning}>
+                    {card.meanings[0] ?? ''}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        <p className={styles.perfect}>Perfect session! 🎯</p>
+      )}
+
+      <div className={styles.actions}>
+        {onRetryStruggled && (
+          <button className={styles.buttonSecondary} onClick={onRetryStruggled}>
+            Review Struggled Cards
+          </button>
+        )}
+        <button className={styles.buttonSecondary} onClick={onNewSession}>
+          Start New Session
+        </button>
+        <button className={styles.button} onClick={onDone}>
+          Done
+        </button>
+      </div>
     </div>
   )
 }

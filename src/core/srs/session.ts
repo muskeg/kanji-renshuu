@@ -3,6 +3,7 @@ import type {
   CardState,
   ReviewItem,
   ReviewLogEntry,
+  ReviewedCard,
   RatingValue,
   SessionSummaryData,
   QueueStatus,
@@ -175,6 +176,7 @@ export async function processReview(
 /** Compute summary from a completed session of ratings */
 export function computeSessionSummary(
   ratings: RatingValue[],
+  reviewedCards: ReviewedCard[],
   newCardsCount: number,
   totalTimeMs: number,
 ): SessionSummaryData {
@@ -187,5 +189,6 @@ export function computeSessionSummary(
     easyCount: ratings.filter(r => r === 4).length,
     newCardsIntroduced: newCardsCount,
     totalTimeMs,
+    reviewedCards,
   }
 }

@@ -1,5 +1,5 @@
 import type { QueueStatus } from '@/core/srs/types'
-import { formatRelativeTime } from '@/utils/time'
+import { useCountdown } from '@/hooks/useCountdown'
 import styles from './EmptyState.module.css'
 
 interface EmptyStateProps {
@@ -9,6 +9,7 @@ interface EmptyStateProps {
 
 export function EmptyState({ status, onStart }: EmptyStateProps) {
   const { reason, nextDueDate, newCardsToday, newCardsLimit, totalIntroduced, totalKanji } = status
+  const countdown = useCountdown(nextDueDate)
 
   switch (reason) {
     case 'no-cards':
@@ -30,10 +31,10 @@ export function EmptyState({ status, onStart }: EmptyStateProps) {
           <h2 className={styles.title}>All caught up!</h2>
           <p className={styles.body}>
             You've studied {newCardsToday}/{newCardsLimit} new cards today.
-            {nextDueDate && (
+            {countdown && (
               <>
                 <br />
-                Next review in {formatRelativeTime(nextDueDate)}.
+                Next review in {countdown}.
               </>
             )}
           </p>
@@ -45,7 +46,7 @@ export function EmptyState({ status, onStart }: EmptyStateProps) {
         <div className={styles.container}>
           <div className={styles.icon}>⏳</div>
           <h2 className={styles.title}>
-            {nextDueDate ? `Next review in ${formatRelativeTime(nextDueDate)}` : 'All cards scheduled'}
+            {countdown ? `Next review in ${countdown}` : 'All cards scheduled'}
           </h2>
           <p className={styles.body}>
             {totalIntroduced} card{totalIntroduced === 1 ? '' : 's'} scheduled. Check back soon.
@@ -60,10 +61,10 @@ export function EmptyState({ status, onStart }: EmptyStateProps) {
           <h2 className={styles.title}>Incredible!</h2>
           <p className={styles.body}>
             All {totalKanji.toLocaleString()} kanji reviewed.
-            {nextDueDate && (
+            {countdown && (
               <>
                 <br />
-                Next due {formatRelativeTime(nextDueDate)}.
+                Next due {countdown}.
               </>
             )}
           </p>
