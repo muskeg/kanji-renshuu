@@ -22,18 +22,18 @@ interface KanjiVGData {
 }
 
 /**
- * Recursively extract all <path d="..."> values from nested <g>/<path> elements.
- * Preserves document order (which is stroke order in KanjiVG).
+ * Recursively extract all <path> elements with their id and d attribute.
+ * Returns unsorted — caller must sort by stroke number from id.
  */
-function extractPaths(node: unknown): string[] {
+function extractPaths(node: unknown): { id: string; d: string }[] {
   if (node === null || node === undefined || typeof node !== 'object') return []
 
-  const paths: string[] = []
+  const results: { id: string; d: string }[] = []
   const obj = node as Record<string, unknown>
 
   // If this node is a <path> with a d attribute
-  if (obj['@_d'] && typeof obj['@_d'] === 'string') {
-    paths.push(obj['@_d'])
+  if (obj['@_d'] && typeof obj['@_d'] === 'string' && obj['@_id']) {
+    results.push({ id: obj['@_id'] as string, d: obj['@_d'] as string })
   }
 
   // Recurse into <path> children (could be single or array)
@@ -41,8 +41,11 @@ function extractPaths(node: unknown): string[] {
   if (pathChildren) {
     const pathArr = Array.isArray(pathChildren) ? pathChildren : [pathChildren]
     for (const p of pathArr) {
-      if (p && typeof p === 'object' && (p as Record<string, unknown>)['@_d']) {
-        paths.push((p as Record<string, unknown>)['@_d'] as string)
+      if (p && typeof p === 'object') {
+        const po = p as Record<string, unknown>
+        if (po['@_d'] && po['@_id']) {
+          results.push({ id: po['@_id'] as string, d: po['@_d'] as string })
+        }
       }
     }
   }
@@ -52,11 +55,17 @@ function extractPaths(node: unknown): string[] {
   if (gChildren) {
     const gArr = Array.isArray(gChildren) ? gChildren : [gChildren]
     for (const g of gArr) {
-      paths.push(...extractPaths(g))
+      results.push(...extractPaths(g))
     }
   }
 
-  return paths
+  return results
+}
+
+/** Extract the stroke number from a KanjiVG path id like "kvg:0672c-s3" → 3 */
+function strokeNumber(id: string): number {
+  const m = /-s(\d+)$/.exec(id)
+  return m ? parseInt(m[1], 10) : 0
 }
 
 /**
@@ -121,15 +130,19 @@ export function parseKanjiVG(cacheDir: string): KanjiVGData {
 
     const char = String.fromCodePoint(codePoint)
 
-    // Extract all path d-attributes in stroke order
+    // Extract all path d-attributes and sort by stroke number from id
     const gElements = el['g']
     if (!gElements) continue
 
     const gArr = Array.isArray(gElements) ? gElements : [gElements]
-    const paths: string[] = []
+    const rawPaths: { id: string; d: string }[] = []
     for (const g of gArr) {
-      paths.push(...extractPaths(g))
+      rawPaths.push(...extractPaths(g))
     }
+
+    // Sort by stroke number suffix (e.g., kvg:0672c-s1 → 1, kvg:0672c-s2 → 2)
+    rawPaths.sort((a, b) => strokeNumber(a.id) - strokeNumber(b.id))
+    const paths = rawPaths.map(p => p.d)
 
     if (paths.length > 0) {
       strokeSvgMap.set(char, buildSvgString(paths))
