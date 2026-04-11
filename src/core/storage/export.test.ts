@@ -36,6 +36,8 @@ describe('export/import', () => {
         maximumInterval: 365,
         defaultQuizMode: 'recognition',
         showReadingsOnFront: false,
+        theme: 'system',
+        soundEnabled: false,
       })
 
       const json = await exportData()
