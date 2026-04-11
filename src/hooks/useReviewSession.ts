@@ -12,6 +12,7 @@ import { buildReviewQueue, processReview, computeSessionSummary } from '@/core/s
 import { checkMilestones } from '@/core/srs/milestones'
 import { showToast } from '@/hooks/useToast'
 import { loadSettings } from '@/core/storage/settings'
+import { playFlipSound, playCorrectSound, playCelebrationSound, playMilestoneSound } from '@/utils/sounds'
 
 interface ReviewSessionState {
   phase: SessionPhase
@@ -83,6 +84,7 @@ export function useReviewSession(kanjiData: KanjiEntry[]) {
   const flipCard = useCallback(() => {
     setState(prev => {
       if (prev.phase !== 'reviewing' || prev.isFlipped) return prev
+      playFlipSound()
       return { ...prev, isFlipped: true }
     })
   }, [])
@@ -112,8 +114,10 @@ export function useReviewSession(kanjiData: KanjiEntry[]) {
       const totalTimeMs = Date.now() - state.sessionStartTime
       const summary = computeSessionSummary(newRatings, newReviewedCards, state.newCardsCount, totalTimeMs)
       window.dispatchEvent(new Event('kanji-review-complete'))
+      playCelebrationSound()
       checkMilestones(kanjiData).then(events => {
         for (const event of events) {
+          playMilestoneSound()
           showToast({ title: event.title, body: event.body, icon: event.icon })
         }
       })
@@ -134,6 +138,7 @@ export function useReviewSession(kanjiData: KanjiEntry[]) {
         reviewedCards: newReviewedCards,
       }))
       cardStartTimeRef.current = Date.now()
+      if (rating >= 3) playCorrectSound()
     }
   }, [state, kanjiData])
 

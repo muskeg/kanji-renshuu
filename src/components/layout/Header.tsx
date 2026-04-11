@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { StatusBar } from './StatusBar'
 import { useActiveGrade } from '@/hooks/useActiveGrade'
+import { useTheme } from '@/hooks/useTheme'
 import styles from './Header.module.css'
 
 interface HeaderProps {
@@ -26,6 +27,7 @@ export function Header({ currentView, onNavigate }: HeaderProps) {
 
   const isStudyView = STUDY_VIEWS.includes(currentView)
   const activeGrade = useActiveGrade()
+  const { effectiveTheme, cycleTheme } = useTheme()
 
   return (
     <>
@@ -93,6 +95,14 @@ export function Header({ currentView, onNavigate }: HeaderProps) {
           onClick={() => onNavigate('progress')}
         >
           Progress
+        </button>
+        <button
+          className={styles.navButton}
+          onClick={cycleTheme}
+          aria-label={`Theme: ${effectiveTheme}`}
+          title={`Theme: ${effectiveTheme}`}
+        >
+          {effectiveTheme === 'dark' ? '🌙' : '☀️'}
         </button>
         <button
           className={`${styles.navButton} ${currentView === 'settings' ? styles.navButtonActive : ''}`}

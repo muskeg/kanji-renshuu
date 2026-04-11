@@ -13,6 +13,7 @@ import { buildReviewQueue, processReview, computeSessionSummary } from '@/core/s
 import { checkMilestones } from '@/core/srs/milestones'
 import { showToast } from '@/hooks/useToast'
 import { loadSettings } from '@/core/storage/settings'
+import { playCorrectSound, playCelebrationSound, playMilestoneSound } from '@/utils/sounds'
 
 interface QuizSessionState {
   phase: SessionPhase
@@ -102,8 +103,10 @@ export function useQuizSession(kanjiData: KanjiEntry[], mode: QuizMode) {
       const totalTimeMs = Date.now() - state.sessionStartTime
       const summary = computeSessionSummary(newRatings, newReviewedCards, state.newCardsCount, totalTimeMs)
       window.dispatchEvent(new Event('kanji-review-complete'))
+      playCelebrationSound()
       checkMilestones(kanjiData).then(events => {
         for (const event of events) {
+          playMilestoneSound()
           showToast({ title: event.title, body: event.body, icon: event.icon })
         }
       })
@@ -122,6 +125,7 @@ export function useQuizSession(kanjiData: KanjiEntry[], mode: QuizMode) {
         reviewedCards: newReviewedCards,
       }))
       cardStartTimeRef.current = Date.now()
+      if (rating >= 3) playCorrectSound()
     }
   }, [state, mode, kanjiData])
 

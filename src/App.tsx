@@ -4,6 +4,7 @@ import { BottomNav } from '@/components/layout/BottomNav'
 import { PageTransition } from '@/components/layout/PageTransition'
 import { ToastContainer } from '@/components/ui/Toast'
 import { useToastListener } from '@/hooks/useToast'
+import { useTheme } from '@/hooks/useTheme'
 import { ReviewSession } from '@/components/review/ReviewSession'
 import { MeaningQuizSession } from '@/components/study/MeaningQuizSession'
 import { ReadingQuizSession } from '@/components/study/ReadingQuizSession'
@@ -29,6 +30,7 @@ export function App() {
   const { kanji, loading, error } = useKanjiData()
   const cardStatusMap = useCardStatus()
   const { toasts, dismissToast } = useToastListener()
+  useTheme()
 
   const handleSelectKanji = useCallback((k: KanjiEntry) => {
     setSelectedKanji(k)

@@ -63,6 +63,8 @@ export interface AppSettings {
   maximumInterval: number
   defaultQuizMode: QuizMode
   showReadingsOnFront: boolean
+  theme: 'dark' | 'light' | 'system'
+  soundEnabled: boolean
 }
 
 /** Default settings */
@@ -73,6 +75,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
   maximumInterval: 365,
   defaultQuizMode: 'recognition',
   showReadingsOnFront: false,
+  theme: 'system',
+  soundEnabled: false,
 }
 
 /** Review session state */
