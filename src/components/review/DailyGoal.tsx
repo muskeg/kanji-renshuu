@@ -8,7 +8,7 @@ function streakIcon(streak: number): string {
   return '🔥'
 }
 
-export function DailyGoal() {
+export function DailyGoal({ onReview }: { onReview?: () => void }) {
   const { dueCount, newToday, newLimit, currentStreak, activatedToday } = useQueueStats()
 
   const newPct = newLimit > 0 ? Math.min(100, (newToday / newLimit) * 100) : 0
@@ -45,6 +45,12 @@ export function DailyGoal() {
           {reviewsDone ? 'Done ✅' : dueCount > 0 ? `${dueCount} due` : 'None due'}
         </span>
       </div>
+
+      {dueCount > 0 && onReview && (
+        <button className={styles.reviewAction} onClick={onReview} type="button">
+          Review {dueCount} card{dueCount === 1 ? '' : 's'} →
+        </button>
+      )}
 
       {(currentStreak > 0 || activatedToday) && (
         <div className={`${styles.streak} ${currentStreak >= 30 ? styles.streakGold : ''}`}>

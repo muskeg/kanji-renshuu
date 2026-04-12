@@ -12,6 +12,28 @@ export function EmptyState({ status, onStart, modeName }: EmptyStateProps) {
   const { reason, nextDueDate, newCardsToday, newCardsLimit, totalIntroduced, totalKanji } = status
   const countdown = useCountdown(nextDueDate)
 
+  // Common "start" button — always shown when there are cards to study
+  if (reason === 'has-cards') {
+    const reviewCount = status.items.filter(i => i.cardState.introduced).length
+    const newCount = status.items.length - reviewCount
+    const parts = [
+      reviewCount > 0 ? `${reviewCount} review${reviewCount === 1 ? '' : 's'}` : '',
+      newCount > 0 ? `${newCount} new` : '',
+    ].filter(Boolean).join(' + ')
+
+    return (
+      <div className={styles.container}>
+        <div className={styles.icon}>漢</div>
+        <h2 className={styles.title}>{modeName ?? 'Ready to Study'}</h2>
+        <p className={styles.body}>{parts} available</p>
+        <button className={styles.action} onClick={onStart}>
+          Start {modeName ?? 'Session'}
+        </button>
+      </div>
+    )
+  }
+
+  // All other reasons are "nothing to do right now" states
   switch (reason) {
     case 'no-cards':
       return (
@@ -19,15 +41,8 @@ export function EmptyState({ status, onStart, modeName }: EmptyStateProps) {
           <div className={styles.icon}>📚</div>
           <h2 className={styles.title}>{modeName ?? 'No Cards Yet'}</h2>
           <p className={styles.body}>
-            {modeName
-              ? 'No cards available yet. Start a Flashcards session to introduce new kanji first.'
-              : 'Start your kanji journey with your first review session.'}
+            No cards to study yet. Start a Flashcards session from the Home page to introduce new kanji.
           </p>
-          {!modeName && (
-            <button className={styles.action} onClick={onStart}>
-              Begin Learning
-            </button>
-          )}
         </div>
       )
 
@@ -35,13 +50,12 @@ export function EmptyState({ status, onStart, modeName }: EmptyStateProps) {
       return (
         <div className={styles.container}>
           <div className={styles.icon}>✅</div>
-          <h2 className={styles.title}>All caught up!</h2>
+          <h2 className={styles.title}>Daily limit reached</h2>
           <p className={styles.body}>
-            You've studied {newCardsToday}/{newCardsLimit} new cards today.
+            You've hit today's study limit ({newCardsToday}/{newCardsLimit} new cards).
             {countdown && (
               <>
-                <br />
-                Next review in {countdown}.
+                {' '}Next review in {countdown}.
               </>
             )}
           </p>
@@ -56,7 +70,7 @@ export function EmptyState({ status, onStart, modeName }: EmptyStateProps) {
             {countdown ? `Next review in ${countdown}` : 'All cards scheduled'}
           </h2>
           <p className={styles.body}>
-            {totalIntroduced} card{totalIntroduced === 1 ? '' : 's'} scheduled. Check back soon.
+            {totalIntroduced} card{totalIntroduced === 1 ? '' : 's'} in your deck. Come back later!
           </p>
         </div>
       )
@@ -70,32 +84,11 @@ export function EmptyState({ status, onStart, modeName }: EmptyStateProps) {
             All {totalKanji.toLocaleString()} kanji reviewed.
             {countdown && (
               <>
-                <br />
-                Next due {countdown}.
+                {' '}Next due {countdown}.
               </>
             )}
           </p>
         </div>
       )
-
-    case 'has-cards': {
-      const reviewCount = status.items.filter(i => i.cardState.introduced).length
-      const newCount = status.items.length - reviewCount
-      const description = [
-        reviewCount > 0 ? `${reviewCount} review${reviewCount === 1 ? '' : 's'} due` : '',
-        newCount > 0 ? `${newCount} new kanji to learn` : '',
-      ].filter(Boolean).join(' · ')
-
-      return (
-        <div className={styles.container}>
-          <div className={styles.icon}>漢</div>
-          <h2 className={styles.title}>{modeName ?? 'Ready to Study'}</h2>
-          <p className={styles.body}>{description}</p>
-          <button className={styles.action} onClick={onStart}>
-            {modeName ? `Start ${modeName}` : 'Start Session'}
-          </button>
-        </div>
-      )
-    }
   }
 }

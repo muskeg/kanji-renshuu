@@ -29,7 +29,7 @@ export function HomePage({ kanjiData, onNavigate }: HomePageProps) {
       <StreakRecovery />
 
       {/* Daily progress */}
-      <DailyGoal />
+      <DailyGoal onReview={() => onNavigate('review')} />
 
       {/* Study modes grid */}
       <section className={styles.modesSection}>
