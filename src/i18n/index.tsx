@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect, useSyncExternalStore, useCallback, type ReactNode } from 'react'
 import type { Locale } from './types'
+import type { KanjiEntry } from '@/core/srs/types'
 import en from './en'
 import fr from './fr'
 
@@ -37,6 +38,14 @@ export function t(key: TranslationKey, params?: Record<string, string | number>)
     }
   }
   return str
+}
+
+/** Return locale-appropriate meanings for a kanji entry */
+export function getMeanings(kanji: KanjiEntry): string[] {
+  if (currentLocale === 'fr' && kanji.meaningsFr && kanji.meaningsFr.length > 0) {
+    return kanji.meaningsFr
+  }
+  return kanji.meanings
 }
 
 // --- React context ---

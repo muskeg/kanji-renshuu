@@ -1,5 +1,5 @@
 import type { KanjiEntry } from '@/core/srs/types'
-import { useTranslation } from '@/i18n'
+import { useTranslation, getMeanings } from '@/i18n'
 import styles from './KanjiDetail.module.css'
 import { StrokeOrder } from './StrokeOrder'
 
@@ -19,7 +19,7 @@ export function KanjiDetail({ kanji, onBack }: KanjiDetailProps) {
 
       <div className={styles.hero}>
         <div className={styles.literal}>{kanji.literal}</div>
-        <div className={styles.meanings}>{kanji.meanings.join(', ')}</div>
+        <div className={styles.meanings}>{getMeanings(kanji).join(', ')}</div>
       </div>
 
       <div className={styles.sections}>

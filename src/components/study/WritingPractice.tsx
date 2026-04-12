@@ -1,6 +1,6 @@
 import { useRef, useState, useCallback, useEffect } from 'react'
 import type { ReviewItem, RatingValue } from '@/core/srs/types'
-import { useTranslation } from '@/i18n'
+import { useTranslation, getMeanings } from '@/i18n'
 import styles from './WritingPractice.module.css'
 
 interface WritingPracticeProps {
@@ -128,7 +128,7 @@ export function WritingPractice({ item, onRate }: WritingPracticeProps) {
           {item.kanji.readings.onYomi.length > 0 && item.kanji.readings.kunYomi.length > 0 && '\u30FB'}
           {item.kanji.readings.kunYomi.join('\u3001')}
         </span>
-        <span className={styles.meaning}>{item.kanji.meanings.slice(0, 3).join(', ')}</span>
+        <span className={styles.meaning}>{getMeanings(item.kanji).slice(0, 3).join(', ')}</span>
       </div>
 
       <div className={styles.canvasWrapper}>

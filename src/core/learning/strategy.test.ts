@@ -21,6 +21,7 @@ function makeKanji(literal: string, grade: number, frequency: number | null = nu
     radical: 1,
     readings: { onYomi: [], kunYomi: [], nanori: [] },
     meanings: [`meaning of ${literal}`],
+    meaningsFr: [],
     strokeOrderSvg: '',
     components: [],
   }

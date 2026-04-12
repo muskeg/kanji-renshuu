@@ -14,6 +14,7 @@ export interface KanjiEntry {
     nanori: string[]
   }
   meanings: string[]
+  meaningsFr: string[]
   strokeOrderSvg: string
   components: string[]
 }

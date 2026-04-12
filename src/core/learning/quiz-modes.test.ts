@@ -16,6 +16,7 @@ function makeKanji(literal: string, grade: number): KanjiEntry {
       nanori: [],
     },
     meanings: [`meaning of ${literal}`],
+    meaningsFr: [],
     strokeOrderSvg: '',
     components: [],
   }

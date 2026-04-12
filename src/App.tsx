@@ -5,7 +5,7 @@ import { PageTransition } from '@/components/layout/PageTransition'
 import { ToastContainer } from '@/components/ui/Toast'
 import { useToastListener } from '@/hooks/useToast'
 import { useTheme } from '@/hooks/useTheme'
-import { I18nProvider } from '@/i18n'
+import { I18nProvider, getMeanings } from '@/i18n'
 import { loadSettings } from '@/core/storage/settings'
 import { ReviewSession } from '@/components/review/ReviewSession'
 import { MeaningQuizSession } from '@/components/study/MeaningQuizSession'
@@ -71,7 +71,7 @@ export function App() {
       const qHiragana = katakanaToHiragana(q)
       result = result.filter(k =>
         k.literal === q ||
-        k.meanings.some(m => m.toLowerCase().includes(q)) ||
+        getMeanings(k).some(m => m.toLowerCase().includes(q)) ||
         k.readings.onYomi.some(r => katakanaToHiragana(r).includes(qHiragana)) ||
         k.readings.kunYomi.some(r => normalizeReading(r).includes(qHiragana)) ||
         k.components.some(c => c.includes(q))

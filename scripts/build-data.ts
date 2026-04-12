@@ -30,6 +30,7 @@ interface KanjiEntry {
     nanori: string[]
   }
   meanings: string[]
+  meaningsFr: string[]
   strokeOrderSvg: string
   components: string[]
 }
@@ -122,6 +123,7 @@ function parseKanjidic2(): KanjiEntry[] {
     const onYomi: string[] = []
     const kunYomi: string[] = []
     const meanings: string[] = []
+    const meaningsFr: string[] = []
 
     const readingMeaning = c.reading_meaning as Record<string, unknown> | undefined
     if (readingMeaning) {
@@ -142,9 +144,12 @@ function parseKanjidic2(): KanjiEntry[] {
           if (typeof m === 'string') {
             meanings.push(m)
           } else if (typeof m === 'object' && m !== null) {
-            // Meanings with m_lang attribute — only include English (no attribute)
-            if (!m['@_m_lang']) {
-              meanings.push(String(m['#text'] ?? ''))
+            const lang = m['@_m_lang'] as string | undefined
+            const text = String(m['#text'] ?? '')
+            if (!lang) {
+              meanings.push(text)
+            } else if (lang === 'fr') {
+              meaningsFr.push(text)
             }
           }
         }
@@ -163,6 +168,7 @@ function parseKanjidic2(): KanjiEntry[] {
         radical,
         readings: { onYomi, kunYomi, nanori },
         meanings,
+        meaningsFr,
         strokeOrderSvg: '',
         components: [],
       })

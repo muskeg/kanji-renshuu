@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef } from 'react'
 import type { ReviewItem, RatingValue } from '@/core/srs/types'
 import { matchesReading, normalizeReading } from '@/utils/japanese'
-import { useTranslation } from '@/i18n'
+import { useTranslation, getMeanings } from '@/i18n'
 import styles from './ReadingQuiz.module.css'
 
 interface ReadingQuizProps {
@@ -42,7 +42,7 @@ export function ReadingQuiz({ item, onRate }: ReadingQuizProps) {
   return (
     <div className={styles.container}>
       <div className={styles.kanji}>{item.kanji.literal}</div>
-      <div className={styles.hint}>{item.kanji.meanings.slice(0, 2).join(', ')}</div>
+      <div className={styles.hint}>{getMeanings(item.kanji).slice(0, 2).join(', ')}</div>
 
       <form className={styles.form} onSubmit={handleSubmit}>
         <input

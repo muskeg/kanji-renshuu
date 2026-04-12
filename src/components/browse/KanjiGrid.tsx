@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import type { KanjiEntry } from '@/core/srs/types'
 import type { CardSrsStatus } from '@/hooks/useCardStatus'
-import { useTranslation } from '@/i18n'
+import { useTranslation, getMeanings } from '@/i18n'
 import styles from './KanjiGrid.module.css'
 
 interface KanjiGridProps {
@@ -52,7 +52,7 @@ export function KanjiGrid({ kanji, onSelect, statusMap }: KanjiGridProps) {
                 key={k.literal}
                 className={styles.tile}
                 onClick={() => onSelect(k)}
-                title={k.meanings[0]}
+                title={getMeanings(k)[0]}
                 type="button"
               >
                 {statusMap && (
@@ -62,7 +62,7 @@ export function KanjiGrid({ kanji, onSelect, statusMap }: KanjiGridProps) {
                   />
                 )}
                 <span className={styles.literal}>{k.literal}</span>
-                <span className={styles.meaning}>{k.meanings[0]}</span>
+                <span className={styles.meaning}>{getMeanings(k)[0]}</span>
               </button>
             ))}
           </div>

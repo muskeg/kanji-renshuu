@@ -24,6 +24,7 @@ function makeKanji(overrides: Partial<KanjiEntry> = {}): KanjiEntry {
       nanori: [],
     },
     meanings: ['day', 'sun', 'Japan'],
+    meaningsFr: ['jour', 'soleil', 'Japon'],
     strokeOrderSvg: '',
     components: [],
     ...overrides,

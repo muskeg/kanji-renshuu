@@ -13,6 +13,7 @@ import { checkMilestones } from '@/core/srs/milestones'
 import { showToast } from '@/hooks/useToast'
 import { loadSettings } from '@/core/storage/settings'
 import { playFlipSound, playCorrectSound, playCelebrationSound, playMilestoneSound } from '@/utils/sounds'
+import { getMeanings } from '@/i18n'
 
 interface ReviewSessionState {
   phase: SessionPhase
@@ -110,7 +111,7 @@ export function useReviewSession(kanjiData: KanjiEntry[]) {
     const newReviewedCards: ReviewedCard[] = [...state.reviewedCards, {
       kanjiLiteral: currentItem.kanji.literal,
       rating,
-      meanings: currentItem.kanji.meanings,
+      meanings: getMeanings(currentItem.kanji),
       readings: {
         onYomi: currentItem.kanji.readings.onYomi,
         kunYomi: currentItem.kanji.readings.kunYomi,

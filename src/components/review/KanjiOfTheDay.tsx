@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import type { KanjiEntry } from '@/core/srs/types'
-import { useTranslation } from '@/i18n'
+import { useTranslation, getMeanings } from '@/i18n'
 import styles from './KanjiOfTheDay.module.css'
 
 interface KanjiOfTheDayProps {
@@ -30,7 +30,7 @@ export function KanjiOfTheDay({ kanjiData }: KanjiOfTheDayProps) {
       <span className={styles.heading}>{t('kanjiOfDay.heading')}</span>
       <span className={styles.kanji}>{kanji.literal}</span>
       <span className={styles.readings}>{readings}</span>
-      <span className={styles.meaning}>{kanji.meanings.slice(0, 3).join(', ')}</span>
+      <span className={styles.meaning}>{getMeanings(kanji).slice(0, 3).join(', ')}</span>
       <div className={styles.meta}>
         <span className={styles.tag}>{kanji.grade === 8 ? t('kanjiOfDay.gradeS') : t('kanjiOfDay.grade', { grade: kanji.grade })}</span>
         <span className={styles.tag}>{t('kanjiOfDay.strokes', { count: kanji.strokeCount })}</span>

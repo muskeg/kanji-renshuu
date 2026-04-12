@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react'
 import type { KanjiEntry, ReviewItem, RatingValue } from '@/core/srs/types'
 import { selectDistractors } from '@/core/learning/quiz-modes'
-import { useTranslation } from '@/i18n'
+import { useTranslation, getMeanings } from '@/i18n'
 import styles from './MeaningQuiz.module.css'
 
 /** Shuffle an array (called only during initial render via useMemo) */
@@ -57,7 +57,7 @@ export function MeaningQuiz({ item, kanjiPool, onRate }: MeaningQuizProps) {
     <div className={styles.container}>
       <div className={styles.prompt}>
         <span className={styles.promptLabel}>{t('meaningQuiz.prompt')}</span>
-        <span className={styles.meaning}>{item.kanji.meanings.join(', ')}</span>
+        <span className={styles.meaning}>{getMeanings(item.kanji).join(', ')}</span>
       </div>
 
       <div className={styles.options}>

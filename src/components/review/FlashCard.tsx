@@ -1,5 +1,5 @@
 import type { KanjiEntry } from '@/core/srs/types'
-import { useTranslation } from '@/i18n'
+import { useTranslation, getMeanings } from '@/i18n'
 import styles from './FlashCard.module.css'
 
 interface FlashCardProps {
@@ -55,7 +55,7 @@ export function FlashCard({ kanji, isFlipped, onFlip }: FlashCardProps) {
           )}
 
           <div className={styles.meanings}>
-            {kanji.meanings.join(', ')}
+            {getMeanings(kanji).join(', ')}
           </div>
 
           <div className={styles.meta}>
