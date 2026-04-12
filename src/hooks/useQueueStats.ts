@@ -37,6 +37,13 @@ async function fetchQueueStats(): Promise<QueueStats> {
     }
   }
 
+  // Cap due count by daily review limit
+  const reviewsDoneToday = todayStats?.reviewsCompleted ?? 0
+  if (settings.dailyReviewLimit > 0) {
+    const remaining = Math.max(0, settings.dailyReviewLimit - reviewsDoneToday)
+    dueCount = Math.min(dueCount, remaining)
+  }
+
   // Current streak: consecutive days with reviews or freeze starting from today/yesterday
   const statsSet = new Set(
     allStats

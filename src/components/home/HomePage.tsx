@@ -1,5 +1,4 @@
 import type { KanjiEntry } from '@/core/srs/types'
-import { useQueueStats } from '@/hooks/useQueueStats'
 import { Onboarding } from '@/components/onboarding/Onboarding'
 import { isOnboarded } from '@/core/storage/onboarding'
 import { DailyGoal } from '@/components/review/DailyGoal'
@@ -20,31 +19,14 @@ const STUDY_MODES = [
 ] as const
 
 export function HomePage({ kanjiData, onNavigate }: HomePageProps) {
-  const stats = useQueueStats()
-
   // First-time users see the onboarding flow
   if (!isOnboarded()) {
     return <Onboarding onComplete={() => onNavigate('review')} />
   }
 
-  const hasReviews = stats.dueCount > 0
-  const ctaLabel = hasReviews
-    ? `Start Review (${stats.dueCount} due)`
-    : 'Start Session'
-
   return (
     <div className={styles.container}>
       <StreakRecovery />
-
-      {/* Primary CTA */}
-      <section className={styles.hero}>
-        <button
-          className={styles.startButton}
-          onClick={() => onNavigate('review')}
-        >
-          {ctaLabel}
-        </button>
-      </section>
 
       {/* Daily progress */}
       <DailyGoal />

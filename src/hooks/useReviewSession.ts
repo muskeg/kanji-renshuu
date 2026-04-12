@@ -47,7 +47,7 @@ export function useReviewSession(kanjiData: KanjiEntry[]) {
   useEffect(() => {
     if (kanjiData.length === 0) return
     const settings = loadSettings()
-    buildReviewQueue(kanjiData, settings.dailyNewCards).then(queueStatus => {
+    buildReviewQueue(kanjiData, settings.dailyNewCards, settings.dailyReviewLimit).then(queueStatus => {
       setState(prev => {
         if (prev.phase !== 'idle') return prev
         return { ...prev, queueStatus }
@@ -57,7 +57,7 @@ export function useReviewSession(kanjiData: KanjiEntry[]) {
 
   const startSession = useCallback(async () => {
     const settings = loadSettings()
-    const queueStatus = await buildReviewQueue(kanjiData, settings.dailyNewCards)
+    const queueStatus = await buildReviewQueue(kanjiData, settings.dailyNewCards, settings.dailyReviewLimit)
 
     if (queueStatus.items.length === 0) {
       setState(prev => ({ ...prev, phase: 'idle', summary: null, queueStatus }))
@@ -183,7 +183,7 @@ export function useReviewSession(kanjiData: KanjiEntry[]) {
   // 5B-1: Start a fresh session
   const startNewSession = useCallback(async () => {
     const settings = loadSettings()
-    const queueStatus = await buildReviewQueue(kanjiData, settings.dailyNewCards)
+    const queueStatus = await buildReviewQueue(kanjiData, settings.dailyNewCards, settings.dailyReviewLimit)
     if (queueStatus.items.length === 0) {
       setState(prev => ({ ...prev, phase: 'idle', summary: null, queueStatus }))
       return

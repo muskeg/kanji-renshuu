@@ -26,14 +26,16 @@ import {
 export async function buildReviewQueue(
   kanjiData: KanjiEntry[],
   dailyNewLimit: number,
+  dailyReviewLimit: number = 0,
 ): Promise<QueueStatus> {
   const now = new Date()
   const today = todayDateString()
   const todayStats = await getDailyStats(today)
   const newCardsToday = todayStats?.newCardsIntroduced ?? 0
+  const reviewsDoneToday = todayStats?.reviewsCompleted ?? 0
 
   const introduced = await getIntroducedCards()
-  const dueItems: ReviewItem[] = []
+  const allDueItems: ReviewItem[] = []
 
   // Track next due date across all introduced cards
   let nextDueDate: Date | null = null
@@ -43,7 +45,7 @@ export async function buildReviewQueue(
     if (isDue(cardState.fsrsCard, now)) {
       const kanji = kanjiData.find(k => k.literal === cardState.kanjiLiteral)
       if (kanji) {
-        dueItems.push({ cardState, kanji })
+        allDueItems.push({ cardState, kanji })
       }
     } else {
       // Not due yet — track nearest future due date
@@ -55,11 +57,18 @@ export async function buildReviewQueue(
   }
 
   // Sort due items: most overdue first
-  dueItems.sort((a, b) => {
+  allDueItems.sort((a, b) => {
     const aTime = a.cardState.fsrsCard.due.getTime()
     const bTime = b.cardState.fsrsCard.due.getTime()
     return aTime - bTime
   })
+
+  // Apply daily review limit (0 = unlimited)
+  const reviewLimitReached = dailyReviewLimit > 0 && reviewsDoneToday >= dailyReviewLimit
+  const remainingReviews = dailyReviewLimit > 0
+    ? Math.max(0, dailyReviewLimit - reviewsDoneToday)
+    : allDueItems.length
+  const dueItems = reviewLimitReached ? [] : allDueItems.slice(0, remainingReviews)
 
   // Gather new cards
   const newItems: ReviewItem[] = []
@@ -94,9 +103,12 @@ export async function buildReviewQueue(
     reason = 'has-cards'
   } else if (totalIntroduced === 0) {
     reason = 'no-cards'
-  } else if (totalIntroduced >= totalKanji && dueItems.length === 0) {
+  } else if (totalIntroduced >= totalKanji && allDueItems.length === 0) {
     reason = 'all-mastered'
-  } else if (newCardsToday >= dailyNewLimit && dueItems.length === 0) {
+  } else if (
+    (newCardsToday >= dailyNewLimit && allDueItems.length === 0) ||
+    (reviewLimitReached && newCardsToday >= dailyNewLimit)
+  ) {
     reason = 'daily-limit'
   } else {
     reason = 'all-scheduled'
