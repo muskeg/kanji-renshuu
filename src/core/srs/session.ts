@@ -58,8 +58,8 @@ export async function buildReviewQueue(
 
   // Sort due items: most overdue first
   allDueItems.sort((a, b) => {
-    const aTime = a.cardState.fsrsCard.due.getTime()
-    const bTime = b.cardState.fsrsCard.due.getTime()
+    const aTime = new Date(a.cardState.fsrsCard.due).getTime()
+    const bTime = new Date(b.cardState.fsrsCard.due).getTime()
     return aTime - bTime
   })
 

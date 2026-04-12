@@ -75,7 +75,7 @@ export function getRetrievability(card: Card, now: Date = new Date()): number {
 }
 
 export function isDue(card: Card, now: Date = new Date()): boolean {
-  return card.due <= now
+  return new Date(card.due) <= now
 }
 
 export function isNewCard(cardState: CardState): boolean {

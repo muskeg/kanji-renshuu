@@ -67,18 +67,8 @@ export async function getAllCardStates(): Promise<CardState[]> {
 
 export async function getIntroducedCards(): Promise<CardState[]> {
   const db = await getDB()
-  const tx = db.transaction('cards', 'readonly')
-  const index = tx.store.index('by-introduced')
-  // introduced = true maps to 1 in IDB boolean indexing
-  const cards: CardState[] = []
-  let cursor = await index.openCursor()
-  while (cursor) {
-    if (cursor.value.introduced) {
-      cards.push(cursor.value)
-    }
-    cursor = await cursor.continue()
-  }
-  return cards
+  const all = await db.getAll('cards')
+  return all.filter(card => card.introduced)
 }
 
 export async function getCardCount(): Promise<number> {
