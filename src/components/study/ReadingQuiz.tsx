@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef } from 'react'
 import type { ReviewItem, RatingValue } from '@/core/srs/types'
 import { matchesReading, normalizeReading } from '@/utils/japanese'
+import { useTranslation } from '@/i18n'
 import styles from './ReadingQuiz.module.css'
 
 interface ReadingQuizProps {
@@ -14,6 +15,7 @@ export function ReadingQuiz({ item, onRate }: ReadingQuizProps) {
   const [input, setInput] = useState('')
   const [answerState, setAnswerState] = useState<AnswerState>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const { t } = useTranslation()
 
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
@@ -55,29 +57,29 @@ export function ReadingQuiz({ item, onRate }: ReadingQuizProps) {
           type="text"
           value={input}
           onChange={e => setInput(e.target.value)}
-          placeholder="Type reading…"
+          placeholder={t('readingQuiz.placeholder')}
           disabled={answerState !== null}
           autoComplete="off"
           autoCapitalize="off"
           spellCheck={false}
-          aria-label="Type the reading for this kanji"
+          aria-label={t('readingQuiz.inputLabel')}
         />
         <button
           className={styles.submit}
           type="submit"
           disabled={answerState !== null || input.trim().length === 0}
         >
-          Check
+          {t('readingQuiz.check')}
         </button>
       </form>
 
       {answerState === 'correct' && (
-        <div className={styles.feedbackCorrect}>Correct!</div>
+        <div className={styles.feedbackCorrect}>{t('readingQuiz.correct')}</div>
       )}
 
       {answerState === 'wrong' && (
         <div className={styles.feedbackWrong}>
-          <span>Correct readings:</span>
+          <span>{t('readingQuiz.correctReadings')}</span>
           <span className={styles.correctAnswer}>{allReadings.join('、')}</span>
         </div>
       )}

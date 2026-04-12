@@ -3,11 +3,13 @@ import type { AppSettings, QuizMode } from '@/core/srs/types'
 import { DEFAULT_SETTINGS } from '@/core/srs/types'
 import { loadSettings, saveSettings } from '@/core/storage/settings'
 import { updateSchedulerSettings } from '@/core/srs/scheduler'
+import { useTranslation } from '@/i18n'
 import styles from './SrsSettings.module.css'
 
 export function SrsSettings() {
   const [settings, setSettings] = useState<AppSettings>(loadSettings)
   const [saved, setSaved] = useState(false)
+  const { t } = useTranslation()
 
   const handleChange = <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => {
     setSettings(prev => ({ ...prev, [key]: value }))
@@ -30,8 +32,8 @@ export function SrsSettings() {
     <div className={styles.container}>
       <div className={styles.group}>
         <label className={styles.label}>
-          Daily New Cards
-          <span className={styles.hint}>Number of new kanji to introduce per day (0–50)</span>
+          {t('srs.dailyNewCards')}
+          <span className={styles.hint}>{t('srs.dailyNewCardsHint')}</span>
         </label>
         <input
           type="number"
@@ -45,8 +47,8 @@ export function SrsSettings() {
 
       <div className={styles.group}>
         <label className={styles.label}>
-          Daily Review Limit
-          <span className={styles.hint}>Maximum reviews per day (0 = unlimited)</span>
+          {t('srs.dailyReviewLimit')}
+          <span className={styles.hint}>{t('srs.dailyReviewLimitHint')}</span>
         </label>
         <input
           type="number"
@@ -59,8 +61,8 @@ export function SrsSettings() {
 
       <div className={styles.group}>
         <label className={styles.label}>
-          Target Retention
-          <span className={styles.hint}>Desired recall rate (0.70–0.99)</span>
+          {t('srs.targetRetention')}
+          <span className={styles.hint}>{t('srs.targetRetentionHint')}</span>
         </label>
         <input
           type="number"
@@ -75,8 +77,8 @@ export function SrsSettings() {
 
       <div className={styles.group}>
         <label className={styles.label}>
-          Maximum Interval (days)
-          <span className={styles.hint}>Longest gap between reviews</span>
+          {t('srs.maxInterval')}
+          <span className={styles.hint}>{t('srs.maxIntervalHint')}</span>
         </label>
         <input
           type="number"
@@ -90,27 +92,27 @@ export function SrsSettings() {
 
       <div className={styles.group}>
         <label className={styles.label}>
-          Default Quiz Mode
-          <span className={styles.hint}>Default mode when starting a session</span>
+          {t('srs.defaultQuizMode')}
+          <span className={styles.hint}>{t('srs.defaultQuizModeHint')}</span>
         </label>
         <select
           className={styles.select}
           value={settings.defaultQuizMode}
           onChange={e => handleChange('defaultQuizMode', e.target.value as QuizMode)}
         >
-          <option value="recognition">Flashcards</option>
-          <option value="meaning">Meaning Quiz</option>
-          <option value="reading">Reading Quiz</option>
-          <option value="writing">Writing Practice</option>
+          <option value="recognition">{t('mode.flashcards')}</option>
+          <option value="meaning">{t('mode.meaningQuiz')}</option>
+          <option value="reading">{t('mode.readingQuiz')}</option>
+          <option value="writing">{t('mode.writingPractice')}</option>
         </select>
       </div>
 
       <div className={styles.actions}>
         <button className={styles.saveButton} onClick={handleSave} type="button">
-          {saved ? 'Saved!' : 'Save Settings'}
+          {saved ? t('srs.saved') : t('srs.save')}
         </button>
         <button className={styles.resetButton} onClick={handleReset} type="button">
-          Reset to Defaults
+          {t('srs.reset')}
         </button>
       </div>
     </div>

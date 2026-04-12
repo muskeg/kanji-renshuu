@@ -3,6 +3,7 @@ import type { SessionSummaryData } from '@/core/srs/types'
 import { computeSessionScore, recordScore } from '@/core/srs/scoring'
 import { useQueueStats } from '@/hooks/useQueueStats'
 import { useCountdown } from '@/hooks/useCountdown'
+import { useTranslation } from '@/i18n'
 import { SessionScoreCard } from './SessionScore'
 import styles from './SessionSummary.module.css'
 
@@ -26,6 +27,7 @@ export function SessionSummary({ summary, onDone, onRetryStruggled, onNewSession
   const [showStruggled, setShowStruggled] = useState(false)
   const { currentStreak, dueCount, newToday, newLimit, nextDueDate } = useQueueStats()
   const countdown = useCountdown(nextDueDate)
+  const { t } = useTranslation()
   const accuracy = summary.totalReviewed > 0
     ? Math.round((summary.correctCount / summary.totalReviewed) * 100)
     : 0
@@ -44,48 +46,48 @@ export function SessionSummary({ summary, onDone, onRetryStruggled, onNewSession
       <div className={styles.checkmark}>
         <span className={styles.checkmarkIcon}>✓</span>
       </div>
-      <h2 className={styles.title}>Session Complete</h2>
+      <h2 className={styles.title}>{t('summary.title')}</h2>
 
       <div className={styles.stats}>
         <div className={styles.stat}>
           <div className={`${styles.statValue} ${accuracy >= 80 ? styles.accuracy : styles.accuracyLow}`}>
             {accuracy}%
           </div>
-          <div className={styles.statLabel}>Accuracy</div>
+          <div className={styles.statLabel}>{t('summary.accuracy')}</div>
         </div>
 
         <div className={styles.stat}>
           <div className={styles.statValue}>{summary.totalReviewed}</div>
-          <div className={styles.statLabel}>Cards Reviewed</div>
+          <div className={styles.statLabel}>{t('summary.cardsReviewed')}</div>
         </div>
 
         <div className={styles.stat}>
           <div className={styles.statValue}>{summary.newCardsIntroduced}</div>
-          <div className={styles.statLabel}>New Cards</div>
+          <div className={styles.statLabel}>{t('summary.newCards')}</div>
         </div>
 
         <div className={styles.stat}>
           <div className={styles.statValue}>{formatTime(summary.totalTimeMs)}</div>
-          <div className={styles.statLabel}>Time Spent</div>
+          <div className={styles.statLabel}>{t('summary.timeSpent')}</div>
         </div>
       </div>
 
       <div className={styles.breakdown}>
         <div className={styles.breakdownItem}>
           <span className={`${styles.dot} ${styles.dotAgain}`} />
-          Again: {summary.againCount}
+          {t('summary.again', { count: summary.againCount })}
         </div>
         <div className={styles.breakdownItem}>
           <span className={`${styles.dot} ${styles.dotHard}`} />
-          Hard: {summary.hardCount}
+          {t('summary.hard', { count: summary.hardCount })}
         </div>
         <div className={styles.breakdownItem}>
           <span className={`${styles.dot} ${styles.dotGood}`} />
-          Good: {summary.goodCount}
+          {t('summary.good', { count: summary.goodCount })}
         </div>
         <div className={styles.breakdownItem}>
           <span className={`${styles.dot} ${styles.dotEasy}`} />
-          Easy: {summary.easyCount}
+          {t('summary.easy', { count: summary.easyCount })}
         </div>
       </div>
 
@@ -97,9 +99,9 @@ export function SessionSummary({ summary, onDone, onRetryStruggled, onNewSession
 
       {/* Daily progress update */}
       <div className={styles.dailyProgress}>
-        <span>Today: {newToday}/{newLimit} new</span>
+        <span>{t('summary.todayNew', { newToday, newLimit })}</span>
         <span className={styles.dailySep}>·</span>
-        <span>{dueCount > 0 ? `${dueCount} reviews left` : 'Reviews done ✅'}</span>
+        <span>{dueCount > 0 ? t('summary.reviewsLeft', { count: dueCount }) : t('summary.reviewsDone')}</span>
       </div>
 
       {/* Struggled cards section */}
@@ -110,7 +112,7 @@ export function SessionSummary({ summary, onDone, onRetryStruggled, onNewSession
             onClick={() => setShowStruggled(s => !s)}
             type="button"
           >
-            {showStruggled ? '▾' : '▸'} Struggled Cards ({struggled.length})
+            {showStruggled ? '▾' : '▸'} {t('summary.struggledCards', { count: struggled.length })}
           </button>
           {showStruggled && (
             <div className={styles.struggledList}>
@@ -129,27 +131,27 @@ export function SessionSummary({ summary, onDone, onRetryStruggled, onNewSession
           )}
         </div>
       ) : (
-        <p className={styles.perfect}>Perfect session! 🎯</p>
+        <p className={styles.perfect}>{t('summary.perfectSession')}</p>
       )}
 
       <div className={styles.actions}>
         {onRetryStruggled && (
           <button className={styles.buttonSecondary} onClick={onRetryStruggled}>
-            Review Struggled Cards
+            {t('summary.reviewStruggled')}
           </button>
         )}
         {!queueEmpty && onNewSession && (
           <button className={styles.button} onClick={onNewSession}>
-            Start New Session
+            {t('summary.startNewSession')}
           </button>
         )}
         {queueEmpty && countdown && (
           <p className={styles.ctaMessage}>
-            All done for today! Next review in {countdown}.
+            {t('summary.allDone', { countdown })}
           </p>
         )}
         <button className={queueEmpty ? styles.button : styles.buttonSecondary} onClick={onDone}>
-          {queueEmpty ? 'Done' : 'Back to Home'}
+          {queueEmpty ? t('summary.done') : t('summary.backToHome')}
         </button>
       </div>
     </div>

@@ -1,10 +1,12 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import { Header } from '@/components/layout/Header'
 import { BottomNav } from '@/components/layout/BottomNav'
 import { PageTransition } from '@/components/layout/PageTransition'
 import { ToastContainer } from '@/components/ui/Toast'
 import { useToastListener } from '@/hooks/useToast'
 import { useTheme } from '@/hooks/useTheme'
+import { I18nProvider } from '@/i18n'
+import { loadSettings } from '@/core/storage/settings'
 import { ReviewSession } from '@/components/review/ReviewSession'
 import { MeaningQuizSession } from '@/components/study/MeaningQuizSession'
 import { ReadingQuizSession } from '@/components/study/ReadingQuizSession'
@@ -32,6 +34,16 @@ export function App() {
   const cardStatusMap = useCardStatus()
   const { toasts, dismissToast } = useToastListener()
   useTheme()
+
+  const [language] = useState(() => loadSettings().language)
+
+  // Apply UI scale on mount
+  useEffect(() => {
+    const scale = loadSettings().uiScale
+    if (scale && scale !== 100) {
+      document.documentElement.style.zoom = `${scale}%`
+    }
+  }, [])
 
   const handleSelectKanji = useCallback((k: KanjiEntry) => {
     setSelectedKanji(k)
@@ -70,7 +82,7 @@ export function App() {
   }, [kanji, filter, searchQuery])
 
   return (
-    <>
+    <I18nProvider locale={language}>
       <Header currentView={currentView} onNavigate={(v) => setCurrentView(v as AppView)} />
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 'var(--spacing-lg)' }}>
         <PageTransition viewKey={currentView}>
@@ -129,6 +141,6 @@ export function App() {
       </main>
       <ToastContainer toasts={toasts} onDismiss={dismissToast} />
       <BottomNav currentView={currentView} onNavigate={(v) => setCurrentView(v as AppView)} />
-    </>
+    </I18nProvider>
   )
 }

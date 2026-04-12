@@ -1,4 +1,5 @@
 import type { CardState } from './types'
+import { t } from '@/i18n'
 
 export interface ForecastDay {
   date: string
@@ -6,7 +7,10 @@ export interface ForecastDay {
   dueCount: number
 }
 
-const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const
+const DAY_NAME_KEYS = [
+  'forecast.sun', 'forecast.mon', 'forecast.tue', 'forecast.wed',
+  'forecast.thu', 'forecast.fri', 'forecast.sat',
+] as const
 
 /** Compute a 7-day review forecast from card due dates */
 export function computeForecast(cards: CardState[], days = 7): ForecastDay[] {
@@ -21,7 +25,7 @@ export function computeForecast(cards: CardState[], days = 7): ForecastDay[] {
     dayEnd.setDate(dayEnd.getDate() + 1)
 
     const dateStr = dayStart.toISOString().split('T')[0]!
-    const label = i === 1 ? 'Tomorrow' : DAY_NAMES[dayStart.getDay()]!
+    const label = i === 1 ? t('forecast.tomorrow') : t(DAY_NAME_KEYS[dayStart.getDay()]!)
 
     let dueCount = 0
     for (const card of cards) {

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { StatusBar } from './StatusBar'
 import { useTheme } from '@/hooks/useTheme'
+import { useTranslation } from '@/i18n'
 import styles from './Header.module.css'
 
 interface HeaderProps {
@@ -16,6 +17,7 @@ export function Header({ currentView, onNavigate }: HeaderProps) {
   const brandRef = useRef<HTMLDivElement>(null)
   const isStudyView = STUDY_VIEWS.includes(currentView)
   const { effectiveTheme, cycleTheme } = useTheme()
+  const { t } = useTranslation()
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -52,7 +54,7 @@ export function Header({ currentView, onNavigate }: HeaderProps) {
           className={`${styles.navButton} ${currentView === 'home' ? styles.navButtonActive : ''}`}
           onClick={() => onNavigate('home')}
         >
-          Home
+          {t('nav.home')}
         </button>
         <div className={styles.dropdown} ref={dropdownRef}>
           <button
@@ -61,7 +63,7 @@ export function Header({ currentView, onNavigate }: HeaderProps) {
             aria-expanded={studyOpen}
             aria-haspopup="true"
           >
-            Study ▾
+            {t('nav.studyDropdown')}
           </button>
           {studyOpen && (
             <div className={styles.dropdownMenu}>
@@ -69,25 +71,25 @@ export function Header({ currentView, onNavigate }: HeaderProps) {
                 className={`${styles.dropdownItem} ${currentView === 'review' ? styles.dropdownItemActive : ''}`}
                 onClick={() => { onNavigate('review'); setStudyOpen(false) }}
               >
-                Flashcards
+                {t('mode.flashcards')}
               </button>
               <button
                 className={`${styles.dropdownItem} ${currentView === 'meaning-quiz' ? styles.dropdownItemActive : ''}`}
                 onClick={() => { onNavigate('meaning-quiz'); setStudyOpen(false) }}
               >
-                Meaning Quiz
+                {t('mode.meaningQuiz')}
               </button>
               <button
                 className={`${styles.dropdownItem} ${currentView === 'reading-quiz' ? styles.dropdownItemActive : ''}`}
                 onClick={() => { onNavigate('reading-quiz'); setStudyOpen(false) }}
               >
-                Reading Quiz
+                {t('mode.readingQuiz')}
               </button>
               <button
                 className={`${styles.dropdownItem} ${currentView === 'writing' ? styles.dropdownItemActive : ''}`}
                 onClick={() => { onNavigate('writing'); setStudyOpen(false) }}
               >
-                Writing Practice
+                {t('mode.writingPractice')}
               </button>
             </div>
           )}
@@ -96,13 +98,13 @@ export function Header({ currentView, onNavigate }: HeaderProps) {
           className={`${styles.navButton} ${currentView === 'browse' ? styles.navButtonActive : ''}`}
           onClick={() => onNavigate('browse')}
         >
-          Browse
+          {t('nav.browse')}
         </button>
         <button
           className={`${styles.navButton} ${currentView === 'progress' ? styles.navButtonActive : ''}`}
           onClick={() => onNavigate('progress')}
         >
-          Progress
+          {t('nav.progress')}
         </button>
         <button
           className={styles.navButton}

@@ -3,6 +3,7 @@ import { useQuizSession } from '@/hooks/useQuizSession'
 import { ReadingQuiz } from './ReadingQuiz'
 import { SessionSummary } from '@/components/review/SessionSummary'
 import { EmptyState } from '@/components/review/EmptyState'
+import { useTranslation } from '@/i18n'
 import styles from './QuizSession.module.css'
 
 interface ReadingQuizSessionProps {
@@ -21,6 +22,7 @@ export function ReadingQuizSession({ kanjiData }: ReadingQuizSessionProps) {
     rateCard,
     endSession,
   } = useQuizSession(kanjiData, 'reading')
+  const { t } = useTranslation()
 
   if (phase === 'summary' && summary) {
     return <SessionSummary summary={summary} onDone={endSession} />
@@ -28,19 +30,19 @@ export function ReadingQuizSession({ kanjiData }: ReadingQuizSessionProps) {
 
   if (phase === 'idle' || !currentItem) {
     if (queueStatus) {
-      return <EmptyState status={queueStatus} onStart={startSession} modeName="Reading Quiz" />
+      return <EmptyState status={queueStatus} onStart={startSession} modeName={t('mode.readingQuiz')} />
     }
 
     return (
       <div className={styles.empty}>
         <div className={styles.emptyIcon}>読</div>
-        <h2 className={styles.emptyTitle}>Reading Quiz</h2>
+        <h2 className={styles.emptyTitle}>{t('readingQuiz.title')}</h2>
         <p className={styles.emptyText}>
-          See a kanji and type its reading in hiragana or katakana.
+          {t('readingQuiz.desc')}
         </p>
         {kanjiData.length > 0 && (
           <button className={styles.startButton} onClick={startSession}>
-            Start Quiz
+            {t('readingQuiz.startQuiz')}
           </button>
         )}
       </div>

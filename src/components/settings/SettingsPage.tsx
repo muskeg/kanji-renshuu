@@ -2,14 +2,16 @@ import { useState } from 'react'
 import { SrsSettings } from './SrsSettings'
 import { DataManagement } from './DataManagement'
 import { AppearanceSettings } from './AppearanceSettings'
+import { useTranslation } from '@/i18n'
 import styles from './SettingsPage.module.css'
 
 export function SettingsPage() {
   const [activeTab, setActiveTab] = useState<'srs' | 'appearance' | 'data'>('srs')
+  const { t } = useTranslation()
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.heading}>Settings</h2>
+      <h2 className={styles.heading}>{t('settings.title')}</h2>
 
       <div className={styles.tabs}>
         <button
@@ -17,21 +19,21 @@ export function SettingsPage() {
           onClick={() => setActiveTab('srs')}
           type="button"
         >
-          SRS & Study
+          {t('settings.tabSrs')}
         </button>
         <button
           className={`${styles.tab} ${activeTab === 'appearance' ? styles.tabActive : ''}`}
           onClick={() => setActiveTab('appearance')}
           type="button"
         >
-          Appearance
+          {t('settings.tabAppearance')}
         </button>
         <button
           className={`${styles.tab} ${activeTab === 'data' ? styles.tabActive : ''}`}
           onClick={() => setActiveTab('data')}
           type="button"
         >
-          Data
+          {t('settings.tabData')}
         </button>
       </div>
 

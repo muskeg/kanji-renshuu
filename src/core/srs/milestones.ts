@@ -1,5 +1,6 @@
 import type { KanjiEntry } from './types'
 import { getAllCardStates, getAllDailyStats, todayDateString } from '@/core/storage/db'
+import { t } from '@/i18n'
 
 export interface MilestoneEvent {
   id: string
@@ -27,45 +28,47 @@ const MILESTONES_KEY = 'kanji-renshuu-triggered-milestones'
 const MILESTONES_DATES_KEY = 'kanji-renshuu-milestone-dates'
 
 const KANJI_MILESTONES = [
-  { count: 10, title: 'First 10 kanji!', body: "You're on your way." },
-  { count: 50, title: '50 kanji learned!', body: 'Building a strong foundation.' },
-  { count: 100, title: '100 kanji learned!', body: "You're making great progress!" },
-  { count: 200, title: '200 kanji learned!', body: 'Impressive dedication!' },
-  { count: 500, title: '500 kanji learned!', body: "You're reading more every day!" },
-  { count: 1000, title: '1,000 kanji learned!', body: 'Halfway to Jōyō mastery!' },
-  { count: 2136, title: 'All 2,136 Jōyō kanji!', body: 'You did it — complete mastery!' },
+  { count: 10, titleKey: 'milestone.kanji10.title', bodyKey: 'milestone.kanji10.body' },
+  { count: 50, titleKey: 'milestone.kanji50.title', bodyKey: 'milestone.kanji50.body' },
+  { count: 100, titleKey: 'milestone.kanji100.title', bodyKey: 'milestone.kanji100.body' },
+  { count: 200, titleKey: 'milestone.kanji200.title', bodyKey: 'milestone.kanji200.body' },
+  { count: 500, titleKey: 'milestone.kanji500.title', bodyKey: 'milestone.kanji500.body' },
+  { count: 1000, titleKey: 'milestone.kanji1000.title', bodyKey: 'milestone.kanji1000.body' },
+  { count: 2136, titleKey: 'milestone.kanji2136.title', bodyKey: 'milestone.kanji2136.body' },
 ] as const
 
 const STREAK_MILESTONES = [
-  { days: 7, title: '7-day streak!', body: 'Consistency is key.' },
-  { days: 30, title: '30-day streak!', body: 'Incredible dedication!' },
-  { days: 100, title: '100-day streak!', body: "You're unstoppable." },
-  { days: 365, title: 'One full year!', body: '365 days of daily practice!' },
+  { days: 7, titleKey: 'milestone.streak7.title', bodyKey: 'milestone.streak7.body' },
+  { days: 30, titleKey: 'milestone.streak30.title', bodyKey: 'milestone.streak30.body' },
+  { days: 100, titleKey: 'milestone.streak100.title', bodyKey: 'milestone.streak100.body' },
+  { days: 365, titleKey: 'milestone.streak365.title', bodyKey: 'milestone.streak365.body' },
 ] as const
 
-export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
-  ...KANJI_MILESTONES.map(m => ({
-    id: `kanji-${m.count}`,
-    title: m.title.replace('!', ''),
-    description: m.body,
-    icon: '🎉',
-    category: 'kanji' as const,
-  })),
-  ...[1, 2, 3, 4, 5, 6].map(grade => ({
-    id: `grade-${grade}`,
-    title: `Grade ${grade} complete`,
-    description: `Learn all Grade ${grade} kanji`,
-    icon: '🏆',
-    category: 'grade' as const,
-  })),
-  ...STREAK_MILESTONES.map(m => ({
-    id: `streak-${m.days}`,
-    title: m.title.replace('!', ''),
-    description: m.body,
-    icon: '🔥',
-    category: 'streak' as const,
-  })),
-]
+export function getAchievementDefinitions(): AchievementDefinition[] {
+  return [
+    ...KANJI_MILESTONES.map(m => ({
+      id: `kanji-${m.count}`,
+      title: t(m.titleKey as 'milestone.kanji10.title').replace('!', ''),
+      description: t(m.bodyKey as 'milestone.kanji10.body'),
+      icon: '🎉',
+      category: 'kanji' as const,
+    })),
+    ...[1, 2, 3, 4, 5, 6].map(grade => ({
+      id: `grade-${grade}`,
+      title: t('milestone.gradeCompleteAchievement', { grade }),
+      description: t('milestone.gradeCompleteDesc', { grade }),
+      icon: '🏆',
+      category: 'grade' as const,
+    })),
+    ...STREAK_MILESTONES.map(m => ({
+      id: `streak-${m.days}`,
+      title: t(m.titleKey as 'milestone.streak7.title').replace('!', ''),
+      description: t(m.bodyKey as 'milestone.streak7.body'),
+      icon: '🔥',
+      category: 'streak' as const,
+    })),
+  ]
+}
 
 function getTriggeredMilestones(): Set<string> {
   try {
@@ -120,7 +123,7 @@ export async function checkMilestones(kanjiData: KanjiEntry[]): Promise<Mileston
   for (const m of KANJI_MILESTONES) {
     const id = `kanji-${m.count}`
     if (!triggered.has(id) && totalIntroduced >= m.count) {
-      events.push({ id, title: m.title, body: m.body, icon: '🎉' })
+      events.push({ id, title: t(m.titleKey as 'milestone.kanji10.title'), body: t(m.bodyKey as 'milestone.kanji10.body'), icon: '🎉' })
     }
   }
 
@@ -146,8 +149,8 @@ export async function checkMilestones(kanjiData: KanjiEntry[]): Promise<Mileston
     if (!triggered.has(id) && (introducedByGrade.get(grade) ?? 0) >= total) {
       events.push({
         id,
-        title: `Grade ${grade} complete!`,
-        body: `${total} kanji mastered!`,
+        title: t('milestone.gradeComplete.title', { grade }),
+        body: t('milestone.gradeComplete.body', { total }),
         icon: '🏆',
       })
     }
@@ -175,7 +178,7 @@ export async function checkMilestones(kanjiData: KanjiEntry[]): Promise<Mileston
   for (const m of STREAK_MILESTONES) {
     const id = `streak-${m.days}`
     if (!triggered.has(id) && streak >= m.days) {
-      events.push({ id, title: m.title, body: m.body, icon: '🔥' })
+      events.push({ id, title: t(m.titleKey as 'milestone.streak7.title'), body: t(m.bodyKey as 'milestone.streak7.body'), icon: '🔥' })
     }
   }
 

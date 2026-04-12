@@ -3,6 +3,7 @@ import { useQuizSession } from '@/hooks/useQuizSession'
 import { MeaningQuiz } from './MeaningQuiz'
 import { SessionSummary } from '@/components/review/SessionSummary'
 import { EmptyState } from '@/components/review/EmptyState'
+import { useTranslation } from '@/i18n'
 import styles from './QuizSession.module.css'
 
 interface MeaningQuizSessionProps {
@@ -21,6 +22,7 @@ export function MeaningQuizSession({ kanjiData }: MeaningQuizSessionProps) {
     rateCard,
     endSession,
   } = useQuizSession(kanjiData, 'meaning')
+  const { t } = useTranslation()
 
   if (phase === 'summary' && summary) {
     return <SessionSummary summary={summary} onDone={endSession} />
@@ -28,19 +30,19 @@ export function MeaningQuizSession({ kanjiData }: MeaningQuizSessionProps) {
 
   if (phase === 'idle' || !currentItem) {
     if (queueStatus) {
-      return <EmptyState status={queueStatus} onStart={startSession} modeName="Meaning Quiz" />
+      return <EmptyState status={queueStatus} onStart={startSession} modeName={t('mode.meaningQuiz')} />
     }
 
     return (
       <div className={styles.empty}>
         <div className={styles.emptyIcon}>意</div>
-        <h2 className={styles.emptyTitle}>Meaning Quiz</h2>
+        <h2 className={styles.emptyTitle}>{t('meaningQuiz.title')}</h2>
         <p className={styles.emptyText}>
-          See an English meaning and pick the matching kanji from 4 choices.
+          {t('meaningQuiz.desc')}
         </p>
         {kanjiData.length > 0 && (
           <button className={styles.startButton} onClick={startSession}>
-            Start Quiz
+            {t('meaningQuiz.startQuiz')}
           </button>
         )}
       </div>

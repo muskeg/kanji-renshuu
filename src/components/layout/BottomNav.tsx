@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from '@/i18n'
 import styles from './BottomNav.module.css'
 
 interface BottomNavProps {
@@ -8,17 +9,18 @@ interface BottomNavProps {
 
 const STUDY_VIEWS = ['review', 'meaning-quiz', 'reading-quiz', 'writing']
 
-const STUDY_MODES = [
-  { view: 'review', icon: '📖', label: 'Flashcards', desc: 'See kanji, recall reading & meaning' },
-  { view: 'meaning-quiz', icon: '🔤', label: 'Meaning Quiz', desc: 'See English meaning, pick the kanji' },
-  { view: 'reading-quiz', icon: '🗣️', label: 'Reading Quiz', desc: 'See kanji, type the reading' },
-  { view: 'writing', icon: '✍️', label: 'Writing', desc: 'Practice writing strokes' },
-]
-
 export function BottomNav({ currentView, onNavigate }: BottomNavProps) {
   const [sheetOpen, setSheetOpen] = useState(false)
+  const { t } = useTranslation()
   const isStudy = STUDY_VIEWS.includes(currentView)
   const isHome = currentView === 'home' || isStudy
+
+  const STUDY_MODES = [
+    { view: 'review', icon: '📖', label: t('mode.flashcards'), desc: t('mode.flashcards.desc') },
+    { view: 'meaning-quiz', icon: '🔤', label: t('mode.meaningQuiz'), desc: t('mode.meaningQuiz.desc') },
+    { view: 'reading-quiz', icon: '🗣️', label: t('mode.readingQuiz'), desc: t('mode.readingQuiz.desc') },
+    { view: 'writing', icon: '✍️', label: t('mode.writing'), desc: t('mode.writingPractice.desc') },
+  ]
 
   function handleStudyTap() {
     if (isStudy) {
@@ -42,7 +44,7 @@ export function BottomNav({ currentView, onNavigate }: BottomNavProps) {
           type="button"
         >
           <span className={styles.tabIcon}>🏠</span>
-          Home
+          {t('nav.home')}
         </button>
         <button
           className={`${styles.tab} ${isStudy ? styles.tabActive : ''}`}
@@ -50,7 +52,7 @@ export function BottomNav({ currentView, onNavigate }: BottomNavProps) {
           type="button"
         >
           <span className={styles.tabIcon}>📖</span>
-          Study
+          {t('nav.study')}
         </button>
         <button
           className={`${styles.tab} ${currentView === 'browse' ? styles.tabActive : ''}`}
@@ -58,7 +60,7 @@ export function BottomNav({ currentView, onNavigate }: BottomNavProps) {
           type="button"
         >
           <span className={styles.tabIcon}>📚</span>
-          Browse
+          {t('nav.browse')}
         </button>
         <button
           className={`${styles.tab} ${currentView === 'progress' ? styles.tabActive : ''}`}
@@ -66,7 +68,7 @@ export function BottomNav({ currentView, onNavigate }: BottomNavProps) {
           type="button"
         >
           <span className={styles.tabIcon}>📊</span>
-          Progress
+          {t('nav.progress')}
         </button>
         <button
           className={`${styles.tab} ${currentView === 'settings' ? styles.tabActive : ''}`}
@@ -74,7 +76,7 @@ export function BottomNav({ currentView, onNavigate }: BottomNavProps) {
           type="button"
         >
           <span className={styles.tabIcon}>⚙️</span>
-          Settings
+          {t('nav.settings')}
         </button>
       </nav>
 
@@ -88,7 +90,7 @@ export function BottomNav({ currentView, onNavigate }: BottomNavProps) {
           />
           <div className={styles.sheet} role="dialog" aria-label="Study modes">
             <div className={styles.sheetHandle} />
-            <div className={styles.sheetTitle}>Study Mode</div>
+            <div className={styles.sheetTitle}>{t('nav.studyMode')}</div>
             {STUDY_MODES.map(mode => (
               <button
                 key={mode.view}

@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import type { KanjiEntry } from '@/core/srs/types'
 import type { CardSrsStatus } from '@/hooks/useCardStatus'
+import { useTranslation } from '@/i18n'
 import styles from './KanjiGrid.module.css'
 
 interface KanjiGridProps {
@@ -10,6 +11,7 @@ interface KanjiGridProps {
 }
 
 export function KanjiGrid({ kanji, onSelect, statusMap }: KanjiGridProps) {
+  const { t } = useTranslation()
   const grouped = useMemo(() => {
     const groups = new Map<number, KanjiEntry[]>()
     for (const k of kanji) {
@@ -23,7 +25,7 @@ export function KanjiGrid({ kanji, onSelect, statusMap }: KanjiGridProps) {
   if (kanji.length === 0) {
     return (
       <div className={styles.empty}>
-        <p>No kanji match your filters.</p>
+        <p>{t('browse.noMatch')}</p>
       </div>
     )
   }
@@ -32,16 +34,16 @@ export function KanjiGrid({ kanji, onSelect, statusMap }: KanjiGridProps) {
     <div className={styles.container}>
       {statusMap && (
         <div className={styles.legend}>
-          <span className={styles.legendItem}><span className={styles.legendDot} data-status="new" /> New</span>
-          <span className={styles.legendItem}><span className={styles.legendDot} data-status="learning" /> Learning</span>
-          <span className={styles.legendItem}><span className={styles.legendDot} data-status="mature" /> Mastered</span>
-          <span className={styles.legendItem}><span className={styles.legendDot} data-status="overdue" /> Overdue</span>
+          <span className={styles.legendItem}><span className={styles.legendDot} data-status="new" /> {t('browse.new')}</span>
+          <span className={styles.legendItem}><span className={styles.legendDot} data-status="learning" /> {t('browse.learning')}</span>
+          <span className={styles.legendItem}><span className={styles.legendDot} data-status="mature" /> {t('browse.mastered')}</span>
+          <span className={styles.legendItem}><span className={styles.legendDot} data-status="overdue" /> {t('browse.overdue')}</span>
         </div>
       )}
       {grouped.map(([grade, entries]) => (
         <section key={grade} className={styles.section}>
           <h3 className={styles.gradeHeader}>
-            {grade === 8 ? 'Secondary (Jōyō)' : `Grade ${grade}`}
+            {grade === 8 ? t('browse.secondaryJoyo') : t('browse.gradeHeader', { grade })}
             <span className={styles.count}>{entries.length}</span>
           </h3>
           <div className={styles.grid}>

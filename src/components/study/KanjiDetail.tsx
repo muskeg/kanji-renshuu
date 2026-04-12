@@ -1,4 +1,5 @@
 import type { KanjiEntry } from '@/core/srs/types'
+import { useTranslation } from '@/i18n'
 import styles from './KanjiDetail.module.css'
 import { StrokeOrder } from './StrokeOrder'
 
@@ -8,10 +9,12 @@ interface KanjiDetailProps {
 }
 
 export function KanjiDetail({ kanji, onBack }: KanjiDetailProps) {
+  const { t } = useTranslation()
+
   return (
     <div className={styles.container}>
       <button className={styles.backButton} onClick={onBack} type="button">
-        ← Back
+        {t('detail.back')}
       </button>
 
       <div className={styles.hero}>
@@ -22,11 +25,11 @@ export function KanjiDetail({ kanji, onBack }: KanjiDetailProps) {
       <div className={styles.sections}>
         {/* Readings */}
         <section className={styles.section}>
-          <h3 className={styles.sectionTitle}>Readings</h3>
+          <h3 className={styles.sectionTitle}>{t('detail.readings')}</h3>
 
           {kanji.readings.onYomi.length > 0 && (
             <div className={styles.readingRow}>
-              <span className={styles.readingType}>On&apos;yomi</span>
+              <span className={styles.readingType}>{t('reading.onYomi')}</span>
               <span className={styles.readingValue}>
                 {kanji.readings.onYomi.join('、')}
               </span>
@@ -35,7 +38,7 @@ export function KanjiDetail({ kanji, onBack }: KanjiDetailProps) {
 
           {kanji.readings.kunYomi.length > 0 && (
             <div className={styles.readingRow}>
-              <span className={styles.readingType}>Kun&apos;yomi</span>
+              <span className={styles.readingType}>{t('reading.kunYomi')}</span>
               <span className={styles.readingValue}>
                 {kanji.readings.kunYomi.join('、')}
               </span>
@@ -44,7 +47,7 @@ export function KanjiDetail({ kanji, onBack }: KanjiDetailProps) {
 
           {kanji.readings.nanori.length > 0 && (
             <div className={styles.readingRow}>
-              <span className={styles.readingType}>Nanori</span>
+              <span className={styles.readingType}>{t('reading.nanori')}</span>
               <span className={styles.readingValue}>
                 {kanji.readings.nanori.join('、')}
               </span>
@@ -54,32 +57,32 @@ export function KanjiDetail({ kanji, onBack }: KanjiDetailProps) {
 
         {/* Details */}
         <section className={styles.section}>
-          <h3 className={styles.sectionTitle}>Details</h3>
+          <h3 className={styles.sectionTitle}>{t('detail.details')}</h3>
           <div className={styles.detailGrid}>
             <div className={styles.detailItem}>
-              <span className={styles.detailLabel}>Grade</span>
+              <span className={styles.detailLabel}>{t('detail.grade')}</span>
               <span className={styles.detailValue}>
-                {kanji.grade === 8 ? 'Secondary' : kanji.grade}
+                {kanji.grade === 8 ? t('detail.secondary') : kanji.grade}
               </span>
             </div>
             <div className={styles.detailItem}>
-              <span className={styles.detailLabel}>Strokes</span>
+              <span className={styles.detailLabel}>{t('detail.strokes')}</span>
               <span className={styles.detailValue}>{kanji.strokeCount}</span>
             </div>
             {kanji.jlpt !== null && (
               <div className={styles.detailItem}>
-                <span className={styles.detailLabel}>JLPT</span>
+                <span className={styles.detailLabel}>{t('detail.jlpt')}</span>
                 <span className={styles.detailValue}>N{kanji.jlpt}</span>
               </div>
             )}
             {kanji.frequency !== null && (
               <div className={styles.detailItem}>
-                <span className={styles.detailLabel}>Frequency</span>
+                <span className={styles.detailLabel}>{t('detail.frequency')}</span>
                 <span className={styles.detailValue}>#{kanji.frequency}</span>
               </div>
             )}
             <div className={styles.detailItem}>
-              <span className={styles.detailLabel}>Radical</span>
+              <span className={styles.detailLabel}>{t('detail.radical')}</span>
               <span className={styles.detailValue}>#{kanji.radical}</span>
             </div>
           </div>
@@ -88,7 +91,7 @@ export function KanjiDetail({ kanji, onBack }: KanjiDetailProps) {
         {/* Components */}
         {kanji.components.length > 0 && (
           <section className={styles.section}>
-            <h3 className={styles.sectionTitle}>Components</h3>
+            <h3 className={styles.sectionTitle}>{t('detail.components')}</h3>
             <div className={styles.components}>
               {kanji.components.map((comp, i) => (
                 <span key={i} className={styles.component}>{comp}</span>
@@ -99,7 +102,7 @@ export function KanjiDetail({ kanji, onBack }: KanjiDetailProps) {
 
         {/* Stroke Order */}
         <section className={styles.section}>
-          <h3 className={styles.sectionTitle}>Stroke Order</h3>
+          <h3 className={styles.sectionTitle}>{t('detail.strokeOrder')}</h3>
           <StrokeOrder key={kanji.literal} svgData={kanji.strokeOrderSvg} />
         </section>
       </div>

@@ -38,6 +38,8 @@ describe('export/import', () => {
         showReadingsOnFront: false,
         theme: 'system',
         soundEnabled: false,
+        language: 'en',
+        uiScale: 100,
       })
 
       const json = await exportData()

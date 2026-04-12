@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useReducer, useRef, useEffect } from 'react'
+import { useTranslation } from '@/i18n'
 import styles from './StrokeOrder.module.css'
 
 interface StrokeOrderProps {
@@ -61,6 +62,7 @@ export function StrokeOrder({ svgData, size = 200 }: StrokeOrderProps) {
   const strokes = useMemo(() => parseStrokes(svgData), [svgData])
   const [state, dispatch] = useReducer(strokeReducer, { visibleStrokes: strokes.length, isPlaying: false })
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const { t } = useTranslation()
 
   const { visibleStrokes, isPlaying } = state
 
@@ -98,7 +100,7 @@ export function StrokeOrder({ svgData, size = 200 }: StrokeOrderProps) {
     return (
       <div className={styles.placeholder}>
         <span className={styles.placeholderText}>
-          Stroke order data not available
+          {t('strokeOrder.notAvailable')}
         </span>
       </div>
     )
@@ -141,18 +143,18 @@ export function StrokeOrder({ svgData, size = 200 }: StrokeOrderProps) {
         <button
           className={styles.controlButton}
           onClick={reset}
-          title="Reset"
+          title={t('strokeOrder.reset')}
           type="button"
-          aria-label="Reset stroke order"
+          aria-label={t('strokeOrder.resetAria')}
         >
           ⏮
         </button>
         <button
           className={styles.controlButton}
           onClick={isPlaying ? reset : play}
-          title={isPlaying ? 'Pause' : 'Play'}
+          title={isPlaying ? t('strokeOrder.pause') : t('strokeOrder.play')}
           type="button"
-          aria-label={isPlaying ? 'Pause animation' : 'Play animation'}
+          aria-label={isPlaying ? t('strokeOrder.pauseAria') : t('strokeOrder.playAria')}
         >
           {isPlaying ? '⏸' : '▶'}
         </button>
@@ -160,9 +162,9 @@ export function StrokeOrder({ svgData, size = 200 }: StrokeOrderProps) {
           className={styles.controlButton}
           onClick={stepForward}
           disabled={visibleStrokes >= strokes.length}
-          title="Next stroke"
+          title={t('strokeOrder.nextStroke')}
           type="button"
-          aria-label="Next stroke"
+          aria-label={t('strokeOrder.nextAria')}
         >
           ⏭
         </button>

@@ -5,6 +5,7 @@ import { RatingButtons } from './RatingButtons'
 import { SessionSummary } from './SessionSummary'
 import { EmptyState } from './EmptyState'
 import { RatingTooltip } from '@/components/onboarding/RatingTooltip'
+import { useTranslation } from '@/i18n'
 import styles from './ReviewSession.module.css'
 
 interface ReviewSessionProps {
@@ -27,6 +28,7 @@ export function ReviewSession({ kanjiData }: ReviewSessionProps) {
     retryStruggled,
     startNewSession,
   } = useReviewSession(kanjiData)
+  const { t } = useTranslation()
 
   if (phase === 'summary' && summary) {
     return (
@@ -48,16 +50,16 @@ export function ReviewSession({ kanjiData }: ReviewSessionProps) {
       <div className={styles.empty}>
         <div className={styles.emptyKanji}>漢</div>
         <h2 className={styles.emptyTitle}>
-          {kanjiData.length === 0 ? 'Loading...' : 'Ready to Study'}
+          {kanjiData.length === 0 ? t('review.loading') : t('review.readyToStudy')}
         </h2>
         <p className={styles.emptyText}>
           {kanjiData.length === 0
-            ? 'Loading kanji data...'
-            : 'Start a review session to practice your kanji.'}
+            ? t('review.loadingData')
+            : t('review.startPrompt')}
         </p>
         {kanjiData.length > 0 && (
           <button className={styles.startButton} onClick={startSession}>
-            Start Review
+            {t('review.startReview')}
           </button>
         )}
       </div>

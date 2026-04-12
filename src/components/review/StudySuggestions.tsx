@@ -1,5 +1,6 @@
 import type { QueueStatus } from '@/core/srs/types'
 import { useSuggestions } from '@/hooks/useSuggestions'
+import { useTranslation } from '@/i18n'
 import styles from './StudySuggestions.module.css'
 
 interface StudySuggestionsProps {
@@ -8,13 +9,14 @@ interface StudySuggestionsProps {
 }
 
 export function StudySuggestions({ status, onStart }: StudySuggestionsProps) {
+  const { t } = useTranslation()
   const suggestions = useSuggestions(status)
 
   if (suggestions.length === 0) return null
 
   return (
     <div className={styles.container}>
-      <div className={styles.heading}>Suggested next</div>
+      <div className={styles.heading}>{t('suggestions.heading')}</div>
       {suggestions.map((s, i) => {
         const isClickable = s.action === 'start' && onStart
         return (

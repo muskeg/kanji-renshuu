@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from '@/i18n'
 import styles from './SearchBar.module.css'
 
 interface SearchBarProps {
@@ -7,8 +8,9 @@ interface SearchBarProps {
   placeholder?: string
 }
 
-export function SearchBar({ value, onChange, placeholder = 'Search kanji, readings, meanings…' }: SearchBarProps) {
+export function SearchBar({ value, onChange, placeholder }: SearchBarProps) {
   const [focused, setFocused] = useState(false)
+  const { t } = useTranslation()
 
   return (
     <div className={`${styles.wrapper} ${focused ? styles.focused : ''}`}>
@@ -23,14 +25,14 @@ export function SearchBar({ value, onChange, placeholder = 'Search kanji, readin
         onChange={e => onChange(e.target.value)}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
-        placeholder={placeholder}
-        aria-label="Search kanji"
+        placeholder={placeholder ?? t('browse.searchPlaceholder')}
+        aria-label={t('browse.searchLabel')}
       />
       {value && (
         <button
           className={styles.clear}
           onClick={() => onChange('')}
-          aria-label="Clear search"
+          aria-label={t('browse.clearSearch')}
           type="button"
         >
           ✕

@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import type { KanjiEntry } from '@/core/srs/types'
+import { useTranslation } from '@/i18n'
 import styles from './KanjiOfTheDay.module.css'
 
 interface KanjiOfTheDayProps {
@@ -15,6 +16,7 @@ function pickDaily(kanjiData: KanjiEntry[]): KanjiEntry | null {
 
 export function KanjiOfTheDay({ kanjiData }: KanjiOfTheDayProps) {
   const kanji = useMemo(() => pickDaily(kanjiData), [kanjiData])
+  const { t } = useTranslation()
 
   if (!kanji) return null
 
@@ -25,13 +27,13 @@ export function KanjiOfTheDay({ kanjiData }: KanjiOfTheDayProps) {
 
   return (
     <div className={styles.container}>
-      <span className={styles.heading}>Today&apos;s Kanji</span>
+      <span className={styles.heading}>{t('kanjiOfDay.heading')}</span>
       <span className={styles.kanji}>{kanji.literal}</span>
       <span className={styles.readings}>{readings}</span>
       <span className={styles.meaning}>{kanji.meanings.slice(0, 3).join(', ')}</span>
       <div className={styles.meta}>
-        <span className={styles.tag}>Grade {kanji.grade === 8 ? 'S' : kanji.grade}</span>
-        <span className={styles.tag}>{kanji.strokeCount} strokes</span>
+        <span className={styles.tag}>{kanji.grade === 8 ? t('kanjiOfDay.gradeS') : t('kanjiOfDay.grade', { grade: kanji.grade })}</span>
+        <span className={styles.tag}>{t('kanjiOfDay.strokes', { count: kanji.strokeCount })}</span>
         {kanji.jlpt && <span className={styles.tag}>N{kanji.jlpt}</span>}
       </div>
     </div>

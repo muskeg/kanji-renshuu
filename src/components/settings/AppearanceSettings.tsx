@@ -1,17 +1,28 @@
 import { useState } from 'react'
 import { useTheme } from '@/hooks/useTheme'
 import { loadSettings, saveSettings } from '@/core/storage/settings'
+import { useTranslation } from '@/i18n'
+import type { Locale } from '@/i18n/types'
 import styles from './AppearanceSettings.module.css'
 
-const THEME_OPTIONS = [
-  { value: 'system', label: 'System', icon: '💻' },
-  { value: 'light', label: 'Light', icon: '☀️' },
-  { value: 'dark', label: 'Dark', icon: '🌙' },
-] as const
+const SCALE_OPTIONS = [75, 80, 90, 100, 110, 125, 150] as const
 
 export function AppearanceSettings() {
+  const { t, locale, setLocale } = useTranslation()
   const { theme, setTheme } = useTheme()
   const [soundEnabled, setSoundEnabled] = useState(() => loadSettings().soundEnabled)
+  const [uiScale, setUiScale] = useState(() => loadSettings().uiScale)
+
+  const THEME_OPTIONS = [
+    { value: 'system', label: t('appearance.system'), icon: '💻' },
+    { value: 'light', label: t('appearance.light'), icon: '☀️' },
+    { value: 'dark', label: t('appearance.dark'), icon: '🌙' },
+  ] as const
+
+  const LANGUAGE_OPTIONS: { value: Locale; label: string }[] = [
+    { value: 'en', label: 'English' },
+    { value: 'fr', label: 'Français' },
+  ]
 
   const toggleSound = () => {
     const next = !soundEnabled
@@ -24,8 +35,31 @@ export function AppearanceSettings() {
   return (
     <div className={styles.container}>
       <div className={styles.group}>
-        <span className={styles.label}>Theme</span>
-        <span className={styles.hint}>Choose your preferred color scheme</span>
+        <span className={styles.label}>{t('appearance.language')}</span>
+        <span className={styles.hint}>{t('appearance.languageHint')}</span>
+        <div className={styles.options}>
+          {LANGUAGE_OPTIONS.map(opt => (
+            <button
+              key={opt.value}
+              className={`${styles.option} ${locale === opt.value ? styles.optionActive : ''}`}
+              onClick={() => {
+                setLocale(opt.value)
+                const settings = loadSettings()
+                settings.language = opt.value
+                saveSettings(settings)
+              }}
+              type="button"
+              aria-pressed={locale === opt.value}
+            >
+              <span className={styles.optionLabel}>{opt.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className={styles.group}>
+        <span className={styles.label}>{t('appearance.theme')}</span>
+        <span className={styles.hint}>{t('appearance.themeHint')}</span>
         <div className={styles.options}>
           {THEME_OPTIONS.map(opt => (
             <button
@@ -43,8 +77,8 @@ export function AppearanceSettings() {
       </div>
 
       <div className={styles.group}>
-        <span className={styles.label}>Sound Effects</span>
-        <span className={styles.hint}>Play audio feedback during reviews</span>
+        <span className={styles.label}>{t('appearance.sound')}</span>
+        <span className={styles.hint}>{t('appearance.soundHint')}</span>
         <button
           className={`${styles.toggle} ${soundEnabled ? styles.toggleOn : ''}`}
           onClick={toggleSound}
@@ -53,8 +87,31 @@ export function AppearanceSettings() {
           aria-checked={soundEnabled}
         >
           <span className={styles.toggleThumb} />
-          <span className={styles.toggleLabel}>{soundEnabled ? 'On' : 'Off'}</span>
+          <span className={styles.toggleLabel}>{soundEnabled ? t('appearance.on') : t('appearance.off')}</span>
         </button>
+      </div>
+
+      <div className={styles.group}>
+        <span className={styles.label}>{t('appearance.uiScale')}</span>
+        <span className={styles.hint}>{t('appearance.uiScaleHint')}</span>
+        <div className={styles.scaleControl}>
+          <select
+            className={styles.scaleSelect}
+            value={uiScale}
+            onChange={e => {
+              const value = Number(e.target.value)
+              setUiScale(value)
+              const settings = loadSettings()
+              settings.uiScale = value
+              saveSettings(settings)
+              document.documentElement.style.zoom = `${value}%`
+            }}
+          >
+            {SCALE_OPTIONS.map(v => (
+              <option key={v} value={v}>{v}%</option>
+            ))}
+          </select>
+        </div>
       </div>
     </div>
   )

@@ -1,3 +1,4 @@
+import { useTranslation } from '@/i18n'
 import styles from './LevelProgress.module.css'
 
 interface LevelProgressProps {
@@ -5,15 +6,17 @@ interface LevelProgressProps {
   jlptProgress: { level: number; total: number; introduced: number }[]
 }
 
-function gradeLabel(grade: number): string {
-  return grade === 8 ? 'Secondary' : `Grade ${grade}`
-}
-
 export function LevelProgress({ gradeProgress, jlptProgress }: LevelProgressProps) {
+  const { t } = useTranslation()
+
+  function gradeLabel(grade: number): string {
+    return grade === 8 ? t('grades.secondary') : t('grades.grade', { grade })
+  }
+
   return (
     <div className={styles.container}>
       <section>
-        <h3 className={styles.sectionTitle}>By Grade</h3>
+        <h3 className={styles.sectionTitle}>{t('levels.byGrade')}</h3>
         <div className={styles.items}>
           {gradeProgress.map(({ grade, total, introduced }) => (
             <div key={grade} className={styles.item}>
@@ -31,7 +34,7 @@ export function LevelProgress({ gradeProgress, jlptProgress }: LevelProgressProp
       </section>
 
       <section>
-        <h3 className={styles.sectionTitle}>By JLPT Level</h3>
+        <h3 className={styles.sectionTitle}>{t('levels.byJlpt')}</h3>
         <div className={styles.items}>
           {jlptProgress.map(({ level, total, introduced }) => (
             <div key={level} className={styles.item}>

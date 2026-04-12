@@ -1,3 +1,4 @@
+import { useTranslation } from '@/i18n'
 import styles from './GradeJourney.module.css'
 
 interface GradeData {
@@ -10,18 +11,20 @@ interface GradeJourneyProps {
   gradeProgress: GradeData[]
 }
 
-function gradeLabel(grade: number): string {
-  return grade === 8 ? 'Secondary' : `Grade ${grade}`
-}
-
-function nodeStatus(g: GradeData): 'completed' | 'current' | 'future' {
-  if (g.introduced >= g.total && g.total > 0) return 'completed'
-  if (g.introduced > 0) return 'current'
-  // First grade with 0 introduced but all previous are complete → current
-  return 'future'
-}
-
 export function GradeJourney({ gradeProgress }: GradeJourneyProps) {
+  const { t } = useTranslation()
+
+  function gradeLabel(grade: number): string {
+    return grade === 8 ? t('grades.secondary') : t('grades.grade', { grade })
+  }
+
+  function nodeStatus(g: GradeData) {
+    if (g.introduced >= g.total && g.total > 0) return 'completed'
+    if (g.introduced > 0) return 'current'
+    // First grade with 0 introduced but all previous are complete → current
+    return 'future'
+  }
+
   // Determine statuses — first "future" grade after all completed should be "current"
   const statuses = gradeProgress.map(g => nodeStatus(g))
   const firstFuture = statuses.indexOf('future')
@@ -71,7 +74,7 @@ export function GradeJourney({ gradeProgress }: GradeJourneyProps) {
                   {g.introduced}/{g.total}
                 </span>
                 {status === 'current' && (
-                  <span className={styles.marker}>← You are here</span>
+                  <span className={styles.marker}>{t('grades.youAreHere')}</span>
                 )}
               </div>
             </div>
@@ -82,7 +85,7 @@ export function GradeJourney({ gradeProgress }: GradeJourneyProps) {
         <div className={`${styles.connector} ${allComplete ? styles.connectorDone : ''}`} />
         <div className={`${styles.node} ${styles.master} ${allComplete ? styles.nodeCompleted : styles.nodeFuture}`}>
           <div className={styles.circle}>🏆</div>
-          <span className={styles.label}>Jōyō Master</span>
+          <span className={styles.label}>{t('grades.joyoMaster')}</span>
         </div>
       </div>
     </div>

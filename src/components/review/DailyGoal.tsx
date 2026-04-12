@@ -1,4 +1,5 @@
 import { useQueueStats } from '@/hooks/useQueueStats'
+import { useTranslation } from '@/i18n'
 import styles from './DailyGoal.module.css'
 
 function streakIcon(streak: number): string {
@@ -10,16 +11,17 @@ function streakIcon(streak: number): string {
 
 export function DailyGoal({ onReview }: { onReview?: () => void }) {
   const { dueCount, newToday, newLimit, currentStreak, activatedToday } = useQueueStats()
+  const { t } = useTranslation()
 
   const newPct = newLimit > 0 ? Math.min(100, (newToday / newLimit) * 100) : 0
   const reviewsDone = dueCount === 0 && activatedToday
 
   return (
     <div className={styles.container}>
-      <h3 className={styles.heading}>Today&apos;s Goal</h3>
+      <h3 className={styles.heading}>{t('dailyGoal.heading')}</h3>
 
       <div className={styles.row}>
-        <span className={styles.label}>New kanji</span>
+        <span className={styles.label}>{t('dailyGoal.newKanji')}</span>
         <div className={styles.barTrack}>
           <div
             className={styles.barFill}
@@ -34,7 +36,7 @@ export function DailyGoal({ onReview }: { onReview?: () => void }) {
       </div>
 
       <div className={styles.row}>
-        <span className={styles.label}>Reviews</span>
+        <span className={styles.label}>{t('dailyGoal.reviews')}</span>
         <div className={styles.barTrack}>
           <div
             className={`${styles.barFill} ${styles.barReview}`}
@@ -42,13 +44,13 @@ export function DailyGoal({ onReview }: { onReview?: () => void }) {
           />
         </div>
         <span className={styles.count}>
-          {reviewsDone ? 'Done ✅' : dueCount > 0 ? `${dueCount} due` : 'None due'}
+          {reviewsDone ? t('dailyGoal.done') : dueCount > 0 ? t('dailyGoal.due', { count: dueCount }) : t('dailyGoal.noneDue')}
         </span>
       </div>
 
       {dueCount > 0 && onReview && (
         <button className={styles.reviewAction} onClick={onReview} type="button">
-          Review {dueCount} card{dueCount === 1 ? '' : 's'} →
+          {dueCount === 1 ? t('dailyGoal.reviewCards', { count: dueCount }) : t('dailyGoal.reviewCardsPlural', { count: dueCount })}
         </button>
       )}
 
@@ -56,7 +58,7 @@ export function DailyGoal({ onReview }: { onReview?: () => void }) {
         <div className={`${styles.streak} ${currentStreak >= 30 ? styles.streakGold : ''}`}>
           <span className={styles.streakIcon}>{streakIcon(currentStreak)}</span>
           <span className={styles.streakNum}>{currentStreak}</span>
-          <span className={styles.streakLabel}>day streak</span>
+          <span className={styles.streakLabel}>{t('dailyGoal.dayStreak')}</span>
         </div>
       )}
     </div>

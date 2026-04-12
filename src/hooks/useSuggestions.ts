@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import type { QueueStatus, QuizMode } from '@/core/srs/types'
 import { getReviewLogsByDate, todayDateString } from '@/core/storage/db'
+import { t } from '@/i18n'
 
 export interface Suggestion {
   icon: string
@@ -10,11 +11,11 @@ export interface Suggestion {
 
 const ALL_MODES: QuizMode[] = ['recognition', 'meaning', 'reading', 'writing']
 
-const MODE_LABELS: Record<QuizMode, string> = {
-  recognition: 'Flashcards',
-  meaning: 'Meaning Quiz',
-  reading: 'Reading Quiz',
-  writing: 'Writing Practice',
+const MODE_LABEL_KEYS: Record<QuizMode, string> = {
+  recognition: 'mode.flashcards',
+  meaning: 'mode.meaningQuiz',
+  reading: 'mode.readingQuiz',
+  writing: 'mode.writingPractice',
 }
 
 export function useSuggestions(status: QueueStatus | null): Suggestion[] {
@@ -40,13 +41,15 @@ export function useSuggestions(status: QueueStatus | null): Suggestion[] {
       if (reviewCount > 0) {
         result.push({
           icon: '📋',
-          text: `${reviewCount} review${reviewCount === 1 ? '' : 's'} due — clear your queue first`,
+          text: reviewCount === 1
+            ? t('suggestions.reviewsDue', { count: reviewCount })
+            : t('suggestions.reviewsDuePlural', { count: reviewCount }),
           action: 'start',
         })
       } else if (newCount > 0) {
         result.push({
           icon: '✨',
-          text: `${newCount} new kanji ready to learn`,
+          text: t('suggestions.newReady', { count: newCount }),
           action: 'start',
         })
       }
@@ -59,7 +62,7 @@ export function useSuggestions(status: QueueStatus | null): Suggestion[] {
         const suggest = unusedModes[0]!
         result.push({
           icon: '🎯',
-          text: `Try ${MODE_LABELS[suggest]} — you haven't used it today`,
+          text: t('suggestions.tryMode', { mode: t(MODE_LABEL_KEYS[suggest] as 'mode.flashcards') }),
           action: suggest,
         })
       }
@@ -75,10 +78,10 @@ export function useSuggestions(status: QueueStatus | null): Suggestion[] {
         if (gradeMap.size > 1) {
           const [topGrade, count] = [...gradeMap.entries()]
             .sort((a, b) => b[1] - a[1])[0]!
-          const label = topGrade === 8 ? 'Secondary' : `Grade ${topGrade}`
+          const label = topGrade === 8 ? t('grades.secondary') : t('grades.grade', { grade: topGrade })
           result.push({
             icon: '🏅',
-            text: `${label}: ${count} reviews — your most active grade`,
+            text: t('suggestions.gradeReviews', { label, count }),
           })
         }
       }

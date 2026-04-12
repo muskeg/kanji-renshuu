@@ -65,6 +65,8 @@ export interface AppSettings {
   showReadingsOnFront: boolean
   theme: 'dark' | 'light' | 'system'
   soundEnabled: boolean
+  language: 'en' | 'fr'
+  uiScale: number
 }
 
 /** Default settings */
@@ -77,6 +79,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
   showReadingsOnFront: false,
   theme: 'system',
   soundEnabled: false,
+  language: 'en',
+  uiScale: 100,
 }
 
 /** Review session state */

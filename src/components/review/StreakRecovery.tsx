@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { getBrokenStreak, dismissBrokenStreak } from '@/core/srs/streakFreeze'
+import { useTranslation } from '@/i18n'
 import styles from './StreakRecovery.module.css'
 
 export function StreakRecovery() {
   const [broken] = useState(() => getBrokenStreak())
   const [dismissed, setDismissed] = useState(false)
+  const { t } = useTranslation()
 
   if (!broken || dismissed) return null
 
@@ -18,10 +20,10 @@ export function StreakRecovery() {
       <span className={styles.icon}>💪</span>
       <div className={styles.text}>
         <div className={styles.title}>
-          Your {broken.streak}-day streak ended
+          {t('streakRecovery.title', { count: broken.streak })}
         </div>
         <div className={styles.body}>
-          Start a new one today!
+          {t('streakRecovery.body')}
         </div>
       </div>
       <button className={styles.dismiss} onClick={handleDismiss} type="button">

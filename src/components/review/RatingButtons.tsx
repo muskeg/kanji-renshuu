@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import type { Card } from 'ts-fsrs'
 import type { RatingValue } from '@/core/srs/types'
 import { previewCard } from '@/core/srs/scheduler'
+import { useTranslation } from '@/i18n'
 import styles from './RatingButtons.module.css'
 
 interface RatingButtonsProps {
@@ -24,14 +25,15 @@ function formatInterval(card: Card): string {
   return `${diffDays}d`
 }
 
-const BUTTONS: { rating: RatingValue; label: string; key: string; style: string }[] = [
-  { rating: 1, label: 'Again', key: '1', style: styles.again },
-  { rating: 2, label: 'Hard', key: '2', style: styles.hard },
-  { rating: 3, label: 'Good', key: '3', style: styles.good },
-  { rating: 4, label: 'Easy', key: '4', style: styles.easy },
+const BUTTONS: { rating: RatingValue; labelKey: 'rating.again' | 'rating.hard' | 'rating.good' | 'rating.easy'; key: string; style: string }[] = [
+  { rating: 1, labelKey: 'rating.again', key: '1', style: styles.again },
+  { rating: 2, labelKey: 'rating.hard', key: '2', style: styles.hard },
+  { rating: 3, labelKey: 'rating.good', key: '3', style: styles.good },
+  { rating: 4, labelKey: 'rating.easy', key: '4', style: styles.easy },
 ]
 
 export function RatingButtons({ card, onRate, disabled }: RatingButtonsProps) {
+  const { t } = useTranslation()
   const previews = useMemo(() => {
     try {
       return previewCard(card)
@@ -41,8 +43,9 @@ export function RatingButtons({ card, onRate, disabled }: RatingButtonsProps) {
   }, [card])
 
   return (
-    <div className={styles.container} role="group" aria-label="Rate your recall">
-      {BUTTONS.map(({ rating, label, key, style }) => {
+    <div className={styles.container} role="group" aria-label={t('rating.rateRecall')}>
+      {BUTTONS.map(({ rating, labelKey, key, style }) => {
+        const label = t(labelKey)
         const previewItem = previews?.[rating as keyof typeof previews]
         const preview = previewItem && typeof previewItem === 'object' && 'card' in previewItem ? previewItem : null
         const interval = preview ? formatInterval(preview.card) : ''
@@ -53,7 +56,7 @@ export function RatingButtons({ card, onRate, disabled }: RatingButtonsProps) {
             className={`${styles.button} ${style}`}
             onClick={() => onRate(rating)}
             disabled={disabled}
-            aria-label={`${label} - next review in ${interval}`}
+            aria-label={t('rating.nextReview', { label, interval })}
           >
             <span className={styles.label}>{label}</span>
             <span className={styles.shortcut}>{key}</span>

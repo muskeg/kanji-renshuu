@@ -1,3 +1,4 @@
+import { useTranslation } from '@/i18n'
 import styles from './FilterBar.module.css'
 
 export interface KanjiFilter {
@@ -19,10 +20,18 @@ function toggleInArray<T>(arr: T[], item: T): T[] {
 }
 
 export function FilterBar({ filter, onChange }: FilterBarProps) {
+  const { t } = useTranslation()
+
+  const STATUS_LABELS: Record<string, string> = {
+    new: t('browse.new'),
+    learning: t('browse.learning'),
+    review: t('browse.review'),
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.group}>
-        <span className={styles.label}>Grade</span>
+        <span className={styles.label}>{t('browse.grade')}</span>
         <div className={styles.chips}>
           {GRADES.map(g => (
             <button
@@ -38,7 +47,7 @@ export function FilterBar({ filter, onChange }: FilterBarProps) {
       </div>
 
       <div className={styles.group}>
-        <span className={styles.label}>JLPT</span>
+        <span className={styles.label}>{t('browse.jlpt')}</span>
         <div className={styles.chips}>
           {JLPT_LEVELS.map(n => (
             <button
@@ -54,7 +63,7 @@ export function FilterBar({ filter, onChange }: FilterBarProps) {
       </div>
 
       <div className={styles.group}>
-        <span className={styles.label}>Status</span>
+        <span className={styles.label}>{t('browse.status')}</span>
         <div className={styles.chips}>
           {(['new', 'learning', 'review'] as const).map(s => (
             <button
@@ -63,7 +72,7 @@ export function FilterBar({ filter, onChange }: FilterBarProps) {
               onClick={() => onChange({ ...filter, status: toggleInArray(filter.status, s) })}
               type="button"
             >
-              {s.charAt(0).toUpperCase() + s.slice(1)}
+              {STATUS_LABELS[s]}
             </button>
           ))}
         </div>
@@ -75,7 +84,7 @@ export function FilterBar({ filter, onChange }: FilterBarProps) {
           onClick={() => onChange({ grades: [], jlptLevels: [], status: [] })}
           type="button"
         >
-          Clear all
+          {t('browse.clearAll')}
         </button>
       )}
     </div>

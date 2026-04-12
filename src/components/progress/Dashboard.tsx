@@ -5,6 +5,7 @@ import { ReviewForecast } from './ReviewForecast'
 import { GradeJourney } from './GradeJourney'
 import { LevelProgress } from './LevelProgress'
 import { AchievementGallery } from './AchievementGallery'
+import { useTranslation } from '@/i18n'
 import styles from './Dashboard.module.css'
 
 interface DashboardProps {
@@ -21,10 +22,11 @@ function formatTime(ms: number): string {
 
 export function Dashboard({ kanjiData }: DashboardProps) {
   const progress = useProgress(kanjiData)
+  const { t } = useTranslation()
 
   if (progress.loading) {
     return (
-      <div className={styles.loading}>Loading progress data...</div>
+      <div className={styles.loading}>{t('progress.loading')}</div>
     )
   }
 
@@ -34,51 +36,51 @@ export function Dashboard({ kanjiData }: DashboardProps) {
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.heading}>Progress</h2>
+      <h2 className={styles.heading}>{t('progress.title')}</h2>
 
       {/* Today's Stats */}
       <section className={styles.section}>
-        <h3 className={styles.sectionTitle}>Today</h3>
+        <h3 className={styles.sectionTitle}>{t('progress.today')}</h3>
         <div className={styles.statsRow}>
           <div className={styles.statCard}>
             <span className={styles.statValue}>{progress.todayReviews}</span>
-            <span className={styles.statLabel}>Reviews</span>
+            <span className={styles.statLabel}>{t('progress.reviews')}</span>
           </div>
           <div className={styles.statCard}>
             <span className={`${styles.statValue} ${accuracy >= 80 ? styles.good : accuracy > 0 ? styles.warn : ''}`}>
               {progress.todayReviews > 0 ? `${accuracy}%` : '—'}
             </span>
-            <span className={styles.statLabel}>Accuracy</span>
+            <span className={styles.statLabel}>{t('progress.accuracy')}</span>
           </div>
           <div className={styles.statCard}>
             <span className={styles.statValue}>{progress.todayNewCards}</span>
-            <span className={styles.statLabel}>New Cards</span>
+            <span className={styles.statLabel}>{t('progress.newCards')}</span>
           </div>
           <div className={styles.statCard}>
             <span className={styles.statValue}>{formatTime(progress.todayTimeMs)}</span>
-            <span className={styles.statLabel}>Time</span>
+            <span className={styles.statLabel}>{t('progress.time')}</span>
           </div>
         </div>
       </section>
 
       {/* Upcoming Reviews Forecast */}
       <section className={styles.section}>
-        <h3 className={styles.sectionTitle}>Upcoming Reviews</h3>
+        <h3 className={styles.sectionTitle}>{t('progress.upcomingReviews')}</h3>
         <ReviewForecast />
       </section>
 
       {/* Streak */}
       <section className={styles.section}>
-        <h3 className={styles.sectionTitle}>Streak</h3>
+        <h3 className={styles.sectionTitle}>{t('progress.streakTitle')}</h3>
         <div className={styles.streakRow}>
           <div className={styles.streakMain}>
             <span className={styles.streakNumber}>{progress.currentStreak}</span>
-            <span className={styles.streakUnit}>day streak</span>
+            <span className={styles.streakUnit}>{t('progress.dayStreak')}</span>
           </div>
           <div className={styles.streakMeta}>
-            <span className={styles.metaItem}>Longest: {progress.longestStreak} days</span>
+            <span className={styles.metaItem}>{t('progress.longest', { days: progress.longestStreak })}</span>
             <span className={styles.metaItem}>
-              Retention: {progress.retentionRate > 0 ? `${Math.round(progress.retentionRate * 100)}%` : '—'}
+              {progress.retentionRate > 0 ? t('progress.retention', { rate: Math.round(progress.retentionRate * 100) }) : '—'}
             </span>
           </div>
         </div>
@@ -86,31 +88,31 @@ export function Dashboard({ kanjiData }: DashboardProps) {
 
       {/* Overview */}
       <section className={styles.section}>
-        <h3 className={styles.sectionTitle}>Overview</h3>
+        <h3 className={styles.sectionTitle}>{t('progress.overview')}</h3>
         <div className={styles.overviewRow}>
           <span className={styles.overviewItem}>
-            <strong>{progress.introduced}</strong> introduced
+            <strong>{progress.introduced}</strong> {t('progress.introduced', { count: '' }).trim()}
           </span>
           <span className={styles.overviewDivider}>/</span>
           <span className={styles.overviewItem}>
-            <strong>{progress.totalKanji}</strong> total
+            <strong>{progress.totalKanji}</strong> {t('progress.total', { count: '' }).trim()}
           </span>
           <span className={styles.overviewDivider}>·</span>
           <span className={styles.overviewItem}>
-            <strong>{progress.notStarted}</strong> remaining
+            <strong>{progress.notStarted}</strong> {t('progress.remaining', { count: '' }).trim()}
           </span>
         </div>
       </section>
 
       {/* Activity Heatmap */}
       <section className={styles.section}>
-        <h3 className={styles.sectionTitle}>Activity</h3>
+        <h3 className={styles.sectionTitle}>{t('progress.activity')}</h3>
         <StreakCalendar dailyActivity={progress.dailyActivity} />
       </section>
 
       {/* Grade Journey */}
       <section className={styles.section}>
-        <h3 className={styles.sectionTitle}>Grade Journey</h3>
+        <h3 className={styles.sectionTitle}>{t('progress.gradeJourney')}</h3>
         <GradeJourney gradeProgress={progress.gradeProgress} />
       </section>
 
@@ -124,7 +126,7 @@ export function Dashboard({ kanjiData }: DashboardProps) {
 
       {/* Achievements */}
       <section className={styles.section}>
-        <h3 className={styles.sectionTitle}>Achievements</h3>
+        <h3 className={styles.sectionTitle}>{t('progress.achievements')}</h3>
         <AchievementGallery kanjiData={kanjiData} />
       </section>
     </div>

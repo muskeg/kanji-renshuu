@@ -43,6 +43,15 @@ export function useReviewSession(kanjiData: KanjiEntry[]) {
 
   const cardStartTimeRef = useRef<number>(0)
 
+  const flipBackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Clean up pending flip-back timer on unmount
+  useEffect(() => {
+    return () => {
+      if (flipBackTimerRef.current) clearTimeout(flipBackTimerRef.current)
+    }
+  }, [])
+
   // Prefetch queue status on mount so idle screen shows context
   useEffect(() => {
     if (kanjiData.length === 0) return
@@ -130,15 +139,22 @@ export function useReviewSession(kanjiData: KanjiEntry[]) {
         isFlipped: false,
       }))
     } else {
+      // Flip back first, then swap content after the CSS transition completes
       setState(prev => ({
         ...prev,
-        currentIndex: nextIndex,
         isFlipped: false,
         ratings: newRatings,
         reviewedCards: newReviewedCards,
       }))
-      cardStartTimeRef.current = Date.now()
       if (rating >= 3) playCorrectSound()
+      flipBackTimerRef.current = setTimeout(() => {
+        flipBackTimerRef.current = null
+        setState(prev => ({
+          ...prev,
+          currentIndex: nextIndex,
+        }))
+        cardStartTimeRef.current = Date.now()
+      }, 420) // slightly longer than 400ms CSS transition
     }
   }, [state, kanjiData])
 

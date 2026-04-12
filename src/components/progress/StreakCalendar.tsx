@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { getFrozenDates } from '@/core/srs/streakFreeze'
+import { useTranslation } from '@/i18n'
 import styles from './StreakCalendar.module.css'
 
 interface StreakCalendarProps {
@@ -14,20 +15,27 @@ function getColorLevel(count: number): string {
   return styles.level4
 }
 
-function formatTooltip(date: string, count: number, correct: number): string {
-  const d = new Date(date + 'T00:00:00')
-  const formatted = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-  if (count === 0) return `${formatted}\nNo reviews`
-  const accuracy = Math.round((correct / count) * 100)
-  return `${formatted}\n${count} reviews · ${accuracy}% accuracy`
-}
-
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-const DAYS = ['', 'M', '', 'W', '', 'F', '']
-
 export function StreakCalendar({ dailyActivity }: StreakCalendarProps) {
   const [selected, setSelected] = useState<{ date: string; count: number; correct: number } | null>(null)
+  const { t, locale } = useTranslation()
+
+  const dateLocale = locale === 'fr' ? 'fr-FR' : 'en-US'
+
+  function formatTooltip(date: string, count: number, correct: number): string {
+    const d = new Date(date + 'T00:00:00')
+    const formatted = d.toLocaleDateString(dateLocale, { month: 'short', day: 'numeric', year: 'numeric' })
+    if (count === 0) return `${formatted}\n${t('calendar.noReviews')}`
+    const accuracy = Math.round((correct / count) * 100)
+    return `${formatted}\n${t('calendar.reviewCount', { count })} · ${t('calendar.accuracyPct', { pct: accuracy })}`
+  }
+
+  const DAYS = ['', t('calendar.mon'), '', t('calendar.wed'), '', t('calendar.fri'), '']
   const { weeks, monthLabels } = useMemo(() => {
+    const MONTHS = [
+      t('calendar.jan'), t('calendar.feb'), t('calendar.mar'), t('calendar.apr'),
+      t('calendar.may'), t('calendar.jun'), t('calendar.jul'), t('calendar.aug'),
+      t('calendar.sep'), t('calendar.oct'), t('calendar.nov'), t('calendar.dec'),
+    ]
     const activityMap = new Map(dailyActivity.map(a => [a.date, { count: a.count, correct: a.correct }]))
     const frozenDates = getFrozenDates()
 
@@ -87,7 +95,7 @@ export function StreakCalendar({ dailyActivity }: StreakCalendarProps) {
     }
 
     return { weeks, monthLabels }
-  }, [dailyActivity])
+  }, [dailyActivity, t])
 
   return (
     <div className={styles.container}>
@@ -117,7 +125,7 @@ export function StreakCalendar({ dailyActivity }: StreakCalendarProps) {
                     key={di}
                     className={`${styles.cell} ${day.frozen ? styles.frozen : getColorLevel(day.count)} ${day.isToday ? styles.today : ''}`}
                     data-tooltip={day.frozen
-                      ? `${new Date(day.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}\n❄️ Streak freeze used`
+                      ? `${new Date(day.date + 'T00:00:00').toLocaleDateString(dateLocale, { month: 'short', day: 'numeric', year: 'numeric' })}\n${t('calendar.freezeUsed')}`
                       : formatTooltip(day.date, day.count, day.correct)}
                     style={{ gridRow: day.dayOfWeek + 1 }}
                     onClick={() => setSelected(
@@ -136,17 +144,17 @@ export function StreakCalendar({ dailyActivity }: StreakCalendarProps) {
       {selected && (
         <div className={styles.panel}>
           <span className={styles.panelDate}>
-            {new Date(selected.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+            {new Date(selected.date + 'T00:00:00').toLocaleDateString(dateLocale, { weekday: 'short', month: 'short', day: 'numeric' })}
           </span>
           {selected.count > 0 ? (
             <>
-              <span className={styles.panelStat}>{selected.count} reviews</span>
+              <span className={styles.panelStat}>{t('calendar.reviewCount', { count: selected.count })}</span>
               <span className={styles.panelStat}>
-                {Math.round((selected.correct / selected.count) * 100)}% accuracy
+                {t('calendar.accuracyPct', { pct: Math.round((selected.correct / selected.count) * 100) })}
               </span>
             </>
           ) : (
-            <span className={styles.panelStat}>No reviews</span>
+            <span className={styles.panelStat}>{t('calendar.noReviews')}</span>
           )}
         </div>
       )}

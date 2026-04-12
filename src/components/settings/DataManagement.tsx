@@ -1,8 +1,10 @@
 import { useState, useRef } from 'react'
 import { exportData, importData, downloadJson } from '@/core/storage/export'
+import { useTranslation } from '@/i18n'
 import styles from './DataManagement.module.css'
 
 export function DataManagement() {
+  const { t } = useTranslation()
   const [status, setStatus] = useState<string | null>(null)
   const [isError, setIsError] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -12,10 +14,10 @@ export function DataManagement() {
       const json = await exportData()
       const date = new Date().toISOString().split('T')[0]
       downloadJson(json, `kanji-renshuu-backup-${date}.json`)
-      setStatus('Export downloaded successfully')
+      setStatus(t('data.exportSuccess'))
       setIsError(false)
     } catch {
-      setStatus('Export failed')
+      setStatus(t('data.exportFailed'))
       setIsError(true)
     }
   }
@@ -27,10 +29,10 @@ export function DataManagement() {
     try {
       const text = await file.text()
       const result = await importData(text)
-      setStatus(`Imported ${result.cardsImported} cards and ${result.statsImported} daily stats`)
+      setStatus(t('data.importSuccess', { cards: result.cardsImported, stats: result.statsImported }))
       setIsError(false)
     } catch (err) {
-      setStatus(err instanceof Error ? err.message : 'Import failed')
+      setStatus(err instanceof Error ? err.message : t('data.importFailed'))
       setIsError(true)
     }
 
@@ -41,7 +43,7 @@ export function DataManagement() {
   }
 
   const handleReset = async () => {
-    if (!confirm('This will delete all your progress. Are you sure?')) return
+    if (!confirm(t('data.resetConfirm'))) return
 
     try {
       // Clear IndexedDB
@@ -51,10 +53,10 @@ export function DataManagement() {
       }
       // Clear localStorage
       localStorage.clear()
-      setStatus('All data cleared. Reload the page to start fresh.')
+      setStatus(t('data.resetSuccess'))
       setIsError(false)
     } catch {
-      setStatus('Reset failed')
+      setStatus(t('data.resetFailed'))
       setIsError(true)
     }
   }
@@ -62,16 +64,16 @@ export function DataManagement() {
   return (
     <div className={styles.container}>
       <div className={styles.section}>
-        <h3 className={styles.sectionTitle}>Export</h3>
-        <p className={styles.description}>Download a JSON backup of all your progress, card states, and settings.</p>
+        <h3 className={styles.sectionTitle}>{t('data.exportTitle')}</h3>
+        <p className={styles.description}>{t('data.exportDesc')}</p>
         <button className={styles.button} onClick={handleExport} type="button">
-          Export Data
+          {t('data.exportButton')}
         </button>
       </div>
 
       <div className={styles.section}>
-        <h3 className={styles.sectionTitle}>Import</h3>
-        <p className={styles.description}>Restore from a previously exported JSON backup. This will merge with existing data.</p>
+        <h3 className={styles.sectionTitle}>{t('data.importTitle')}</h3>
+        <p className={styles.description}>{t('data.importDesc')}</p>
         <input
           ref={fileInputRef}
           type="file"
@@ -81,15 +83,15 @@ export function DataManagement() {
           id="import-file"
         />
         <label htmlFor="import-file" className={styles.button}>
-          Choose File
+          {t('data.chooseFile')}
         </label>
       </div>
 
       <div className={styles.section}>
-        <h3 className={`${styles.sectionTitle} ${styles.danger}`}>Reset</h3>
-        <p className={styles.description}>Delete all progress data and settings. This cannot be undone.</p>
+        <h3 className={`${styles.sectionTitle} ${styles.danger}`}>{t('data.resetTitle')}</h3>
+        <p className={styles.description}>{t('data.resetDesc')}</p>
         <button className={styles.dangerButton} onClick={handleReset} type="button">
-          Reset All Data
+          {t('data.resetButton')}
         </button>
       </div>
 

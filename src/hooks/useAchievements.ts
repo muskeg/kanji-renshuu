@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import type { KanjiEntry } from '@/core/srs/types'
 import type { AchievementStatus } from '@/core/srs/milestones'
-import { ACHIEVEMENT_DEFINITIONS, getEarnedDates } from '@/core/srs/milestones'
+import { getAchievementDefinitions, getEarnedDates } from '@/core/srs/milestones'
 import { getAllCardStates, getAllDailyStats, todayDateString } from '@/core/storage/db'
 
 export function useAchievements(kanjiData: KanjiEntry[]): {
@@ -56,7 +56,7 @@ export function useAchievements(kanjiData: KanjiEntry[]): {
         d.setDate(d.getDate() - 1)
       }
 
-      const result: AchievementStatus[] = ACHIEVEMENT_DEFINITIONS.map(def => {
+      const result: AchievementStatus[] = getAchievementDefinitions().map(def => {
         const dateEarned = earnedDates.get(def.id) ?? null
         const earned = dateEarned !== null
 

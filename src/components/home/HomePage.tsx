@@ -4,6 +4,7 @@ import { isOnboarded } from '@/core/storage/onboarding'
 import { DailyGoal } from '@/components/review/DailyGoal'
 import { StreakRecovery } from '@/components/review/StreakRecovery'
 import { KanjiOfTheDay } from '@/components/review/KanjiOfTheDay'
+import { useTranslation } from '@/i18n'
 import styles from './HomePage.module.css'
 
 interface HomePageProps {
@@ -11,14 +12,16 @@ interface HomePageProps {
   onNavigate: (view: string) => void
 }
 
-const STUDY_MODES = [
-  { view: 'review', icon: '📖', label: 'Flashcards', desc: 'Recall reading & meaning' },
-  { view: 'meaning-quiz', icon: '🔤', label: 'Meaning Quiz', desc: 'Pick the kanji from meaning' },
-  { view: 'reading-quiz', icon: '🗣️', label: 'Reading Quiz', desc: 'Type the reading' },
-  { view: 'writing', icon: '✍️', label: 'Writing', desc: 'Practice strokes' },
-] as const
-
 export function HomePage({ kanjiData, onNavigate }: HomePageProps) {
+  const { t } = useTranslation()
+
+  const STUDY_MODES = [
+    { view: 'review', icon: '📖', label: t('mode.flashcards'), desc: t('mode.flashcards.descShort') },
+    { view: 'meaning-quiz', icon: '🔤', label: t('mode.meaningQuiz'), desc: t('mode.meaningQuiz.descShort') },
+    { view: 'reading-quiz', icon: '🗣️', label: t('mode.readingQuiz'), desc: t('mode.readingQuiz.descShort') },
+    { view: 'writing', icon: '✍️', label: t('mode.writing'), desc: t('mode.writingPractice.desc') },
+  ]
+
   // First-time users see the onboarding flow
   if (!isOnboarded()) {
     return <Onboarding onComplete={() => onNavigate('review')} />
@@ -33,7 +36,7 @@ export function HomePage({ kanjiData, onNavigate }: HomePageProps) {
 
       {/* Study modes grid */}
       <section className={styles.modesSection}>
-        <h3 className={styles.sectionTitle}>Study Modes</h3>
+        <h3 className={styles.sectionTitle}>{t('home.studyModes')}</h3>
         <div className={styles.modesGrid}>
           {STUDY_MODES.map(mode => (
             <button

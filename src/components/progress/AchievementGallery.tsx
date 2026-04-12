@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { KanjiEntry } from '@/core/srs/types'
 import type { AchievementStatus } from '@/core/srs/milestones'
 import { useAchievements } from '@/hooks/useAchievements'
+import { useTranslation } from '@/i18n'
 import styles from './AchievementGallery.module.css'
 
 interface AchievementGalleryProps {
@@ -11,6 +12,7 @@ interface AchievementGalleryProps {
 export function AchievementGallery({ kanjiData }: AchievementGalleryProps) {
   const { achievements, loading } = useAchievements(kanjiData)
   const [selected, setSelected] = useState<AchievementStatus | null>(null)
+  const { t } = useTranslation()
 
   if (loading) return null
 
@@ -21,7 +23,7 @@ export function AchievementGallery({ kanjiData }: AchievementGalleryProps) {
     <div className={styles.container}>
       {earned.length > 0 && (
         <div className={styles.group}>
-          <span className={styles.groupLabel}>Earned — {earned.length}</span>
+          <span className={styles.groupLabel}>{t('achievements.earned', { count: earned.length })}</span>
           <div className={styles.grid}>
             {earned.map(a => (
               <button
@@ -43,7 +45,7 @@ export function AchievementGallery({ kanjiData }: AchievementGalleryProps) {
 
       {locked.length > 0 && (
         <div className={styles.group}>
-          <span className={styles.groupLabel}>Locked — {locked.length}</span>
+          <span className={styles.groupLabel}>{t('achievements.locked', { count: locked.length })}</span>
           <div className={styles.grid}>
             {locked.map(a => (
               <button
@@ -79,7 +81,7 @@ export function AchievementGallery({ kanjiData }: AchievementGalleryProps) {
           <span className={styles.detailTitle}>{selected.title}</span>
           <span className={styles.detailDesc}>{selected.description}</span>
           {selected.earned && selected.dateEarned && (
-            <span className={styles.detailDate}>Earned {selected.dateEarned}</span>
+            <span className={styles.detailDate}>{t('achievements.earnedDate', { date: selected.dateEarned })}</span>
           )}
           {!selected.earned && selected.target > 0 && (
             <span className={styles.detailProgress}>

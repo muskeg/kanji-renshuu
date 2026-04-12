@@ -3,6 +3,7 @@ import { useQuizSession } from '@/hooks/useQuizSession'
 import { WritingPractice } from './WritingPractice'
 import { SessionSummary } from '@/components/review/SessionSummary'
 import { EmptyState } from '@/components/review/EmptyState'
+import { useTranslation } from '@/i18n'
 import styles from './QuizSession.module.css'
 
 interface WritingPracticeSessionProps {
@@ -21,6 +22,7 @@ export function WritingPracticeSession({ kanjiData }: WritingPracticeSessionProp
     rateCard,
     endSession,
   } = useQuizSession(kanjiData, 'writing')
+  const { t } = useTranslation()
 
   if (phase === 'summary' && summary) {
     return <SessionSummary summary={summary} onDone={endSession} />
@@ -28,19 +30,19 @@ export function WritingPracticeSession({ kanjiData }: WritingPracticeSessionProp
 
   if (phase === 'idle' || !currentItem) {
     if (queueStatus) {
-      return <EmptyState status={queueStatus} onStart={startSession} modeName="Writing Practice" />
+      return <EmptyState status={queueStatus} onStart={startSession} modeName={t('mode.writingPractice')} />
     }
 
     return (
       <div className={styles.empty}>
         <div className={styles.emptyIcon}>書</div>
-        <h2 className={styles.emptyTitle}>Writing Practice</h2>
+        <h2 className={styles.emptyTitle}>{t('writing.title')}</h2>
         <p className={styles.emptyText}>
-          See readings and meaning, then draw the kanji from memory.
+          {t('writing.desc')}
         </p>
         {kanjiData.length > 0 && (
           <button className={styles.startButton} onClick={startSession}>
-            Start Practice
+            {t('writing.startPractice')}
           </button>
         )}
       </div>

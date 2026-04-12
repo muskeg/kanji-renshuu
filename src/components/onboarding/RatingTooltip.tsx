@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from '@/i18n'
 import styles from './RatingTooltip.module.css'
 
 const TOOLTIP_SHOWN_KEY = 'kanji-renshuu-rating-tooltip-shown'
@@ -7,6 +8,7 @@ export function RatingTooltip() {
   const [visible, setVisible] = useState(
     () => !localStorage.getItem(TOOLTIP_SHOWN_KEY),
   )
+  const { t } = useTranslation()
 
   if (!visible) return null
 
@@ -18,29 +20,29 @@ export function RatingTooltip() {
   return (
     <div className={styles.overlay} onClick={dismiss}>
       <div className={styles.card} onClick={e => e.stopPropagation()}>
-        <h3 className={styles.title}>Rate how well you remembered</h3>
+        <h3 className={styles.title}>{t('ratingTooltip.title')}</h3>
         <dl className={styles.list}>
           <div className={styles.item}>
-            <dt className={styles.rating} data-color="again">Again</dt>
-            <dd className={styles.desc}>Didn&apos;t know it at all</dd>
+            <dt className={styles.rating} data-color="again">{t('rating.again')}</dt>
+            <dd className={styles.desc}>{t('ratingTooltip.again')}</dd>
           </div>
           <div className={styles.item}>
-            <dt className={styles.rating} data-color="hard">Hard</dt>
-            <dd className={styles.desc}>Barely recalled after struggling</dd>
+            <dt className={styles.rating} data-color="hard">{t('rating.hard')}</dt>
+            <dd className={styles.desc}>{t('ratingTooltip.hard')}</dd>
           </div>
           <div className={styles.item}>
-            <dt className={styles.rating} data-color="good">Good</dt>
-            <dd className={styles.desc}>Remembered after a moment of thought</dd>
+            <dt className={styles.rating} data-color="good">{t('rating.good')}</dt>
+            <dd className={styles.desc}>{t('ratingTooltip.good')}</dd>
           </div>
           <div className={styles.item}>
-            <dt className={styles.rating} data-color="easy">Easy</dt>
-            <dd className={styles.desc}>Knew it instantly</dd>
+            <dt className={styles.rating} data-color="easy">{t('rating.easy')}</dt>
+            <dd className={styles.desc}>{t('ratingTooltip.easy')}</dd>
           </div>
         </dl>
         <p className={styles.hint}>
-          The time below each button shows when you&apos;ll see this card again.
+          {t('ratingTooltip.hint')}
         </p>
-        <button className={styles.button} onClick={dismiss}>Got it</button>
+        <button className={styles.button} onClick={dismiss}>{t('ratingTooltip.gotIt')}</button>
       </div>
     </div>
   )

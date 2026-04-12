@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from 'react'
 import type { KanjiEntry, ReviewItem, RatingValue } from '@/core/srs/types'
 import { selectDistractors } from '@/core/learning/quiz-modes'
+import { useTranslation } from '@/i18n'
 import styles from './MeaningQuiz.module.css'
 
 /** Shuffle an array (called only during initial render via useMemo) */
@@ -24,6 +25,7 @@ type AnswerState = null | 'correct' | 'wrong'
 export function MeaningQuiz({ item, kanjiPool, onRate }: MeaningQuizProps) {
   const [selected, setSelected] = useState<string | null>(null)
   const [answerState, setAnswerState] = useState<AnswerState>(null)
+  const { t } = useTranslation()
 
   // Safe: shuffle runs only once per mount (key-based remount resets this)
   const options = useMemo(() => {
@@ -54,7 +56,7 @@ export function MeaningQuiz({ item, kanjiPool, onRate }: MeaningQuizProps) {
   return (
     <div className={styles.container}>
       <div className={styles.prompt}>
-        <span className={styles.promptLabel}>What kanji means:</span>
+        <span className={styles.promptLabel}>{t('meaningQuiz.prompt')}</span>
         <span className={styles.meaning}>{item.kanji.meanings.join(', ')}</span>
       </div>
 
@@ -83,7 +85,7 @@ export function MeaningQuiz({ item, kanjiPool, onRate }: MeaningQuizProps) {
 
       {answerState === 'wrong' && (
         <div className={styles.feedback}>
-          The correct answer is <strong>{item.kanji.literal}</strong>
+          {t('meaningQuiz.correctAnswer', { literal: item.kanji.literal })}
         </div>
       )}
     </div>

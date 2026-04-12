@@ -1,5 +1,6 @@
 import type { QueueStatus } from '@/core/srs/types'
 import { useCountdown } from '@/hooks/useCountdown'
+import { useTranslation } from '@/i18n'
 import styles from './EmptyState.module.css'
 
 interface EmptyStateProps {
@@ -11,23 +12,24 @@ interface EmptyStateProps {
 export function EmptyState({ status, onStart, modeName }: EmptyStateProps) {
   const { reason, nextDueDate, newCardsToday, newCardsLimit, totalIntroduced, totalKanji } = status
   const countdown = useCountdown(nextDueDate)
+  const { t } = useTranslation()
 
   // Common "start" button — always shown when there are cards to study
   if (reason === 'has-cards') {
     const reviewCount = status.items.filter(i => i.cardState.introduced).length
     const newCount = status.items.length - reviewCount
     const parts = [
-      reviewCount > 0 ? `${reviewCount} review${reviewCount === 1 ? '' : 's'}` : '',
-      newCount > 0 ? `${newCount} new` : '',
+      reviewCount > 0 ? (reviewCount === 1 ? t('empty.reviews', { count: reviewCount }) : t('empty.reviewsPlural', { count: reviewCount })) : '',
+      newCount > 0 ? t('empty.new', { count: newCount }) : '',
     ].filter(Boolean).join(' + ')
 
     return (
       <div className={styles.container}>
         <div className={styles.icon}>漢</div>
-        <h2 className={styles.title}>{modeName ?? 'Ready to Study'}</h2>
-        <p className={styles.body}>{parts} available</p>
+        <h2 className={styles.title}>{modeName ?? t('empty.readyToStudy')}</h2>
+        <p className={styles.body}>{t('empty.available', { parts })}</p>
         <button className={styles.action} onClick={onStart}>
-          Start {modeName ?? 'Session'}
+          {modeName ? t('empty.startMode', { mode: modeName }) : t('empty.startSession')}
         </button>
       </div>
     )
@@ -39,9 +41,9 @@ export function EmptyState({ status, onStart, modeName }: EmptyStateProps) {
       return (
         <div className={styles.container}>
           <div className={styles.icon}>📚</div>
-          <h2 className={styles.title}>{modeName ?? 'No Cards Yet'}</h2>
+          <h2 className={styles.title}>{modeName ?? t('empty.noCardsYet')}</h2>
           <p className={styles.body}>
-            No cards to study yet. Start a Flashcards session from the Home page to introduce new kanji.
+            {t('empty.noCardsBody')}
           </p>
         </div>
       )
@@ -50,12 +52,12 @@ export function EmptyState({ status, onStart, modeName }: EmptyStateProps) {
       return (
         <div className={styles.container}>
           <div className={styles.icon}>✅</div>
-          <h2 className={styles.title}>Daily limit reached</h2>
+          <h2 className={styles.title}>{t('empty.dailyLimit')}</h2>
           <p className={styles.body}>
-            You've hit today's study limit ({newCardsToday}/{newCardsLimit} new cards).
+            {t('empty.dailyLimitBody', { newToday: newCardsToday, newLimit: newCardsLimit })}
             {countdown && (
               <>
-                {' '}Next review in {countdown}.
+                {' '}{t('empty.nextReviewIn', { countdown })}
               </>
             )}
           </p>
@@ -67,10 +69,10 @@ export function EmptyState({ status, onStart, modeName }: EmptyStateProps) {
         <div className={styles.container}>
           <div className={styles.icon}>⏳</div>
           <h2 className={styles.title}>
-            {countdown ? `Next review in ${countdown}` : 'All cards scheduled'}
+            {countdown ? t('empty.nextReviewTitle', { countdown }) : t('empty.allScheduled')}
           </h2>
           <p className={styles.body}>
-            {totalIntroduced} card{totalIntroduced === 1 ? '' : 's'} in your deck. Come back later!
+            {totalIntroduced === 1 ? t('empty.cardsInDeck', { count: totalIntroduced }) : t('empty.cardsInDeckPlural', { count: totalIntroduced })}
           </p>
         </div>
       )
@@ -79,12 +81,12 @@ export function EmptyState({ status, onStart, modeName }: EmptyStateProps) {
       return (
         <div className={styles.container}>
           <div className={styles.icon}>🎉</div>
-          <h2 className={styles.title}>Incredible!</h2>
+          <h2 className={styles.title}>{t('empty.incredible')}</h2>
           <p className={styles.body}>
-            All {totalKanji.toLocaleString()} kanji reviewed.
+            {t('empty.allReviewed', { total: totalKanji.toLocaleString() })}
             {countdown && (
               <>
-                {' '}Next due {countdown}.
+                {' '}{t('empty.nextDue', { countdown })}
               </>
             )}
           </p>

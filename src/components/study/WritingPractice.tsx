@@ -1,5 +1,6 @@
 import { useRef, useState, useCallback, useEffect } from 'react'
 import type { ReviewItem, RatingValue } from '@/core/srs/types'
+import { useTranslation } from '@/i18n'
 import styles from './WritingPractice.module.css'
 
 interface WritingPracticeProps {
@@ -23,6 +24,7 @@ export function WritingPractice({ item, onRate }: WritingPracticeProps) {
   const [showAnswer, setShowAnswer] = useState(false)
   const isDrawingRef = useRef(false)
   const canvasSize = 300
+  const { t } = useTranslation()
 
   const redraw = useCallback(() => {
     const canvas = canvasRef.current
@@ -151,20 +153,20 @@ export function WritingPractice({ item, onRate }: WritingPracticeProps) {
       </div>
 
       <div className={styles.toolbar}>
-        <button className={styles.toolButton} onClick={() => setStrokes(prev => prev.slice(0, -1))} disabled={strokes.length === 0} type="button">Undo</button>
-        <button className={styles.toolButton} onClick={() => setStrokes([])} disabled={strokes.length === 0} type="button">Clear</button>
-        <span className={styles.strokeCount}>{strokes.length} strokes</span>
-        <button className={styles.toolButton} onClick={() => setShowAnswer(true)} disabled={showAnswer} type="button">{showAnswer ? 'Shown' : 'Show'}</button>
+        <button className={styles.toolButton} onClick={() => setStrokes(prev => prev.slice(0, -1))} disabled={strokes.length === 0} type="button">{t('writing.undo')}</button>
+        <button className={styles.toolButton} onClick={() => setStrokes([])} disabled={strokes.length === 0} type="button">{t('writing.clear')}</button>
+        <span className={styles.strokeCount}>{t('writing.strokes', { count: strokes.length })}</span>
+        <button className={styles.toolButton} onClick={() => setShowAnswer(true)} disabled={showAnswer} type="button">{showAnswer ? t('writing.shown') : t('writing.show')}</button>
       </div>
 
       {showAnswer && (
         <div className={styles.ratingRow}>
-          <span className={styles.rateLabel}>How did you do?</span>
+          <span className={styles.rateLabel}>{t('writing.howDidYouDo')}</span>
           <div className={styles.ratingButtons}>
-            <button className={`${styles.rateBtn} ${styles.again}`} onClick={() => handleRate(1)} type="button">Again</button>
-            <button className={`${styles.rateBtn} ${styles.hard}`} onClick={() => handleRate(2)} type="button">Hard</button>
-            <button className={`${styles.rateBtn} ${styles.good}`} onClick={() => handleRate(3)} type="button">Good</button>
-            <button className={`${styles.rateBtn} ${styles.easy}`} onClick={() => handleRate(4)} type="button">Easy</button>
+            <button className={`${styles.rateBtn} ${styles.again}`} onClick={() => handleRate(1)} type="button">{t('rating.again')}</button>
+            <button className={`${styles.rateBtn} ${styles.hard}`} onClick={() => handleRate(2)} type="button">{t('rating.hard')}</button>
+            <button className={`${styles.rateBtn} ${styles.good}`} onClick={() => handleRate(3)} type="button">{t('rating.good')}</button>
+            <button className={`${styles.rateBtn} ${styles.easy}`} onClick={() => handleRate(4)} type="button">{t('rating.easy')}</button>
           </div>
         </div>
       )}
