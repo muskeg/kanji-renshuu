@@ -1,42 +1,23 @@
-import type { QueueStatus, KanjiEntry } from '@/core/srs/types'
+import type { QueueStatus } from '@/core/srs/types'
 import { useCountdown } from '@/hooks/useCountdown'
-import { Onboarding } from '@/components/onboarding/Onboarding'
-import { isOnboarded } from '@/core/storage/onboarding'
-import { DailyGoal } from './DailyGoal'
-import { StudySuggestions } from './StudySuggestions'
-import { StreakRecovery } from './StreakRecovery'
-import { KanjiOfTheDay } from './KanjiOfTheDay'
 import styles from './EmptyState.module.css'
 
 interface EmptyStateProps {
   status: QueueStatus
   onStart: () => void
   modeName?: string
-  kanjiData?: KanjiEntry[]
 }
 
-export function EmptyState({ status, onStart, modeName, kanjiData }: EmptyStateProps) {
+export function EmptyState({ status, onStart, modeName }: EmptyStateProps) {
   const { reason, nextDueDate, newCardsToday, newCardsLimit, totalIntroduced, totalKanji } = status
   const countdown = useCountdown(nextDueDate)
-
-  const queueHint = (
-    <p className={styles.queueHint}>
-      All study modes share the same review queue.
-      {reason !== 'no-cards' && ' If you just completed a session, cards are scheduled for later.'}
-    </p>
-  )
-
-  // Show onboarding flow for first-time users on the main Flashcards view
-  if (reason === 'no-cards' && !modeName && !isOnboarded()) {
-    return <Onboarding onComplete={onStart} />
-  }
 
   switch (reason) {
     case 'no-cards':
       return (
         <div className={styles.container}>
           <div className={styles.icon}>📚</div>
-          <h2 className={styles.title}>{modeName ? `${modeName}` : 'Welcome!'}</h2>
+          <h2 className={styles.title}>{modeName ?? 'No Cards Yet'}</h2>
           <p className={styles.body}>
             {modeName
               ? 'No cards available yet. Start a Flashcards session to introduce new kanji first.'
@@ -47,7 +28,6 @@ export function EmptyState({ status, onStart, modeName, kanjiData }: EmptyStateP
               Begin Learning
             </button>
           )}
-          {queueHint}
         </div>
       )
 
@@ -65,10 +45,6 @@ export function EmptyState({ status, onStart, modeName, kanjiData }: EmptyStateP
               </>
             )}
           </p>
-          {!modeName && <DailyGoal />}
-          {!modeName && <StudySuggestions status={status} onStart={onStart} />}
-          {!modeName && kanjiData && <KanjiOfTheDay kanjiData={kanjiData} />}
-          {queueHint}
         </div>
       )
 
@@ -82,10 +58,6 @@ export function EmptyState({ status, onStart, modeName, kanjiData }: EmptyStateP
           <p className={styles.body}>
             {totalIntroduced} card{totalIntroduced === 1 ? '' : 's'} scheduled. Check back soon.
           </p>
-          {!modeName && <DailyGoal />}
-          {!modeName && <StudySuggestions status={status} onStart={onStart} />}
-          {!modeName && kanjiData && <KanjiOfTheDay kanjiData={kanjiData} />}
-          {queueHint}
         </div>
       )
 
@@ -116,15 +88,12 @@ export function EmptyState({ status, onStart, modeName, kanjiData }: EmptyStateP
 
       return (
         <div className={styles.container}>
-          {!modeName && <StreakRecovery />}
           <div className={styles.icon}>漢</div>
           <h2 className={styles.title}>{modeName ?? 'Ready to Study'}</h2>
           <p className={styles.body}>{description}</p>
           <button className={styles.action} onClick={onStart}>
             {modeName ? `Start ${modeName}` : 'Start Session'}
           </button>
-          {!modeName && <DailyGoal />}
-          {!modeName && <StudySuggestions status={status} onStart={onStart} />}
         </div>
       )
     }

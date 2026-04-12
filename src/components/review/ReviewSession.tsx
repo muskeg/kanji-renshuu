@@ -41,7 +41,7 @@ export function ReviewSession({ kanjiData }: ReviewSessionProps) {
 
   if (phase === 'idle' || !currentItem) {
     if (queueStatus) {
-      return <EmptyState status={queueStatus} onStart={startSession} kanjiData={kanjiData} />
+      return <EmptyState status={queueStatus} onStart={startSession} />
     }
 
     return (

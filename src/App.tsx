@@ -15,15 +15,16 @@ import { FilterBar, type KanjiFilter } from '@/components/browse/FilterBar'
 import { SearchBar } from '@/components/browse/SearchBar'
 import { Dashboard } from '@/components/progress/Dashboard'
 import { SettingsPage } from '@/components/settings/SettingsPage'
+import { HomePage } from '@/components/home/HomePage'
 import { useKanjiData } from '@/hooks/useKanjiData'
 import { useCardStatus } from '@/hooks/useCardStatus'
 import type { KanjiEntry } from '@/core/srs/types'
 import { katakanaToHiragana, normalizeReading } from '@/utils/japanese'
 
-export type AppView = 'review' | 'browse' | 'meaning-quiz' | 'reading-quiz' | 'writing' | 'detail' | 'progress' | 'settings'
+export type AppView = 'home' | 'review' | 'browse' | 'meaning-quiz' | 'reading-quiz' | 'writing' | 'detail' | 'progress' | 'settings'
 
 export function App() {
-  const [currentView, setCurrentView] = useState<AppView>('review')
+  const [currentView, setCurrentView] = useState<AppView>('home')
   const [selectedKanji, setSelectedKanji] = useState<KanjiEntry | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [filter, setFilter] = useState<KanjiFilter>({ grades: [], jlptLevels: [], status: [] })
@@ -83,6 +84,10 @@ export function App() {
           <div style={{ padding: 'var(--spacing-2xl)', color: 'var(--color-text-secondary)' }}>
             Loading kanji data...
           </div>
+        )}
+
+        {!loading && !error && currentView === 'home' && (
+          <HomePage kanjiData={kanji} onNavigate={(v) => setCurrentView(v as AppView)} />
         )}
 
         {!loading && !error && currentView === 'review' && (
