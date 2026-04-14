@@ -68,6 +68,7 @@ export interface AppSettings {
   soundEnabled: boolean
   language: 'en' | 'fr'
   uiScale: number
+  guidedWriting: boolean
 }
 
 /** Default settings */
@@ -82,6 +83,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   soundEnabled: false,
   language: 'en',
   uiScale: 100,
+  guidedWriting: true,
 }
 
 /** Review session state */

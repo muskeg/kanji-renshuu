@@ -6,6 +6,8 @@ import styles from './WritingPractice.module.css'
 interface WritingPracticeProps {
   item: ReviewItem
   onRate: (rating: RatingValue) => void
+  onToggleMode?: () => void
+  showModeToggle?: boolean
 }
 
 interface Point {
@@ -17,7 +19,7 @@ interface Stroke {
   points: Point[]
 }
 
-export function WritingPractice({ item, onRate }: WritingPracticeProps) {
+export function WritingPractice({ item, onRate, onToggleMode, showModeToggle }: WritingPracticeProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [strokes, setStrokes] = useState<Stroke[]>([])
   const [currentStroke, setCurrentStroke] = useState<Point[] | null>(null)
@@ -156,6 +158,11 @@ export function WritingPractice({ item, onRate }: WritingPracticeProps) {
         <button className={styles.toolButton} onClick={() => setStrokes(prev => prev.slice(0, -1))} disabled={strokes.length === 0} type="button">{t('writing.undo')}</button>
         <button className={styles.toolButton} onClick={() => setStrokes([])} disabled={strokes.length === 0} type="button">{t('writing.clear')}</button>
         <span className={styles.strokeCount}>{t('writing.strokes', { count: strokes.length })}</span>
+        {showModeToggle && onToggleMode && (
+          <button className={styles.modeToggle} onClick={onToggleMode} type="button">
+            {t('writing.guidedMode')}
+          </button>
+        )}
         <button className={styles.toolButton} onClick={() => setShowAnswer(true)} disabled={showAnswer} type="button">{showAnswer ? t('writing.shown') : t('writing.show')}</button>
       </div>
 

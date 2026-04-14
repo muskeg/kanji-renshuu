@@ -40,6 +40,7 @@ describe('export/import', () => {
         soundEnabled: false,
         language: 'en',
         uiScale: 100,
+        guidedWriting: true,
       })
 
       const json = await exportData()

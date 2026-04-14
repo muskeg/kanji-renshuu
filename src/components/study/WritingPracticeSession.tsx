@@ -1,8 +1,11 @@
+import { useState, useCallback } from 'react'
 import type { KanjiEntry } from '@/core/srs/types'
 import { useQuizSession } from '@/hooks/useQuizSession'
 import { WritingPractice } from './WritingPractice'
+import { GuidedWriting } from './GuidedWriting'
 import { SessionSummary } from '@/components/review/SessionSummary'
 import { EmptyState } from '@/components/review/EmptyState'
+import { loadSettings } from '@/core/storage/settings'
 import { useTranslation } from '@/i18n'
 import styles from './QuizSession.module.css'
 
@@ -11,6 +14,7 @@ interface WritingPracticeSessionProps {
 }
 
 export function WritingPracticeSession({ kanjiData }: WritingPracticeSessionProps) {
+  const [guidedMode, setGuidedMode] = useState(() => loadSettings().guidedWriting ?? true)
   const {
     phase,
     currentItem,
@@ -23,6 +27,10 @@ export function WritingPracticeSession({ kanjiData }: WritingPracticeSessionProp
     endSession,
   } = useQuizSession(kanjiData, 'writing')
   const { t } = useTranslation()
+
+  const toggleMode = useCallback(() => {
+    setGuidedMode(prev => !prev)
+  }, [])
 
   if (phase === 'summary' && summary) {
     return <SessionSummary summary={summary} onDone={endSession} />
@@ -67,7 +75,22 @@ export function WritingPracticeSession({ kanjiData }: WritingPracticeSessionProp
         </div>
       </div>
 
-      <WritingPractice key={currentItem.kanji.literal} item={currentItem} onRate={rateCard} />
+      {guidedMode && currentItem.kanji.strokeOrderSvg ? (
+        <GuidedWriting
+          key={`guided-${currentItem.kanji.literal}`}
+          item={currentItem}
+          onRate={rateCard}
+          onToggleMode={toggleMode}
+        />
+      ) : (
+        <WritingPractice
+          key={`free-${currentItem.kanji.literal}`}
+          item={currentItem}
+          onRate={rateCard}
+          onToggleMode={toggleMode}
+          showModeToggle={!!currentItem.kanji.strokeOrderSvg}
+        />
+      )}
     </div>
   )
 }

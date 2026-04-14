@@ -158,6 +158,7 @@ const en = {
   'readingQuiz.check': 'Check',
   'readingQuiz.correct': 'Correct!',
   'readingQuiz.correctReadings': 'Correct readings:',
+  'readingQuiz.otherReadings': 'All readings:',
 
   // --- Writing practice ---
   'writing.title': 'Writing Practice',
@@ -169,6 +170,10 @@ const en = {
   'writing.show': 'Show',
   'writing.shown': 'Shown',
   'writing.howDidYouDo': 'How did you do?',
+  'writing.guidedMode': 'Guided',
+  'writing.freeMode': 'Free',
+  'writing.perfectStrokes': 'Perfect! No mistakes',
+  'writing.mistakesCount': '{{count}} mistake(s)',
 
   // --- Kanji detail ---
   'detail.back': '← Back',
@@ -288,6 +293,8 @@ const en = {
   'srs.maxIntervalHint': 'Longest gap between reviews',
   'srs.defaultQuizMode': 'Default Quiz Mode',
   'srs.defaultQuizModeHint': 'Default mode when starting a session',
+  'srs.guidedWriting': 'Guided Writing',
+  'srs.guidedWritingHint': 'Enforce stroke order and snap to correct strokes in writing practice',
   'srs.save': 'Save Settings',
   'srs.saved': 'Saved!',
   'srs.reset': 'Reset to Defaults',

@@ -107,6 +107,21 @@ export function SrsSettings() {
         </select>
       </div>
 
+      <div className={styles.group}>
+        <label className={styles.label}>
+          {t('srs.guidedWriting')}
+          <span className={styles.hint}>{t('srs.guidedWritingHint')}</span>
+        </label>
+        <select
+          className={styles.select}
+          value={settings.guidedWriting ? 'on' : 'off'}
+          onChange={e => handleChange('guidedWriting', e.target.value === 'on')}
+        >
+          <option value="on">{t('appearance.on')}</option>
+          <option value="off">{t('appearance.off')}</option>
+        </select>
+      </div>
+
       <div className={styles.actions}>
         <button className={styles.saveButton} onClick={handleSave} type="button">
           {saved ? t('srs.saved') : t('srs.save')}

@@ -160,6 +160,7 @@ const fr: Translations = {
   'readingQuiz.check': 'Vérifier',
   'readingQuiz.correct': 'Correct !',
   'readingQuiz.correctReadings': 'Lectures correctes :',
+  'readingQuiz.otherReadings': 'Toutes les lectures :',
 
   // --- Writing practice ---
   'writing.title': "Pratique d'écriture",
@@ -171,6 +172,10 @@ const fr: Translations = {
   'writing.show': 'Montrer',
   'writing.shown': 'Affiché',
   'writing.howDidYouDo': 'Comment avez-vous fait ?',
+  'writing.guidedMode': 'Guidé',
+  'writing.freeMode': 'Libre',
+  'writing.perfectStrokes': 'Parfait ! Aucune erreur',
+  'writing.mistakesCount': '{{count}} erreur(s)',
 
   // --- Kanji detail ---
   'detail.back': '← Retour',
@@ -290,6 +295,8 @@ const fr: Translations = {
   'srs.maxIntervalHint': 'Intervalle le plus long entre les révisions',
   'srs.defaultQuizMode': "Mode de quiz par défaut",
   'srs.defaultQuizModeHint': "Mode par défaut au lancement d'une session",
+  'srs.guidedWriting': 'Écriture guidée',
+  'srs.guidedWritingHint': "Impose l'ordre des traits et aligne sur les traits corrects lors de la pratique d'écriture",
   'srs.save': 'Enregistrer',
   'srs.saved': 'Enregistré !',
   'srs.reset': 'Réinitialiser',

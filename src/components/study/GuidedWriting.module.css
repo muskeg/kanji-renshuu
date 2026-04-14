@@ -26,37 +26,101 @@
   color: var(--color-text-secondary);
 }
 
-.canvasWrapper {
+.svgWrapper {
   position: relative;
   border-radius: var(--radius-lg);
   overflow: hidden;
   border: 2px solid var(--color-border);
-}
-
-.canvas {
-  display: block;
   background: var(--color-surface-raised);
   touch-action: none;
   cursor: crosshair;
+}
+
+.drawingSvg {
+  display: block;
   width: 300px;
   height: 300px;
 }
 
-.answerOverlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(13, 17, 23, 0.6);
-  pointer-events: none;
+.guide {
+  stroke: var(--color-border);
+  stroke-width: 0.5;
+  stroke-dasharray: 4 4;
 }
 
-.answerKanji {
-  font-family: var(--font-jp);
-  font-size: 12rem;
-  color: rgba(88, 166, 255, 0.35);
-  line-height: 1;
+.strokeCompleted {
+  stroke: var(--color-text);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.8;
+}
+
+.strokeGhost {
+  stroke: var(--color-text-muted);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.15;
+}
+
+.strokeRemaining {
+  stroke: var(--color-text-muted);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.06;
+}
+
+.strokeCurrent {
+  stroke: var(--color-primary);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.startHint {
+  fill: var(--color-primary);
+  opacity: 0.5;
+}
+
+@keyframes pulse-hint {
+  0%, 100% { opacity: 0.3; r: 3; }
+  50% { opacity: 0.7; r: 5; }
+}
+
+.startHintPulse {
+  fill: var(--color-primary);
+  animation: pulse-hint 1.5s ease-in-out infinite;
+}
+
+.strokeSnapIn {
+  stroke: var(--color-success);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 500;
+  stroke-dashoffset: 500;
+  animation: snap-draw 0.35s ease-out forwards;
+}
+
+@keyframes snap-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.errorFlash {
+  position: absolute;
+  inset: 0;
+  background: rgba(248, 81, 73, 0.12);
+  pointer-events: none;
+  animation: flash-out 0.4s ease-out forwards;
+  border-radius: var(--radius-lg);
+}
+
+@keyframes flash-out {
+  to { opacity: 0; }
 }
 
 .toolbar {
@@ -107,6 +171,19 @@
 
 .modeToggle:hover {
   background: rgba(88, 166, 255, 0.1);
+}
+
+.completeMessage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.completeText {
+  font-size: var(--text-lg);
+  color: var(--color-success);
+  font-weight: 600;
 }
 
 .ratingRow {
