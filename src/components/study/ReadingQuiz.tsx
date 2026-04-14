@@ -14,13 +14,11 @@ interface ReadingQuizProps {
 type AnswerState = null | 'correct' | 'wrong'
 
 export function ReadingQuiz({ item, onRate }: ReadingQuizProps) {
-  const [kanaValue, setKanaValue] = useState('')
   const [rawValue, setRawValue] = useState('')
   const [answerState, setAnswerState] = useState<AnswerState>(null)
   const { t } = useTranslation()
 
-  const handleInputChange = useCallback((kana: string, raw: string) => {
-    setKanaValue(kana)
+  const handleInputChange = useCallback((_kana: string, raw: string) => {
     setRawValue(raw)
   }, [])
 
@@ -36,7 +34,6 @@ export function ReadingQuiz({ item, onRate }: ReadingQuizProps) {
 
       setTimeout(() => {
         onRate(isCorrect ? 3 : 1)
-        setKanaValue('')
         setRawValue('')
         setAnswerState(null)
       }, 1200)
@@ -56,7 +53,6 @@ export function ReadingQuiz({ item, onRate }: ReadingQuizProps) {
 
       <form className={styles.form} onSubmit={handleSubmit}>
         <RomajiInput
-          value={kanaValue}
           onChange={handleInputChange}
           className={
             answerState === 'correct'

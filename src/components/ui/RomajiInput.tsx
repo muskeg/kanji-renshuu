@@ -3,7 +3,6 @@ import { romajiToKana } from '@/utils/romaji'
 import styles from './RomajiInput.module.css'
 
 interface RomajiInputProps {
-  value: string
   onChange: (kana: string, raw: string) => void
   placeholder?: string
   disabled?: boolean
@@ -12,13 +11,22 @@ interface RomajiInputProps {
   autoFocus?: boolean
 }
 
+/** Check whether a string contains any non-ASCII character. */
+function hasNonAscii(str: string): boolean {
+  for (let i = 0; i < str.length; i++) {
+    if (str.charCodeAt(i) > 126) return true
+  }
+  return false
+}
+
 /**
  * An input that converts romaji keystrokes to hiragana in real-time.
  * Displays the converted kana as the main value, with a small
  * pending indicator showing unconsumed romaji chars.
+ *
+ * Reset by giving this component a new `key` from the parent.
  */
 export function RomajiInput({
-  value,
   onChange,
   placeholder,
   disabled,
@@ -29,7 +37,6 @@ export function RomajiInput({
   const [rawInput, setRawInput] = useState('')
   const [pending, setPending] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
-  const prevValueRef = useRef(value)
 
   useEffect(() => {
     if (autoFocus && inputRef.current) {
@@ -37,20 +44,12 @@ export function RomajiInput({
     }
   }, [autoFocus])
 
-  // Reset internal state when value is cleared externally
-  if (value === '' && prevValueRef.current !== '') {
-    setRawInput('')
-    setPending('')
-  }
-  prevValueRef.current = value
-
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const newRaw = e.target.value
 
       // If user typed kana directly (e.g. mobile keyboard), pass through
-      const hasNonAscii = /[^\u0000-\u007e]/.test(newRaw)
-      if (hasNonAscii) {
+      if (hasNonAscii(newRaw)) {
         setRawInput(newRaw)
         setPending('')
         onChange(newRaw, newRaw)
