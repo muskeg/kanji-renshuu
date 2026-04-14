@@ -29,6 +29,7 @@ export function RomajiInput({
   const [rawInput, setRawInput] = useState('')
   const [pending, setPending] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
+  const prevValueRef = useRef(value)
 
   useEffect(() => {
     if (autoFocus && inputRef.current) {
@@ -37,19 +38,18 @@ export function RomajiInput({
   }, [autoFocus])
 
   // Reset internal state when value is cleared externally
-  useEffect(() => {
-    if (value === '') {
-      setRawInput('')
-      setPending('')
-    }
-  }, [value])
+  if (value === '' && prevValueRef.current !== '') {
+    setRawInput('')
+    setPending('')
+  }
+  prevValueRef.current = value
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const newRaw = e.target.value
 
       // If user typed kana directly (e.g. mobile keyboard), pass through
-      const hasNonAscii = /[^\x00-\x7e]/.test(newRaw)
+      const hasNonAscii = /[^\u0000-\u007e]/.test(newRaw)
       if (hasNonAscii) {
         setRawInput(newRaw)
         setPending('')
