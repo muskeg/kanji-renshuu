@@ -48,36 +48,30 @@ export function RomajiInput({
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const newDisplay = e.target.value
+      const oldDisplay = displayValue
 
-      // If user typed kana directly (e.g. mobile keyboard), pass through
-      if (hasNonAscii(newDisplay)) {
+      if (newDisplay === oldDisplay) return
+
+      // Determine what was added/removed by comparing display values
+      const commonLen = findCommonPrefixLength(oldDisplay, newDisplay)
+      const removedFromOld = oldDisplay.length - commonLen
+      const addedInNew = newDisplay.substring(commonLen)
+
+      // If the newly typed characters are non-ASCII (mobile kana keyboard),
+      // pass through the entire value as-is
+      if (addedInNew.length > 0 && hasNonAscii(addedInNew)) {
         rawRef.current = newDisplay
         setDisplayValue(newDisplay)
         onChange(newDisplay, newDisplay)
         return
       }
 
-      // Detect what changed: compare new display to old to find the raw edit
-      const oldRaw = rawRef.current
-      const oldDisplay = displayValue
-
-      // Figure out how many characters were added/removed at the end
-      // by comparing the display values
-      const commonLen = findCommonPrefixLength(oldDisplay, newDisplay)
-      const removedFromOld = oldDisplay.length - commonLen
-      const addedInNew = newDisplay.substring(commonLen)
-
-      // Map the edit back to raw romaji:
-      // Remove characters from end of raw corresponding to removed display chars
+      // ASCII edit — update raw romaji and reconvert
       let newRaw: string
       if (removedFromOld > 0) {
-        // User deleted — remove from raw end. We need to figure out how many
-        // raw chars to remove. Rebuild from scratch by trimming raw.
-        // Since kana chars replace multiple raw chars, trim raw to find a
-        // matching prefix, then append what was added.
-        newRaw = trimRawForDisplay(oldRaw, removedFromOld) + addedInNew
+        newRaw = trimRawForDisplay(rawRef.current, removedFromOld) + addedInNew
       } else {
-        newRaw = oldRaw + addedInNew
+        newRaw = rawRef.current + addedInNew
       }
 
       rawRef.current = newRaw

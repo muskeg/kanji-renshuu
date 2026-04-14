@@ -60,32 +60,41 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-sm);
   font-size: var(--text-lg);
   color: var(--color-success);
   font-weight: 600;
-}
-
-.otherReadings {
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-  font-weight: 400;
-  font-family: var(--font-jp);
 }
 
 .feedbackWrong {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-sm);
   color: var(--color-error);
   font-size: var(--text-sm);
 }
 
-.correctAnswer {
+.readingsBreakdown {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.readingGroup {
   font-family: var(--font-jp);
-  font-size: var(--text-lg);
+  font-size: var(--text-md);
   color: var(--color-text);
+  font-weight: 400;
+}
+
+.readingLabel {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-right: var(--spacing-xs);
+  font-weight: 500;
 }
 
 .nextButton {

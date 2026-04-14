@@ -43,10 +43,8 @@ export function ReadingQuiz({ item, onRate }: ReadingQuizProps) {
     }
   }, [rating, onRate])
 
-  const allReadings = [
-    ...item.kanji.readings.onYomi,
-    ...item.kanji.readings.kunYomi.map(r => normalizeReading(r)),
-  ]
+  const onReadings = item.kanji.readings.onYomi
+  const kunReadings = item.kanji.readings.kunYomi.map(r => normalizeReading(r))
 
   return (
     <div className={styles.container}>
@@ -80,16 +78,40 @@ export function ReadingQuiz({ item, onRate }: ReadingQuizProps) {
       {answerState === 'correct' && (
         <div className={styles.feedbackCorrect}>
           <span>{t('readingQuiz.correct')}</span>
-          <span className={styles.otherReadings}>
-            {t('readingQuiz.otherReadings')} {allReadings.join('、')}
-          </span>
+          <div className={styles.readingsBreakdown}>
+            {onReadings.length > 0 && (
+              <span className={styles.readingGroup}>
+                <span className={styles.readingLabel}>{t('reading.onYomi')}</span>
+                {onReadings.join('、')}
+              </span>
+            )}
+            {kunReadings.length > 0 && (
+              <span className={styles.readingGroup}>
+                <span className={styles.readingLabel}>{t('reading.kunYomi')}</span>
+                {kunReadings.join('、')}
+              </span>
+            )}
+          </div>
         </div>
       )}
 
       {answerState === 'wrong' && (
         <div className={styles.feedbackWrong}>
           <span>{t('readingQuiz.correctReadings')}</span>
-          <span className={styles.correctAnswer}>{allReadings.join('、')}</span>
+          <div className={styles.readingsBreakdown}>
+            {onReadings.length > 0 && (
+              <span className={styles.readingGroup}>
+                <span className={styles.readingLabel}>{t('reading.onYomi')}</span>
+                {onReadings.join('、')}
+              </span>
+            )}
+            {kunReadings.length > 0 && (
+              <span className={styles.readingGroup}>
+                <span className={styles.readingLabel}>{t('reading.kunYomi')}</span>
+                {kunReadings.join('、')}
+              </span>
+            )}
+          </div>
         </div>
       )}
 

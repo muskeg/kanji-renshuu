@@ -160,7 +160,6 @@ const fr: Translations = {
   'readingQuiz.check': 'Vérifier',
   'readingQuiz.correct': 'Correct !',
   'readingQuiz.correctReadings': 'Lectures correctes :',
-  'readingQuiz.otherReadings': 'Toutes les lectures :',
   'readingQuiz.next': 'Suivant →',
 
   // --- Writing practice ---
