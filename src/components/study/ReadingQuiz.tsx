@@ -16,6 +16,7 @@ type AnswerState = null | 'correct' | 'wrong'
 export function ReadingQuiz({ item, onRate }: ReadingQuizProps) {
   const [rawValue, setRawValue] = useState('')
   const [answerState, setAnswerState] = useState<AnswerState>(null)
+  const [rating, setRating] = useState<RatingValue | null>(null)
   const { t } = useTranslation()
 
   const handleInputChange = useCallback((_kana: string, raw: string) => {
@@ -31,15 +32,16 @@ export function ReadingQuiz({ item, onRate }: ReadingQuizProps) {
       const finalKana = romajiToKanaFinal(rawValue)
       const isCorrect = matchesReading(finalKana, item.kanji)
       setAnswerState(isCorrect ? 'correct' : 'wrong')
-
-      setTimeout(() => {
-        onRate(isCorrect ? 3 : 1)
-        setRawValue('')
-        setAnswerState(null)
-      }, 1200)
+      setRating(isCorrect ? 3 : 1)
     },
-    [answerState, rawValue, item.kanji, onRate],
+    [answerState, rawValue, item.kanji],
   )
+
+  const handleNext = useCallback(() => {
+    if (rating !== null) {
+      onRate(rating)
+    }
+  }, [rating, onRate])
 
   const allReadings = [
     ...item.kanji.readings.onYomi,
@@ -89,6 +91,16 @@ export function ReadingQuiz({ item, onRate }: ReadingQuizProps) {
           <span>{t('readingQuiz.correctReadings')}</span>
           <span className={styles.correctAnswer}>{allReadings.join('、')}</span>
         </div>
+      )}
+
+      {answerState !== null && (
+        <button
+          className={styles.nextButton}
+          onClick={handleNext}
+          type="button"
+        >
+          {t('readingQuiz.next')}
+        </button>
       )}
     </div>
   )

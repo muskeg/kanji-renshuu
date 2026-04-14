@@ -87,3 +87,19 @@
   font-size: var(--text-lg);
   color: var(--color-text);
 }
+
+.nextButton {
+  padding: var(--spacing-md) var(--spacing-xl);
+  background: var(--color-primary);
+  color: var(--color-bg);
+  border-radius: var(--radius-md);
+  font-size: var(--text-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+  min-width: 120px;
+}
+
+.nextButton:hover {
+  background: var(--color-primary-hover);
+}

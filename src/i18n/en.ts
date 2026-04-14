@@ -159,6 +159,7 @@ const en = {
   'readingQuiz.correct': 'Correct!',
   'readingQuiz.correctReadings': 'Correct readings:',
   'readingQuiz.otherReadings': 'All readings:',
+  'readingQuiz.next': 'Next →',
 
   // --- Writing practice ---
   'writing.title': 'Writing Practice',

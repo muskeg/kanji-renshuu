@@ -51,13 +51,6 @@ export function GuidedWriting({ item, onRate, onToggleMode }: GuidedWritingProps
 
   const isComplete = completedCount >= strokes.length && strokes.length > 0
 
-  // Get the start point of the current expected stroke for the hint
-  const currentStartHint = useMemo(() => {
-    if (completedCount >= strokes.length) return null
-    const pts = refPointsPerStroke[completedCount]
-    return pts.length > 0 ? pts[0] : null
-  }, [completedCount, refPointsPerStroke, strokes.length])
-
   const getPoint = useCallback((e: React.MouseEvent<SVGSVGElement> | React.TouchEvent<SVGSVGElement>): Point => {
     const svg = svgRef.current!
     const rect = svg.getBoundingClientRect()
@@ -197,49 +190,14 @@ export function GuidedWriting({ item, onRate, onToggleMode }: GuidedWritingProps
 
           {/* All strokes as faint ghosts for reference */}
           <g transform={`scale(${CANVAS_SIZE / VIEWBOX_SIZE})`}>
-            {strokes.map((d, i) => {
-              if (i < completedCount) {
-                // Completed strokes — solid
-                return (
-                  <path
-                    key={`completed-${i}`}
-                    d={d}
-                    className={snappingIndex === i ? styles.strokeSnapIn : styles.strokeCompleted}
-                    fill="none"
-                  />
-                )
-              }
-              if (i === completedCount) {
-                // Current target — ghost guide
-                return (
-                  <path
-                    key={`ghost-${i}`}
-                    d={d}
-                    className={styles.strokeGhost}
-                    fill="none"
-                  />
-                )
-              }
-              // Future strokes — very faint
-              return (
-                <path
-                  key={`rest-${i}`}
-                  d={d}
-                  className={styles.strokeRemaining}
-                  fill="none"
-                />
-              )
-            })}
-
-            {/* Start point hint for current stroke */}
-            {currentStartHint && !isComplete && (
-              <circle
-                cx={currentStartHint.x}
-                cy={currentStartHint.y}
-                r="4"
-                className={styles.startHintPulse}
+            {strokes.slice(0, completedCount).map((d, i) => (
+              <path
+                key={`completed-${i}`}
+                d={d}
+                className={snappingIndex === i ? styles.strokeSnapIn : styles.strokeCompleted}
+                fill="none"
               />
-            )}
+            ))}
           </g>
 
           {/* User's current drawing (in canvas coordinates) */}

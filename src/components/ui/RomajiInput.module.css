@@ -36,15 +36,3 @@
   border-color: var(--color-error) !important;
   background: rgba(248, 81, 73, 0.1);
 }
-
-.pending {
-  position: absolute;
-  right: var(--spacing-md);
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: var(--text-xs);
-  color: var(--color-text-muted);
-  pointer-events: none;
-  font-family: var(--font-sans);
-  opacity: 0.6;
-}
