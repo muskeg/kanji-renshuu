@@ -1,7 +1,7 @@
 const CACHE_NAME = 'kanji-renshuu-v1';
 const STATIC_ASSETS = [
-  '/kanji-renshuu/',
-  '/kanji-renshuu/index.html',
+  '/',
+  '/index.html',
 ];
 
 self.addEventListener('install', (event) => {

@@ -2,13 +2,13 @@
   "name": "Kanji Renshū",
   "short_name": "漢字練習",
   "description": "Spaced repetition flashcards for all 2,136 Jōyō kanji",
-  "start_url": "/kanji-renshuu/",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#0d1117",
   "theme_color": "#0d1117",
   "icons": [
     {
-      "src": "/kanji-renshuu/favicon.svg",
+      "src": "/favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
