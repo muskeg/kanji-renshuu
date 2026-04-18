@@ -418,6 +418,15 @@ const fr: Translations = {
   'forecast.thu': 'Jeu',
   'forecast.fri': 'Ven',
   'forecast.sat': 'Sam',
+
+  // --- PWA ---
+  'pwa.updateAvailable': 'Mise à jour disponible',
+  'pwa.updateMessage': 'Une nouvelle version est prête. Rechargez pour mettre à jour.',
+  'pwa.reload': 'Recharger',
+  'pwa.dismiss': 'Plus tard',
+  'pwa.offlineReady': 'Appli prête pour une utilisation hors ligne',
+  'pwa.install': 'Installer l\'appli',
+  'pwa.installDesc': 'Ajoutez à votre écran d\'accueil pour la meilleure expérience.',
 }
 
 export default fr

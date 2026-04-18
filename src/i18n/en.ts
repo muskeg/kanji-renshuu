@@ -416,6 +416,15 @@ const en = {
   'forecast.thu': 'Thu',
   'forecast.fri': 'Fri',
   'forecast.sat': 'Sat',
+
+  // --- PWA ---
+  'pwa.updateAvailable': 'Update available',
+  'pwa.updateMessage': 'A new version is ready. Reload to update.',
+  'pwa.reload': 'Reload',
+  'pwa.dismiss': 'Later',
+  'pwa.offlineReady': 'App ready for offline use',
+  'pwa.install': 'Install App',
+  'pwa.installDesc': 'Add to your home screen for the best experience.',
 } as const
 
 export default en

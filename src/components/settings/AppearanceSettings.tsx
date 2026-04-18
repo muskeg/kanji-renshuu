@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTheme } from '@/hooks/useTheme'
+import { useInstallPrompt } from '@/hooks/useInstallPrompt'
 import { loadSettings, saveSettings } from '@/core/storage/settings'
 import { useTranslation } from '@/i18n'
 import type { Locale } from '@/i18n/types'
@@ -10,6 +11,7 @@ const SCALE_OPTIONS = [75, 80, 90, 100, 110, 125, 150] as const
 export function AppearanceSettings() {
   const { t, locale, setLocale } = useTranslation()
   const { theme, setTheme } = useTheme()
+  const { canInstall, promptInstall } = useInstallPrompt()
   const [soundEnabled, setSoundEnabled] = useState(() => loadSettings().soundEnabled)
   const [uiScale, setUiScale] = useState(() => loadSettings().uiScale)
 
@@ -113,6 +115,20 @@ export function AppearanceSettings() {
           </select>
         </div>
       </div>
+
+      {canInstall && (
+        <div className={styles.group}>
+          <span className={styles.label}>{t('pwa.install')}</span>
+          <span className={styles.hint}>{t('pwa.installDesc')}</span>
+          <button
+            className={styles.installBtn}
+            onClick={promptInstall}
+            type="button"
+          >
+            📲 {t('pwa.install')}
+          </button>
+        </div>
+      )}
     </div>
   )
 }

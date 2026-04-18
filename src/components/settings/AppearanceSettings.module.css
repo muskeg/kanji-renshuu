@@ -121,3 +121,19 @@
   font-size: var(--text-sm);
   cursor: pointer;
 }
+
+.installBtn {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: var(--color-primary);
+  color: var(--color-text);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+.installBtn:hover {
+  opacity: 0.9;
+}

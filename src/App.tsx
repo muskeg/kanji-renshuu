@@ -3,6 +3,7 @@ import { Header } from '@/components/layout/Header'
 import { BottomNav } from '@/components/layout/BottomNav'
 import { PageTransition } from '@/components/layout/PageTransition'
 import { ToastContainer } from '@/components/ui/Toast'
+import { UpdatePrompt } from '@/components/ui/UpdatePrompt'
 import { useToastListener } from '@/hooks/useToast'
 import { useTheme } from '@/hooks/useTheme'
 import { I18nProvider, getMeanings } from '@/i18n'
@@ -140,6 +141,7 @@ export function App() {
         </PageTransition>
       </main>
       <ToastContainer toasts={toasts} onDismiss={dismissToast} />
+      <UpdatePrompt />
       <BottomNav currentView={currentView} onNavigate={(v) => setCurrentView(v as AppView)} />
     </I18nProvider>
   )
