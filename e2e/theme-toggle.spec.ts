@@ -1,7 +1,12 @@
 import { test, expect } from '@playwright/test'
 
+// addInitScript runs on every navigation, including reload. We only want to
+// seed settings on the very first navigation, otherwise we would clobber the
+// user's toggled theme when the test calls page.reload(). Guard with a
+// sentinel stored in localStorage.
 test.beforeEach(async ({ context }) => {
   await context.addInitScript(() => {
+    if (localStorage.getItem('e2e-seeded') === '1') return
     indexedDB.deleteDatabase('kanji-renshuu')
     localStorage.clear()
     localStorage.setItem('kanji-renshuu-onboarded', '1')
@@ -21,6 +26,7 @@ test.beforeEach(async ({ context }) => {
         guidedWriting: true,
       }),
     )
+    localStorage.setItem('e2e-seeded', '1')
   })
 })
 
@@ -32,6 +38,9 @@ test('cycling the theme toggle persists the choice across reloads', async ({ pag
 
   expect(await readTheme()).toBe('dark')
 
+  // The header theme toggle cycles through system -> light -> dark.
+  // Click up to two times so the result is deterministic regardless of the
+  // host's prefers-color-scheme.
   const toggle = page.getByRole('button', { name: /theme:/i })
   await toggle.click()
   let after = await readTheme()
