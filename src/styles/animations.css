@@ -56,3 +56,22 @@
 .slide-up {
   animation: slide-up var(--transition-slow) ease-out;
 }
+
+/*
+ * Honour the user's reduced-motion preference. We disable non-essential
+ * animations and decorative transitions by collapsing their durations to a
+ * tiny value (avoids removing the rules entirely, which would break
+ * `transitionend` listeners). Any animation that conveys meaning (e.g. a
+ * progress bar) should keep its own scoped rule under
+ * `@media (prefers-reduced-motion: no-preference)` instead.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

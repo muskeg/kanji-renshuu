@@ -32,6 +32,8 @@ const fr: Translations = {
 
   // --- Home page ---
   'home.studyModes': "Modes d'étude",
+  'home.sharedQueueBanner': "Tous les modes d'étude partagent la même file de révision — choisissez celui qui vous convient.",
+  'home.dismiss': 'Fermer',
 
   // --- Daily goal ---
   'dailyGoal.heading': "Objectif du jour",
@@ -356,6 +358,7 @@ const fr: Translations = {
   'onboarding.greatJob': "Super ! L'application vous montrera ce kanji au moment parfait pour la mémoire à long terme.",
   'onboarding.modesAvailable': "4 modes d'étude disponibles :",
   'onboarding.startLearning': "Commencer l'apprentissage",
+  'onboarding.skip': 'Passer',
 
   // --- Suggestions ---
   'suggestions.heading': 'Suggestion suivante',

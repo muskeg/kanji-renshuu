@@ -43,6 +43,8 @@ export interface ReviewLogEntry {
   rating: RatingValue
   mode: QuizMode
   timestamp: number
+  /** ISO date (YYYY-MM-DD) derived from `timestamp`, indexed for fast daily lookups. */
+  date: string
   responseTimeMs: number
   fsrsLog: FSRSReviewLog
 }

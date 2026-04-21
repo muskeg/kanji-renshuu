@@ -30,6 +30,8 @@ const en = {
 
   // --- Home page ---
   'home.studyModes': 'Study Modes',
+  'home.sharedQueueBanner': 'All study modes share the same SRS queue — pick whichever feels best today.',
+  'home.dismiss': 'Dismiss',
 
   // --- Daily goal ---
   'dailyGoal.heading': "Today's Goal",
@@ -354,6 +356,7 @@ const en = {
   'onboarding.greatJob': 'Great! The app will show you this kanji again at the perfect time for long-term memory.',
   'onboarding.modesAvailable': '4 study modes available:',
   'onboarding.startLearning': 'Start Learning',
+  'onboarding.skip': 'Skip',
 
   // --- Suggestions ---
   'suggestions.heading': 'Suggested next',

@@ -117,6 +117,8 @@ export function Header({ currentView, onNavigate }: HeaderProps) {
         <button
           className={`${styles.navButton} ${currentView === 'settings' ? styles.navButtonActive : ''}`}
           onClick={() => onNavigate('settings')}
+          aria-label={t('nav.settings')}
+          title={t('nav.settings')}
         >
           ⚙
         </button>

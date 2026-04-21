@@ -1,51 +1,30 @@
 import { openDB, type IDBPDatabase } from 'idb'
 import type { CardState, ReviewLogEntry, DailyStats } from '@/core/srs/types'
+import {
+  type KanjiRenshuuDB,
+  LATEST_DB_VERSION,
+  isoDateFromTimestamp,
+  runMigrations,
+} from './migrations'
 
 const DB_NAME = 'kanji-renshuu'
-const DB_VERSION = 1
-
-interface KanjiRenshuuDB {
-  cards: {
-    key: string
-    value: CardState
-    indexes: { 'by-introduced': number }
-  }
-  reviewLogs: {
-    key: string
-    value: ReviewLogEntry
-    indexes: {
-      'by-kanji': string
-      'by-timestamp': number
-      'by-date': string
-    }
-  }
-  dailyStats: {
-    key: string
-    value: DailyStats
-  }
-}
 
 let dbPromise: Promise<IDBPDatabase<KanjiRenshuuDB>> | null = null
 
 function getDB(): Promise<IDBPDatabase<KanjiRenshuuDB>> {
   if (!dbPromise) {
-    dbPromise = openDB<KanjiRenshuuDB>(DB_NAME, DB_VERSION, {
-      upgrade(db) {
-        // Cards store
-        const cardStore = db.createObjectStore('cards', { keyPath: 'kanjiLiteral' })
-        cardStore.createIndex('by-introduced', 'introduced')
-
-        // Review logs store
-        const logStore = db.createObjectStore('reviewLogs', { keyPath: 'id' })
-        logStore.createIndex('by-kanji', 'kanjiLiteral')
-        logStore.createIndex('by-timestamp', 'timestamp')
-
-        // Daily stats store
-        db.createObjectStore('dailyStats', { keyPath: 'date' })
+    dbPromise = openDB<KanjiRenshuuDB>(DB_NAME, LATEST_DB_VERSION, {
+      upgrade(db, oldVersion, newVersion, tx) {
+        void runMigrations(db, tx, oldVersion, newVersion ?? LATEST_DB_VERSION)
       },
     })
   }
   return dbPromise
+}
+
+/** Test-only: reset the cached connection so a fresh DB can be opened. */
+export function _resetDbForTests(): void {
+  dbPromise = null
 }
 
 // --- Cards ---
@@ -80,16 +59,17 @@ export async function getCardCount(): Promise<number> {
 
 export async function addReviewLog(log: ReviewLogEntry): Promise<void> {
   const db = await getDB()
-  await db.add('reviewLogs', log)
+  // Defensive: callers should set `date`, but we backfill from timestamp
+  // so older code paths and JSON imports stay safe.
+  const withDate: ReviewLogEntry = log.date
+    ? log
+    : { ...log, date: isoDateFromTimestamp(log.timestamp) }
+  await db.add('reviewLogs', withDate)
 }
 
 export async function getReviewLogsByDate(date: string): Promise<ReviewLogEntry[]> {
   const db = await getDB()
-  const all = await db.getAll('reviewLogs')
-  return all.filter(log => {
-    const logDate = new Date(log.timestamp).toISOString().split('T')[0]
-    return logDate === date
-  })
+  return db.getAllFromIndex('reviewLogs', 'by-date', date)
 }
 
 // --- Daily Stats ---

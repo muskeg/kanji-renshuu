@@ -76,5 +76,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/test-setup.ts',
     css: true,
+    // Vitest runs unit tests under src/. Playwright owns everything under e2e/.
+    exclude: ['**/node_modules/**', '**/dist/**', 'e2e/**'],
   },
 })

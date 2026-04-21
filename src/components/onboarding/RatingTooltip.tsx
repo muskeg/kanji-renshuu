@@ -2,18 +2,26 @@ import { useState } from 'react'
 import { useTranslation } from '@/i18n'
 import styles from './RatingTooltip.module.css'
 
-const TOOLTIP_SHOWN_KEY = 'kanji-renshuu-rating-tooltip-shown'
+const TOOLTIP_SEEN_KEY = 'kanji-renshuu-rating-tooltip-seen'
+/** Show the rating helper for the first N sessions, then auto-retire it. */
+const TOOLTIP_MAX_SHOWS = 5
+
+function readSeenCount(): number {
+  const raw = localStorage.getItem(TOOLTIP_SEEN_KEY)
+  if (!raw) return 0
+  const n = Number.parseInt(raw, 10)
+  return Number.isFinite(n) && n >= 0 ? n : 0
+}
 
 export function RatingTooltip() {
-  const [visible, setVisible] = useState(
-    () => !localStorage.getItem(TOOLTIP_SHOWN_KEY),
-  )
+  const [visible, setVisible] = useState(() => readSeenCount() < TOOLTIP_MAX_SHOWS)
   const { t } = useTranslation()
 
   if (!visible) return null
 
   function dismiss() {
-    localStorage.setItem(TOOLTIP_SHOWN_KEY, '1')
+    const next = readSeenCount() + 1
+    localStorage.setItem(TOOLTIP_SEEN_KEY, String(next))
     setVisible(false)
   }
 

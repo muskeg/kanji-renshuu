@@ -30,8 +30,23 @@ export function Onboarding({ onComplete }: OnboardingProps) {
     onComplete()
   }
 
+  function handleSkip() {
+    // Keep whatever pace the user already touched (default 10) but don't
+    // overwrite settings, mirroring the "I'll figure it out later" intent.
+    markOnboarded()
+    onComplete()
+  }
+
   return (
     <div className={styles.container}>
+      <button
+        type="button"
+        className={styles.skipButton}
+        onClick={handleSkip}
+        aria-label={t('onboarding.skip')}
+      >
+        {t('onboarding.skip')}
+      </button>
       {step === 0 && (
         <div className={styles.step}>
           <div className={styles.hero}>漢字練習</div>

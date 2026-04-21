@@ -159,19 +159,20 @@ export async function processReview(
   await putCardState(updatedState)
 
   // Save review log
+  const today = todayDateString()
   const logEntry: ReviewLogEntry = {
     id: generateId(),
     kanjiLiteral: item.cardState.kanjiLiteral,
     rating: ratingValue,
     mode,
     timestamp: now.getTime(),
+    date: today,
     responseTimeMs,
     fsrsLog: result.log,
   }
   await addReviewLog(logEntry)
 
   // Update daily stats
-  const today = todayDateString()
   const existing = await getDailyStats(today)
   const stats: DailyStats = {
     date: today,

@@ -4,6 +4,7 @@ import { isOnboarded } from '@/core/storage/onboarding'
 import { DailyGoal } from '@/components/review/DailyGoal'
 import { StreakRecovery } from '@/components/review/StreakRecovery'
 import { KanjiOfTheDay } from '@/components/review/KanjiOfTheDay'
+import { SharedQueueBanner } from './SharedQueueBanner'
 import { useTranslation } from '@/i18n'
 import styles from './HomePage.module.css'
 
@@ -29,6 +30,8 @@ export function HomePage({ kanjiData, onNavigate }: HomePageProps) {
 
   return (
     <div className={styles.container}>
+      <SharedQueueBanner />
+
       <StreakRecovery />
 
       {/* Daily progress */}
