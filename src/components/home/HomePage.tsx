@@ -21,6 +21,7 @@ export function HomePage({ kanjiData, onNavigate }: HomePageProps) {
     { view: 'meaning-quiz', icon: '🔤', label: t('mode.meaningQuiz'), desc: t('mode.meaningQuiz.descShort') },
     { view: 'reading-quiz', icon: '🗣️', label: t('mode.readingQuiz'), desc: t('mode.readingQuiz.descShort') },
     { view: 'writing', icon: '✍️', label: t('mode.writing'), desc: t('mode.writingPractice.desc') },
+    { view: 'cloze-quiz', icon: '◯', label: t('mode.clozeQuiz'), desc: t('mode.clozeQuiz.descShort') },
   ]
 
   // First-time users see the onboarding flow

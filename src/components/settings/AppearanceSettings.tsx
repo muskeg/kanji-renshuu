@@ -13,6 +13,7 @@ export function AppearanceSettings() {
   const { theme, setTheme } = useTheme()
   const { canInstall, promptInstall } = useInstallPrompt()
   const [soundEnabled, setSoundEnabled] = useState(() => loadSettings().soundEnabled)
+  const [ttsEnabled, setTtsEnabled] = useState(() => loadSettings().ttsEnabled)
   const [uiScale, setUiScale] = useState(() => loadSettings().uiScale)
 
   const THEME_OPTIONS = [
@@ -31,6 +32,14 @@ export function AppearanceSettings() {
     setSoundEnabled(next)
     const settings = loadSettings()
     settings.soundEnabled = next
+    saveSettings(settings)
+  }
+
+  const toggleTts = () => {
+    const next = !ttsEnabled
+    setTtsEnabled(next)
+    const settings = loadSettings()
+    settings.ttsEnabled = next
     saveSettings(settings)
   }
 
@@ -90,6 +99,21 @@ export function AppearanceSettings() {
         >
           <span className={styles.toggleThumb} />
           <span className={styles.toggleLabel}>{soundEnabled ? t('appearance.on') : t('appearance.off')}</span>
+        </button>
+      </div>
+
+      <div className={styles.group}>
+        <span className={styles.label}>{t('appearance.tts')}</span>
+        <span className={styles.hint}>{t('appearance.ttsHint')}</span>
+        <button
+          className={`${styles.toggle} ${ttsEnabled ? styles.toggleOn : ''}`}
+          onClick={toggleTts}
+          type="button"
+          role="switch"
+          aria-checked={ttsEnabled}
+        >
+          <span className={styles.toggleThumb} />
+          <span className={styles.toggleLabel}>{ttsEnabled ? t('appearance.on') : t('appearance.off')}</span>
         </button>
       </div>
 

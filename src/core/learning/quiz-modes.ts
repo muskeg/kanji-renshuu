@@ -1,4 +1,5 @@
 import type { KanjiEntry, QuizMode } from '@/core/srs/types'
+import { getLookalikes } from '@/data/lookalikes-loader'
 
 /** All supported quiz mode definitions */
 export const QUIZ_MODES: Record<
@@ -21,11 +22,16 @@ export const QUIZ_MODES: Record<
     label: 'Writing',
     description: 'Practice writing strokes',
   },
+  cloze: {
+    label: 'Cloze',
+    description: 'Fill the missing kanji in a real word',
+  },
 }
 
 /**
  * Select distractor kanji for multiple-choice quizzes.
- * Prefers kanji from the same grade, falls back to other grades if needed.
+ * Prefers visual look-alikes (same radical / shared component) when known,
+ * then falls back to same grade, then any grade.
  */
 export function selectDistractors(
   correct: KanjiEntry,
@@ -35,11 +41,16 @@ export function selectDistractors(
   // Filter out the correct answer
   const candidates = pool.filter(k => k.literal !== correct.literal)
 
-  // Prefer same grade
-  const sameGrade = candidates.filter(k => k.grade === correct.grade)
-  const otherGrade = candidates.filter(k => k.grade !== correct.grade)
+  const lookalikeLiterals = new Set(getLookalikes(correct.literal, 8))
+  const lookalikes = candidates.filter(k => lookalikeLiterals.has(k.literal))
+  const sameGrade = candidates.filter(
+    k => !lookalikeLiterals.has(k.literal) && k.grade === correct.grade,
+  )
+  const otherGrade = candidates.filter(
+    k => !lookalikeLiterals.has(k.literal) && k.grade !== correct.grade,
+  )
 
-  const shuffled = [...shuffle(sameGrade), ...shuffle(otherGrade)]
+  const shuffled = [...shuffle(lookalikes), ...shuffle(sameGrade), ...shuffle(otherGrade)]
   return shuffled.slice(0, count)
 }
 

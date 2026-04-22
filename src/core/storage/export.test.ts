@@ -41,6 +41,7 @@ describe('export/import', () => {
         language: 'en',
         uiScale: 100,
         guidedWriting: true,
+        ttsEnabled: false,
       })
 
       const json = await exportData()

@@ -15,6 +15,7 @@ function makeKanji(overrides: Partial<KanjiEntry> = {}): KanjiEntry {
     literal: '日',
     grade: 1,
     jlpt: 4,
+    jlptN: 5,
     strokeCount: 4,
     frequency: 1,
     radical: 72,

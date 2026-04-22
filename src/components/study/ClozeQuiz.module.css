@@ -1,0 +1,126 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xl);
+  width: 100%;
+  max-width: 460px;
+}
+
+.loading {
+  color: var(--color-text-muted);
+  padding: var(--spacing-lg);
+}
+
+.prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+  text-align: center;
+}
+
+.promptLabel {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.wordRow {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-sm);
+}
+
+.word {
+  font-family: var(--font-jp);
+  font-size: var(--text-3xl, 2rem);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.char { color: var(--color-text); }
+
+.blank {
+  color: var(--color-primary);
+  border-bottom: 3px dashed var(--color-primary);
+  padding: 0 4px;
+  margin: 0 2px;
+  animation: cloze-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes cloze-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.55; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blank { animation: none; }
+}
+
+.reading {
+  font-family: var(--font-jp);
+  color: var(--color-text-secondary);
+  font-size: var(--text-base);
+}
+
+.meaning {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-style: italic;
+}
+
+.options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+  width: 100%;
+}
+
+.option {
+  font-family: var(--font-jp);
+  font-size: var(--text-kanji-sm);
+  padding: var(--spacing-lg);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.option:hover:not(:disabled) {
+  background: var(--color-surface-hover);
+  border-color: var(--color-primary);
+}
+
+.option:disabled {
+  cursor: default;
+}
+
+.correct {
+  border-color: var(--color-success) !important;
+  background: rgba(63, 185, 80, 0.1) !important;
+}
+
+.wrong {
+  border-color: var(--color-error) !important;
+  background: rgba(248, 81, 73, 0.1) !important;
+}
+
+.feedbackRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-family: var(--font-jp);
+}
+
+.feedbackWord {
+  font-size: var(--text-xl);
+  font-weight: 600;
+}

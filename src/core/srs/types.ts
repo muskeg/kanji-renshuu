@@ -5,6 +5,8 @@ export interface KanjiEntry {
   literal: string
   grade: number
   jlpt: number | null
+  /** Modern JLPT level (5=N5 easiest .. 1=N1 hardest). Derived at build time. */
+  jlptN: 1 | 2 | 3 | 4 | 5 | null
   strokeCount: number
   frequency: number | null
   radical: number
@@ -20,7 +22,19 @@ export interface KanjiEntry {
 }
 
 /** Quiz modes supported by the app */
-export type QuizMode = 'recognition' | 'meaning' | 'reading' | 'writing'
+export type QuizMode = 'recognition' | 'meaning' | 'reading' | 'writing' | 'cloze'
+
+/** Compact vocabulary example from JMdict for a single kanji. */
+export interface VocabExample {
+  /** Word in kanji form, e.g. "本日". */
+  w: string
+  /** Reading in kana, e.g. "ほんじつ". */
+  r: string
+  /** English gloss(es) joined with "; ". */
+  m: string
+  /** 1 when JMdict marks this entry as common. */
+  c?: 1
+}
 
 /** Rating values matching ts-fsrs Rating enum (1-4) */
 export type RatingValue = 1 | 2 | 3 | 4
@@ -82,6 +96,7 @@ export interface AppSettings {
   language: 'en' | 'fr'
   uiScale: number
   guidedWriting: boolean
+  ttsEnabled: boolean
 }
 
 /** Default settings */
@@ -97,6 +112,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   language: 'en',
   uiScale: 100,
   guidedWriting: true,
+  ttsEnabled: false,
 }
 
 /** Review session state */

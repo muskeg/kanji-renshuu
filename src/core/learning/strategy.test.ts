@@ -16,6 +16,7 @@ function makeKanji(literal: string, grade: number, frequency: number | null = nu
     literal,
     grade,
     jlpt: null,
+    jlptN: null,
     strokeCount: 4,
     frequency,
     radical: 1,

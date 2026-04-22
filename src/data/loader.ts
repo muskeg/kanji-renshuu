@@ -1,7 +1,9 @@
 import type { KanjiEntry } from '@/core/srs/types'
 
-// Grade-based data files for lazy loading
-const GRADE_FILES: Record<number, () => Promise<{ default: KanjiEntry[] }>> = {
+// Grade-based data files for lazy loading. JSON imports come back as the
+// inferred literal type; we cast to KanjiEntry[] since the build pipeline
+// guarantees the shape.
+const GRADE_FILES: Record<number, () => Promise<{ default: unknown }>> = {
   1: () => import('@/data/kanji-g1.json'),
   2: () => import('@/data/kanji-g2.json'),
   3: () => import('@/data/kanji-g3.json'),
@@ -24,7 +26,7 @@ export async function loadKanjiByGrade(grade: number): Promise<KanjiEntry[]> {
 
   try {
     const module = await loader()
-    const data = module.default
+    const data = module.default as KanjiEntry[]
     kanjiCache.set(grade, data)
     return data
   } catch {

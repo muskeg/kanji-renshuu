@@ -9,13 +9,14 @@ export interface Suggestion {
   action?: QuizMode | 'start'
 }
 
-const ALL_MODES: QuizMode[] = ['recognition', 'meaning', 'reading', 'writing']
+const ALL_MODES: QuizMode[] = ['recognition', 'meaning', 'reading', 'writing', 'cloze']
 
 const MODE_LABEL_KEYS: Record<QuizMode, string> = {
   recognition: 'mode.flashcards',
   meaning: 'mode.meaningQuiz',
   reading: 'mode.readingQuiz',
   writing: 'mode.writingPractice',
+  cloze: 'mode.clozeQuiz',
 }
 
 export function useSuggestions(status: QueueStatus | null): Suggestion[] {

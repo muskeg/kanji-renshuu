@@ -7,6 +7,7 @@ function makeKanji(literal: string, grade: number): KanjiEntry {
     literal,
     grade,
     jlpt: null,
+    jlptN: null,
     strokeCount: 4,
     frequency: null,
     radical: 1,

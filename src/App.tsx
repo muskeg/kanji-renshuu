@@ -13,6 +13,7 @@ import { ReviewSession } from '@/components/review/ReviewSession'
 import { MeaningQuizSession } from '@/components/study/MeaningQuizSession'
 import { ReadingQuizSession } from '@/components/study/ReadingQuizSession'
 import { WritingPracticeSession } from '@/components/study/WritingPracticeSession'
+import { ClozeQuizSession } from '@/components/study/ClozeQuizSession'
 import { KanjiDetail } from '@/components/study/KanjiDetail'
 import { KanjiGrid } from '@/components/browse/KanjiGrid'
 import { FilterBar, type KanjiFilter } from '@/components/browse/FilterBar'
@@ -25,7 +26,7 @@ import { useCardStatus } from '@/hooks/useCardStatus'
 import type { KanjiEntry } from '@/core/srs/types'
 import { katakanaToHiragana, normalizeReading } from '@/utils/japanese'
 
-export type AppView = 'home' | 'review' | 'browse' | 'meaning-quiz' | 'reading-quiz' | 'writing' | 'detail' | 'progress' | 'settings'
+export type AppView = 'home' | 'review' | 'browse' | 'meaning-quiz' | 'reading-quiz' | 'writing' | 'cloze-quiz' | 'detail' | 'progress' | 'settings'
 
 export function App() {
   const [currentView, setCurrentView] = useState<AppView>('home')
@@ -65,7 +66,7 @@ export function App() {
     }
 
     if (filter.jlptLevels.length > 0) {
-      result = result.filter(k => k.jlpt !== null && filter.jlptLevels.includes(k.jlpt))
+      result = result.filter(k => k.jlptN !== null && filter.jlptLevels.includes(k.jlptN))
     }
 
     if (searchQuery.trim()) {
@@ -118,6 +119,10 @@ export function App() {
 
         {!loading && !error && currentView === 'writing' && (
           <WritingPracticeSession kanjiData={kanji} />
+        )}
+
+        {!loading && !error && currentView === 'cloze-quiz' && (
+          <ClozeQuizSession kanjiData={kanji} />
         )}
 
         {!loading && !error && currentView === 'browse' && (

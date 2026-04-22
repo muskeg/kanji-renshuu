@@ -1,0 +1,4 @@
+{
+  "_comment": "Curated overrides for JLPT N5-N1 mapping. Keys are kanji literals, values are 1-5 (N1-N5). Empty by default; populate to correct individual mappings on top of the heuristic in build-jlpt.ts.",
+  "overrides": {}
+}
