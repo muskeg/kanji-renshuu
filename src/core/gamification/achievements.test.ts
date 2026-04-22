@@ -32,7 +32,7 @@ function kanji(literal: string, grade: number): KanjiEntry {
     meanings: ['x'],
     readings: { onYomi: [], kunYomi: [] },
     components: [],
-  } as KanjiEntry
+  } as unknown as KanjiEntry
 }
 
 function makeStats(overrides: Partial<AchievementStats>): AchievementStats {
