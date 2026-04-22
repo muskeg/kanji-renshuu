@@ -1,5 +1,5 @@
 import type { IDBPDatabase, IDBPTransaction } from 'idb'
-import type { CardState, ReviewLogEntry, DailyStats, UserStats, Deck } from '@/core/srs/types'
+import type { CardState, ReviewLogEntry, DailyStats, UserStats, Deck, KanjiNote } from '@/core/srs/types'
 
 /**
  * Schema description for the IndexedDB instance. Update this in lock-step with
@@ -33,6 +33,10 @@ export interface KanjiRenshuuDB {
     key: string
     value: Deck
     indexes: { 'by-createdAt': number }
+  }
+  notes: {
+    key: string
+    value: KanjiNote
   }
 }
 
@@ -135,6 +139,16 @@ export const migrations: Migration[] = [
       if (!db.objectStoreNames.contains('decks')) {
         const store = db.createObjectStore('decks', { keyPath: 'id' })
         store.createIndex('by-createdAt', 'createdAt')
+      }
+    },
+  },
+  {
+    from: 4,
+    to: 5,
+    description: 'Add notes store for user-editable mnemonics',
+    run: (db) => {
+      if (!db.objectStoreNames.contains('notes')) {
+        db.createObjectStore('notes', { keyPath: 'kanjiLiteral' })
       }
     },
   },

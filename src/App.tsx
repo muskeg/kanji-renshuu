@@ -147,7 +147,20 @@ export function App() {
         )}
 
         {!loading && !error && currentView === 'progress' && (
-          <Dashboard kanjiData={kanji} />
+          <Dashboard
+            kanjiData={kanji}
+            onDrillWeakest={(filter) => {
+              setActiveDeck({
+                id: 'drill-weakest',
+                name: 'Weakest 20 drill',
+                color: '#ff6b6b',
+                filter,
+                createdAt: Date.now(),
+                updatedAt: Date.now(),
+              })
+              setCurrentView('review')
+            }}
+          />
         )}
 
         {!loading && !error && currentView === 'settings' && (

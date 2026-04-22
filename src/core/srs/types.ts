@@ -110,6 +110,14 @@ export interface Deck {
   updatedAt: number
 }
 
+/** User-editable mnemonic / note attached to a kanji (E.5). */
+export interface KanjiNote {
+  kanjiLiteral: string
+  /** Markdown source (subset). Sanitized at render time. */
+  content: string
+  updatedAt: number
+}
+
 /** User-configurable settings */
 export type LearningPath = 'byGrade' | 'byJlpt' | 'byFrequency' | 'radicalFirst' | 'byStrokeCount'
 

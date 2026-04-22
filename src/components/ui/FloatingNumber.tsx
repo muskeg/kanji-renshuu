@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import styles from './FloatingNumber.module.css'
 
 interface FloatingNumberProps {
@@ -14,28 +14,29 @@ interface FloatingNumberProps {
  * Renders a small floating "+N XP" element above its parent that fades and
  * rises on each `trigger` change. Respects `prefers-reduced-motion` (still
  * shows the number, just without the rise/fade animation).
- *
- * The element is removed after `durationMs`. Re-keyed on `trigger` so each
- * change spawns a fresh animation.
  */
 export function FloatingNumber({ trigger, label, durationMs = 900 }: FloatingNumberProps) {
-  const [visibleFor, setVisibleFor] = useState<number | null>(null)
+  const [visible, setVisible] = useState(false)
+  const idRef = useRef(0)
 
   useEffect(() => {
     if (!trigger) return
+    idRef.current += 1
+    const myId = idRef.current
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setVisibleFor(trigger)
+    setVisible(true)
     const timer = window.setTimeout(() => {
-      setVisibleFor((current) => (current === trigger ? null : current))
+      // Only hide if no newer trigger replaced us.
+      if (idRef.current === myId) setVisible(false)
     }, durationMs)
     return () => window.clearTimeout(timer)
   }, [trigger, durationMs])
 
-  if (visibleFor === null) return null
+  if (!visible) return null
 
   return (
     <span
-      key={visibleFor}
+      key={trigger}
       className={styles.floater}
       role="status"
       aria-live="polite"

@@ -1,6 +1,6 @@
 # Kanji Renshū — Implementation Plan
 
-**Status:** Phase A–D complete · Phase E next
+**Status:** Phase A–E complete · Phase F (Stretch) ongoing
 **Companion:** [IMPROVEMENT_PLAN.md](IMPROVEMENT_PLAN.md) (the "what" and "why")
 **This doc:** the "how" — concrete, ordered, file-level tasks ready to pick up.
 

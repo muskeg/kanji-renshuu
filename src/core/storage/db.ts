@@ -80,6 +80,11 @@ export async function getReviewLogsByDate(date: string): Promise<ReviewLogEntry[
   return db.getAllFromIndex('reviewLogs', 'by-date', date)
 }
 
+export async function getAllReviewLogs(): Promise<ReviewLogEntry[]> {
+  const db = await getDB()
+  return db.getAll('reviewLogs')
+}
+
 /** Fetch the most recent review log entry, or undefined if none exist. */
 export async function getLastReviewLog(): Promise<ReviewLogEntry | undefined> {
   const db = await getDB()

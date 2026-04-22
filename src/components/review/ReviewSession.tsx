@@ -1,5 +1,6 @@
 import type { KanjiEntry, DeckFilter } from '@/core/srs/types'
 import { useReviewSession } from '@/hooks/useReviewSession'
+import { useSwipe } from '@/hooks/useSwipe'
 import { FlashCard } from './FlashCard'
 import { RatingButtons } from './RatingButtons'
 import { SessionSummary } from './SessionSummary'
@@ -31,6 +32,16 @@ export function ReviewSession({ kanjiData, deckFilter }: ReviewSessionProps) {
     undoLast,
   } = useReviewSession(kanjiData, deckFilter)
   const { t } = useTranslation()
+
+  // Swipe gestures: tap to flip, then swipe to rate.
+  // left=Again(1), down=Hard(2), right=Good(3), up=Easy(4).
+  const swipeRef = useSwipe<HTMLDivElement>({
+    enabled: phase === 'reviewing' && isFlipped,
+    onSwipe: (dir) => {
+      const map = { left: 1, down: 2, right: 3, up: 4 } as const
+      rateCard(map[dir])
+    },
+  })
 
   if (phase === 'summary' && summary) {
     return (
@@ -86,7 +97,7 @@ export function ReviewSession({ kanjiData, deckFilter }: ReviewSessionProps) {
         </div>
       </div>
 
-      <div className={styles.cardArea}>
+      <div className={styles.cardArea} ref={swipeRef}>
         <FlashCard
           kanji={currentItem.kanji}
           isFlipped={isFlipped}

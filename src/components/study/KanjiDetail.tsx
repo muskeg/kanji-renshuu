@@ -3,6 +3,8 @@ import { useTranslation, getMeanings } from '@/i18n'
 import styles from './KanjiDetail.module.css'
 import { StrokeOrder } from './StrokeOrder'
 import { ComponentGraph } from './ComponentGraph'
+import { CardHistoryModal } from './CardHistoryModal'
+import { MnemonicEditor } from './MnemonicEditor'
 import { SpeakerButton } from '@/components/ui/SpeakerButton'
 import { getLookalikes } from '@/data/lookalikes-loader'
 import { useKanjiData } from '@/hooks/useKanjiData'
@@ -19,6 +21,7 @@ export function KanjiDetail({ kanji, onBack }: KanjiDetailProps) {
   const { t } = useTranslation()
   const { kanji: allKanji } = useKanjiData()
   const [examples, setExamples] = useState<VocabExample[]>([])
+  const [showHistory, setShowHistory] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -44,6 +47,13 @@ export function KanjiDetail({ kanji, onBack }: KanjiDetailProps) {
       <div className={styles.hero}>
         <div className={styles.literal}>{kanji.literal}</div>
         <div className={styles.meanings}>{getMeanings(kanji).join(', ')}</div>
+        <button
+          type="button"
+          className={styles.historyButton}
+          onClick={() => setShowHistory(true)}
+        >
+          ☰ Review history
+        </button>
       </div>
 
       <div className={styles.sections}>
@@ -153,6 +163,9 @@ export function KanjiDetail({ kanji, onBack }: KanjiDetailProps) {
           <StrokeOrder key={kanji.literal} svgData={kanji.strokeOrderSvg} />
         </section>
 
+        {/* Mnemonic editor (E.5) */}
+        <MnemonicEditor literal={kanji.literal} />
+
         {/* Look-alikes */}
         {lookalikes.length > 0 && (
           <section className={styles.section}>
@@ -167,6 +180,10 @@ export function KanjiDetail({ kanji, onBack }: KanjiDetailProps) {
           </section>
         )}
       </div>
+
+      {showHistory && (
+        <CardHistoryModal literal={kanji.literal} onClose={() => setShowHistory(false)} />
+      )}
     </div>
   )
 }

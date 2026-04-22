@@ -69,6 +69,46 @@ jobs:
           path: playwright-report
           retention-days: 7
 
+  lighthouse:
+    needs: build
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build:data
+      - run: npm run build
+      - name: Run Lighthouse CI
+        run: |
+          npm install -g @lhci/cli@0.14.x
+          lhci autorun --config=./lighthouserc.json || echo "::warning::Lighthouse thresholds not met"
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+  size-check:
+    needs: build
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build:data
+      - run: npm run build
+      - name: Report bundle sizes
+        run: |
+          echo "## Bundle sizes" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          du -sh dist/assets/*.js dist/assets/*.css 2>/dev/null | sort -h >> $GITHUB_STEP_SUMMARY || true
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
   deploy:
     needs: [build, e2e]
     runs-on: ubuntu-latest

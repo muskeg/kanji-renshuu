@@ -1,15 +1,18 @@
-import type { KanjiEntry } from '@/core/srs/types'
+import type { KanjiEntry, DeckFilter } from '@/core/srs/types'
 import { useProgress } from '@/hooks/useProgress'
 import { StreakCalendar } from './StreakCalendar'
 import { ReviewForecast } from './ReviewForecast'
 import { GradeJourney } from './GradeJourney'
 import { LevelProgress } from './LevelProgress'
 import { AchievementGallery } from './AchievementGallery'
+import { WeakestCards } from './WeakestCards'
+import { ModeAccuracyChart } from './ModeAccuracyChart'
 import { useTranslation } from '@/i18n'
 import styles from './Dashboard.module.css'
 
 interface DashboardProps {
   kanjiData: KanjiEntry[]
+  onDrillWeakest?: (filter: DeckFilter) => void
 }
 
 function formatTime(ms: number): string {
@@ -20,7 +23,7 @@ function formatTime(ms: number): string {
   return `${minutes}m ${remainingSeconds}s`
 }
 
-export function Dashboard({ kanjiData }: DashboardProps) {
+export function Dashboard({ kanjiData, onDrillWeakest }: DashboardProps) {
   const progress = useProgress(kanjiData)
   const { t } = useTranslation()
 
@@ -122,6 +125,18 @@ export function Dashboard({ kanjiData }: DashboardProps) {
           gradeProgress={progress.gradeProgress}
           jlptProgress={progress.jlptProgress}
         />
+      </section>
+
+      {/* Weakest cards */}
+      <section className={styles.section}>
+        <h3 className={styles.sectionTitle}>Weakest 20</h3>
+        <WeakestCards kanjiData={kanjiData} onDrill={onDrillWeakest} />
+      </section>
+
+      {/* Per-mode accuracy */}
+      <section className={styles.section}>
+        <h3 className={styles.sectionTitle}>Accuracy by mode (30 days)</h3>
+        <ModeAccuracyChart />
       </section>
 
       {/* Achievements */}
