@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { getAllCardStates, getDailyStats, getAllDailyStats, todayDateString } from '@/core/storage/db'
 import { loadSettings } from '@/core/storage/settings'
-import { getFrozenDates, tryAutoFreeze, recordBrokenStreak, checkFreezeReward } from '@/core/srs/streakFreeze'
+import { getFrozenDates, tryAutoFreeze, recordBrokenStreak, checkFreezeReward, getAvailableFreezes } from '@/core/srs/streakFreeze'
 
 interface QueueStats {
   dueCount: number
@@ -10,6 +10,7 @@ interface QueueStats {
   currentStreak: number
   activatedToday: boolean
   nextDueDate: Date | null
+  freezesAvailable: number
 }
 
 async function fetchQueueStats(): Promise<QueueStats> {
@@ -95,6 +96,7 @@ async function fetchQueueStats(): Promise<QueueStats> {
     currentStreak: streak,
     activatedToday,
     nextDueDate,
+    freezesAvailable: getAvailableFreezes(),
   }
 }
 
@@ -106,6 +108,7 @@ export function useQueueStats() {
     currentStreak: 0,
     activatedToday: false,
     nextDueDate: null,
+    freezesAvailable: 0,
   })
 
   const refresh = useCallback(() => {

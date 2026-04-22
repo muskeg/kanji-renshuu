@@ -58,6 +58,17 @@ export interface DailyStats {
   totalTimeMs: number
 }
 
+/** Persistent gamification stats — single record keyed by `'singleton'`. */
+export interface UserStats {
+  id: 'singleton'
+  /** Total XP earned across the lifetime of the account. */
+  lifetimeXp: number
+  /** Available streak-freeze tokens (consumed on missed days). */
+  freezes: number
+  /** Last update timestamp (ms since epoch). */
+  updatedAt: number
+}
+
 /** User-configurable settings */
 export interface AppSettings {
   dailyNewCards: number

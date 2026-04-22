@@ -1,0 +1,29 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-primary) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 35%, transparent);
+  color: var(--color-text);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.level {
+  color: var(--color-primary);
+}
+
+.rank {
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+@media (max-width: 640px) {
+  .rank {
+    display: none;
+  }
+}

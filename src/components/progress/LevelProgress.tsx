@@ -1,4 +1,11 @@
 import { useTranslation } from '@/i18n'
+import { useUserStats } from '@/hooks/useUserStats'
+import {
+  getLevel,
+  getRankKey,
+  levelProgress,
+  xpForNextLevel,
+} from '@/core/gamification/xp'
 import styles from './LevelProgress.module.css'
 
 interface LevelProgressProps {
@@ -8,6 +15,12 @@ interface LevelProgressProps {
 
 export function LevelProgress({ gradeProgress, jlptProgress }: LevelProgressProps) {
   const { t } = useTranslation()
+  const { stats } = useUserStats()
+  const xp = stats?.lifetimeXp ?? 0
+  const level = getLevel(xp)
+  const rank = getRankKey(level)
+  const progressPct = Math.round(levelProgress(xp) * 100)
+  const remaining = xpForNextLevel(xp)
 
   function gradeLabel(grade: number): string {
     return grade === 8 ? t('grades.secondary') : t('grades.grade', { grade })
@@ -15,6 +28,20 @@ export function LevelProgress({ gradeProgress, jlptProgress }: LevelProgressProp
 
   return (
     <div className={styles.container}>
+      <section className={styles.xpSection}>
+        <div className={styles.xpHeader}>
+          <span className={styles.xpLevel}>{t('xp.level', { level })}</span>
+          <span className={styles.xpRank}>{t(rank)}</span>
+        </div>
+        <div className={styles.xpBarTrack}>
+          <div className={styles.xpBarFill} style={{ width: `${progressPct}%` }} />
+        </div>
+        <div className={styles.xpFooter}>
+          <span>{t('xp.lifetime', { xp })}</span>
+          <span>{t('xp.toNext', { xp: remaining, level: level + 1 })}</span>
+        </div>
+      </section>
+
       <section>
         <h3 className={styles.sectionTitle}>{t('levels.byGrade')}</h3>
         <div className={styles.items}>

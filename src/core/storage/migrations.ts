@@ -1,5 +1,5 @@
 import type { IDBPDatabase, IDBPTransaction } from 'idb'
-import type { CardState, ReviewLogEntry, DailyStats } from '@/core/srs/types'
+import type { CardState, ReviewLogEntry, DailyStats, UserStats } from '@/core/srs/types'
 
 /**
  * Schema description for the IndexedDB instance. Update this in lock-step with
@@ -24,6 +24,10 @@ export interface KanjiRenshuuDB {
   dailyStats: {
     key: string
     value: DailyStats
+  }
+  userStats: {
+    key: string
+    value: UserStats
   }
 }
 
@@ -85,6 +89,37 @@ export const migrations: Migration[] = [
       if (!logStore.indexNames.contains('by-date')) {
         logStore.createIndex('by-date', 'date')
       }
+    },
+  },
+  {
+    from: 2,
+    to: 3,
+    description: 'Add userStats store and backfill lifetimeXp from dailyStats',
+    run: async (db, tx) => {
+      if (!db.objectStoreNames.contains('userStats')) {
+        db.createObjectStore('userStats', { keyPath: 'id' })
+      }
+
+      // Backfill XP from existing dailyStats so returning users keep credit
+      // for the work they've already done.
+      let lifetimeXp = 0
+      const statsStore = tx.objectStore('dailyStats')
+      let cursor = await statsStore.openCursor()
+      while (cursor) {
+        const stat = cursor.value as DailyStats
+        const correct = stat.correctCount ?? 0
+        const wrong = Math.max(0, (stat.reviewsCompleted ?? 0) - correct)
+        lifetimeXp += correct * 15 + wrong * 5
+        cursor = await cursor.continue()
+      }
+
+      const userStatsStore = tx.objectStore('userStats')
+      await userStatsStore.put({
+        id: 'singleton',
+        lifetimeXp,
+        freezes: 0,
+        updatedAt: Date.now(),
+      } satisfies UserStats)
     },
   },
 ]

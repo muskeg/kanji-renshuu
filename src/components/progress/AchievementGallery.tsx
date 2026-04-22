@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import type { KanjiEntry } from '@/core/srs/types'
-import type { AchievementStatus } from '@/core/srs/milestones'
+import type { EvaluatedAchievement, AchievementFamily } from '@/core/gamification/achievements'
+import { FAMILY_ORDER } from '@/core/gamification/achievements'
 import { useAchievements } from '@/hooks/useAchievements'
 import { useTranslation } from '@/i18n'
 import styles from './AchievementGallery.module.css'
@@ -11,82 +12,80 @@ interface AchievementGalleryProps {
 
 export function AchievementGallery({ kanjiData }: AchievementGalleryProps) {
   const { achievements, loading } = useAchievements(kanjiData)
-  const [selected, setSelected] = useState<AchievementStatus | null>(null)
+  const [selected, setSelected] = useState<EvaluatedAchievement | null>(null)
   const { t } = useTranslation()
+
+  const grouped = useMemo(() => {
+    const map = new Map<AchievementFamily, EvaluatedAchievement[]>()
+    for (const fam of FAMILY_ORDER) map.set(fam, [])
+    for (const a of achievements) map.get(a.family)?.push(a)
+    return map
+  }, [achievements])
 
   if (loading) return null
 
-  const earned = achievements.filter(a => a.earned)
-  const locked = achievements.filter(a => !a.earned)
+  const totalUnlocked = achievements.filter(a => a.unlocked).length
 
   return (
     <div className={styles.container}>
-      {earned.length > 0 && (
-        <div className={styles.group}>
-          <span className={styles.groupLabel}>{t('achievements.earned', { count: earned.length })}</span>
-          <div className={styles.grid}>
-            {earned.map(a => (
-              <button
-                key={a.id}
-                className={styles.card}
-                onClick={() => setSelected(selected?.id === a.id ? null : a)}
-                aria-expanded={selected?.id === a.id}
-              >
-                <span className={styles.icon}>{a.icon}</span>
-                <span className={styles.title}>{a.title}</span>
-                {a.dateEarned && (
-                  <span className={styles.date}>{a.dateEarned}</span>
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+      <div className={styles.summary}>
+        {t('achievements.earned', { count: totalUnlocked })}
+        {' / '}
+        {achievements.length}
+      </div>
 
-      {locked.length > 0 && (
-        <div className={styles.group}>
-          <span className={styles.groupLabel}>{t('achievements.locked', { count: locked.length })}</span>
-          <div className={styles.grid}>
-            {locked.map(a => (
-              <button
-                key={a.id}
-                className={`${styles.card} ${styles.locked}`}
-                onClick={() => setSelected(selected?.id === a.id ? null : a)}
-                aria-expanded={selected?.id === a.id}
-              >
-                <span className={styles.icon}>🔒</span>
-                <span className={styles.title}>{a.title}</span>
-                {a.target > 0 && (
-                  <div className={styles.progressWrap}>
-                    <div className={styles.progressTrack}>
-                      <div
-                        className={styles.progressFill}
-                        style={{ width: `${Math.round((a.progress / a.target) * 100)}%` }}
-                      />
+      {FAMILY_ORDER.map(family => {
+        const items = grouped.get(family) ?? []
+        if (items.length === 0) return null
+        const earnedInFam = items.filter(a => a.unlocked).length
+        return (
+          <section key={family} className={styles.group}>
+            <header className={styles.groupHeader}>
+              <span className={styles.groupLabel}>{t(`family.${family}` as 'family.milestones')}</span>
+              <span className={styles.groupCount}>{earnedInFam}/{items.length}</span>
+            </header>
+            <div className={styles.grid}>
+              {items.map(a => (
+                <button
+                  key={a.id}
+                  className={`${styles.card} ${a.unlocked ? '' : styles.locked}`}
+                  onClick={() => setSelected(selected?.id === a.id ? null : a)}
+                  aria-expanded={selected?.id === a.id}
+                  aria-pressed={selected?.id === a.id}
+                >
+                  <span className={styles.icon}>{a.unlocked ? a.icon : '🔒'}</span>
+                  <span className={styles.title}>{t(a.titleKey as 'achievement.kanji10.title')}</span>
+                  {!a.unlocked && (
+                    <div className={styles.progressWrap}>
+                      <div className={styles.progressTrack}>
+                        <div
+                          className={styles.progressFill}
+                          style={{ width: `${Math.round(a.progress * 100)}%` }}
+                        />
+                      </div>
+                      <span className={styles.progressText}>{Math.round(a.progress * 100)}%</span>
                     </div>
-                    <span className={styles.progressText}>
-                      {a.progress}/{a.target}
-                    </span>
-                  </div>
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+                  )}
+                  {a.unlocked && a.unlockedAt && (
+                    <span className={styles.date}>{a.unlockedAt}</span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </section>
+        )
+      })}
 
       {selected && (
         <div className={styles.detail}>
-          <span className={styles.detailIcon}>{selected.earned ? selected.icon : '🔒'}</span>
-          <span className={styles.detailTitle}>{selected.title}</span>
-          <span className={styles.detailDesc}>{selected.description}</span>
-          {selected.earned && selected.dateEarned && (
-            <span className={styles.detailDate}>{t('achievements.earnedDate', { date: selected.dateEarned })}</span>
+          <span className={styles.detailIcon}>{selected.unlocked ? selected.icon : '🔒'}</span>
+          <span className={styles.detailTitle}>{t(selected.titleKey as 'achievement.kanji10.title')}</span>
+          <span className={styles.detailDesc}>{t(selected.descriptionKey as 'achievement.kanji10.desc')}</span>
+          {selected.unlocked && selected.unlockedAt && (
+            <span className={styles.detailDate}>{t('achievements.earnedDate', { date: selected.unlockedAt })}</span>
           )}
-          {!selected.earned && selected.target > 0 && (
-            <span className={styles.detailProgress}>
-              {selected.progress} / {selected.target}
-            </span>
+          {!selected.unlocked && (
+            <span className={styles.detailProgress}>{Math.round(selected.progress * 100)}%</span>
           )}
         </div>
       )}

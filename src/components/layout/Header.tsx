@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { StatusBar } from './StatusBar'
 import { useTheme } from '@/hooks/useTheme'
 import { useTranslation } from '@/i18n'
+import { RankBadge } from '@/components/gamification/RankBadge'
 import styles from './Header.module.css'
 
 interface HeaderProps {
@@ -50,6 +51,7 @@ export function Header({ currentView, onNavigate }: HeaderProps) {
       </div>
 
       <nav className={styles.nav} aria-label="Main navigation">
+        <RankBadge />
         <button
           className={`${styles.navButton} ${currentView === 'home' ? styles.navButtonActive : ''}`}
           onClick={() => onNavigate('home')}

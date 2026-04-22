@@ -1,10 +1,11 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import type { SessionSummaryData } from '@/core/srs/types'
 import { computeSessionScore, recordScore } from '@/core/srs/scoring'
 import { useQueueStats } from '@/hooks/useQueueStats'
 import { useCountdown } from '@/hooks/useCountdown'
 import { useTranslation } from '@/i18n'
 import { SessionScoreCard } from './SessionScore'
+import { fireConfetti } from '@/utils/confetti'
 import styles from './SessionSummary.module.css'
 
 interface SessionSummaryProps {
@@ -37,6 +38,18 @@ export function SessionSummary({ summary, onDone, onRetryStruggled, onNewSession
     const record = recordScore(score.total)
     return { score, ...record }
   }, [summary, currentStreak])
+
+  // Confetti for perfect sessions or new personal-best scores. Honours
+  // prefers-reduced-motion via fireConfetti's internal check.
+  useEffect(() => {
+    if (summary.totalReviewed === 0) return
+    const isPerfect = summary.correctCount === summary.totalReviewed
+    if (isPerfect || scoreData.isPersonalBest) {
+      fireConfetti()
+    }
+    // Only fire once on mount per session.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const struggled = summary.reviewedCards.filter(c => c.rating <= 2)
   const queueEmpty = dueCount === 0

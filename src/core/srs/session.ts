@@ -12,6 +12,7 @@ import type {
   QuizMode,
 } from './types'
 import { createNewCardState, isDue, reviewCard } from './scheduler'
+import { addXp, xpForReview } from '@/core/gamification/xp'
 import {
   putCardState,
   addReviewLog,
@@ -125,13 +126,22 @@ export async function buildReviewQueue(
   }
 }
 
+/** Result of processing a single review — includes XP awarded for UI feedback. */
+export interface ProcessReviewResult {
+  cardState: CardState
+  xpAwarded: number
+  leveledUp: boolean
+  previousLevel: number
+  newLevel: number
+}
+
 /** Process a single review rating and update storage */
 export async function processReview(
   item: ReviewItem,
   ratingValue: RatingValue,
   mode: QuizMode,
   responseTimeMs: number,
-): Promise<CardState> {
+): Promise<ProcessReviewResult> {
   const now = new Date()
   const result = reviewCard(item.cardState.fsrsCard, ratingValue, now)
 
@@ -183,7 +193,17 @@ export async function processReview(
   }
   await putDailyStats(stats)
 
-  return updatedState
+  // Award XP
+  const xpAwarded = xpForReview(ratingValue, isNew)
+  const xpResult = await addXp(xpAwarded)
+
+  return {
+    cardState: updatedState,
+    xpAwarded,
+    leveledUp: xpResult.leveledUp,
+    previousLevel: xpResult.previousLevel,
+    newLevel: xpResult.newLevel,
+  }
 }
 
 /** Compute summary from a completed session of ratings */

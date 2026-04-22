@@ -149,3 +149,63 @@ describe('schema upgrade v1 -> v2 (real IndexedDB via fake-indexeddb)', () => {
     v2.close()
   })
 })
+
+describe('schema upgrade v2 -> v3 (userStats backfill)', () => {
+  beforeEach(reset)
+
+  it('creates the userStats store with backfilled XP from dailyStats', async () => {
+    const v2 = await openDB<KanjiRenshuuDB>(DB_NAME, 2, {
+      upgrade(db, oldVersion, newVersion, tx) {
+        void runMigrations(db, tx, oldVersion, newVersion ?? 2)
+      },
+    })
+    await v2.add('dailyStats', {
+      date: '2026-01-15',
+      newCardsIntroduced: 1,
+      reviewsCompleted: 10,
+      correctCount: 8,
+      totalTimeMs: 9999,
+    })
+    await v2.add('dailyStats', {
+      date: '2026-01-16',
+      newCardsIntroduced: 0,
+      reviewsCompleted: 5,
+      correctCount: 5,
+      totalTimeMs: 4321,
+    })
+    v2.close()
+
+    const v3 = await openDB<KanjiRenshuuDB>(DB_NAME, LATEST_DB_VERSION, {
+      upgrade(db, oldVersion, newVersion, tx) {
+        void runMigrations(db, tx, oldVersion, newVersion ?? LATEST_DB_VERSION)
+      },
+    })
+
+    const stats = await v3.get('userStats', 'singleton')
+    expect(stats).toBeDefined()
+    // Day 1: 8 correct * 15 + 2 wrong * 5 = 130
+    // Day 2: 5 correct * 15            = 75
+    // Total                            = 205
+    expect(stats!.lifetimeXp).toBe(205)
+    expect(stats!.freezes).toBe(0)
+    v3.close()
+  })
+
+  it('initialises userStats to zero when no dailyStats exist', async () => {
+    const v2 = await openDB<KanjiRenshuuDB>(DB_NAME, 2, {
+      upgrade(db, oldVersion, newVersion, tx) {
+        void runMigrations(db, tx, oldVersion, newVersion ?? 2)
+      },
+    })
+    v2.close()
+
+    const v3 = await openDB<KanjiRenshuuDB>(DB_NAME, LATEST_DB_VERSION, {
+      upgrade(db, oldVersion, newVersion, tx) {
+        void runMigrations(db, tx, oldVersion, newVersion ?? LATEST_DB_VERSION)
+      },
+    })
+    const stats = await v3.get('userStats', 'singleton')
+    expect(stats?.lifetimeXp).toBe(0)
+    v3.close()
+  })
+})

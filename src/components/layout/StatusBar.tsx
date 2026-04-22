@@ -1,9 +1,10 @@
 import { useQueueStats } from '@/hooks/useQueueStats'
 import { useTranslation } from '@/i18n'
+import { StreakChip } from './StreakChip'
 import styles from './StatusBar.module.css'
 
 export function StatusBar() {
-  const { dueCount, newToday, newLimit, currentStreak, activatedToday } = useQueueStats()
+  const { dueCount, newToday, newLimit, currentStreak, activatedToday, freezesAvailable } = useQueueStats()
   const { t } = useTranslation()
 
   return (
@@ -17,7 +18,11 @@ export function StatusBar() {
       </span>
       <span className={styles.divider}>·</span>
       <span className={styles.stat}>
-        {activatedToday ? '🔥' : ''} <span className={styles.streak}>{currentStreak}d</span> {t('status.streak')}
+        <StreakChip
+          streak={currentStreak}
+          freezes={freezesAvailable}
+          activatedToday={activatedToday}
+        />
       </span>
     </div>
   )

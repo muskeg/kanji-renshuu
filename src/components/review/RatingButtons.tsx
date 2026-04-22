@@ -1,8 +1,10 @@
-import { useMemo } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import type { Card } from 'ts-fsrs'
 import type { RatingValue } from '@/core/srs/types'
 import { previewCard } from '@/core/srs/scheduler'
 import { useTranslation } from '@/i18n'
+import { XP_PER_RATING } from '@/core/gamification/xp'
+import { FloatingNumber } from '@/components/ui/FloatingNumber'
 import styles from './RatingButtons.module.css'
 
 interface RatingButtonsProps {
@@ -42,6 +44,20 @@ export function RatingButtons({ card, onRate, disabled }: RatingButtonsProps) {
     }
   }, [card])
 
+  // Track which rating the user just clicked so we can pop a floating "+N XP"
+  // chip from that specific button. The counter ensures repeat clicks
+  // re-trigger the animation.
+  const [lastRated, setLastRated] = useState<RatingValue | null>(null)
+  const counterRef = useRef(0)
+  const [counter, setCounter] = useState(0)
+
+  function handleRate(rating: RatingValue) {
+    counterRef.current += 1
+    setCounter(counterRef.current)
+    setLastRated(rating)
+    onRate(rating)
+  }
+
   return (
     <div className={styles.container} role="group" aria-label={t('rating.rateRecall')}>
       {BUTTONS.map(({ rating, labelKey, key, style }) => {
@@ -54,13 +70,20 @@ export function RatingButtons({ card, onRate, disabled }: RatingButtonsProps) {
           <button
             key={rating}
             className={`${styles.button} ${style}`}
-            onClick={() => onRate(rating)}
+            onClick={() => handleRate(rating)}
             disabled={disabled}
             aria-label={t('rating.nextReview', { label, interval })}
+            style={{ position: 'relative' }}
           >
             <span className={styles.label}>{label}</span>
             <span className={styles.shortcut}>{key}</span>
             {interval && <span className={styles.preview}>{interval}</span>}
+            {lastRated === rating && (
+              <FloatingNumber
+                trigger={counter}
+                label={t('xp.gain', { amount: XP_PER_RATING[rating] })}
+              />
+            )}
           </button>
         )
       })}

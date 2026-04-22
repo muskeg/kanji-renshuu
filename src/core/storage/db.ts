@@ -1,5 +1,5 @@
 import { openDB, type IDBPDatabase } from 'idb'
-import type { CardState, ReviewLogEntry, DailyStats } from '@/core/srs/types'
+import type { CardState, ReviewLogEntry, DailyStats, UserStats } from '@/core/srs/types'
 import {
   type KanjiRenshuuDB,
   LATEST_DB_VERSION,
@@ -23,7 +23,15 @@ function getDB(): Promise<IDBPDatabase<KanjiRenshuuDB>> {
 }
 
 /** Test-only: reset the cached connection so a fresh DB can be opened. */
-export function _resetDbForTests(): void {
+export async function _resetDbForTests(): Promise<void> {
+  if (dbPromise) {
+    try {
+      const db = await dbPromise
+      db.close()
+    } catch {
+      // ignore — the connection was already invalid
+    }
+  }
   dbPromise = null
 }
 
@@ -87,6 +95,29 @@ export async function putDailyStats(stats: DailyStats): Promise<void> {
 export async function getAllDailyStats(): Promise<DailyStats[]> {
   const db = await getDB()
   return db.getAll('dailyStats')
+}
+
+// --- User Stats (gamification) ---
+
+const USER_STATS_KEY = 'singleton'
+
+export async function getUserStats(): Promise<UserStats> {
+  const db = await getDB()
+  const existing = await db.get('userStats', USER_STATS_KEY)
+  if (existing) return existing
+  const fresh: UserStats = {
+    id: 'singleton',
+    lifetimeXp: 0,
+    freezes: 0,
+    updatedAt: Date.now(),
+  }
+  await db.put('userStats', fresh)
+  return fresh
+}
+
+export async function putUserStats(stats: UserStats): Promise<void> {
+  const db = await getDB()
+  await db.put('userStats', stats)
 }
 
 // --- Utility ---

@@ -4,6 +4,7 @@ import { BottomNav } from '@/components/layout/BottomNav'
 import { PageTransition } from '@/components/layout/PageTransition'
 import { ToastContainer } from '@/components/ui/Toast'
 import { UpdatePrompt } from '@/components/ui/UpdatePrompt'
+import { LevelUpModal } from '@/components/gamification/LevelUpModal'
 import { useToastListener } from '@/hooks/useToast'
 import { useTheme } from '@/hooks/useTheme'
 import { I18nProvider, getMeanings } from '@/i18n'
@@ -142,6 +143,7 @@ export function App() {
       </main>
       <ToastContainer toasts={toasts} onDismiss={dismissToast} />
       <UpdatePrompt />
+      <LevelUpModal />
       <BottomNav currentView={currentView} onNavigate={(v) => setCurrentView(v as AppView)} />
     </I18nProvider>
   )
