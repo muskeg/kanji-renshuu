@@ -1,4 +1,4 @@
-import type { KanjiEntry } from '@/core/srs/types'
+import type { KanjiEntry, DeckFilter } from '@/core/srs/types'
 import { useReviewSession } from '@/hooks/useReviewSession'
 import { FlashCard } from './FlashCard'
 import { RatingButtons } from './RatingButtons'
@@ -10,9 +10,10 @@ import styles from './ReviewSession.module.css'
 
 interface ReviewSessionProps {
   kanjiData: KanjiEntry[]
+  deckFilter?: DeckFilter
 }
 
-export function ReviewSession({ kanjiData }: ReviewSessionProps) {
+export function ReviewSession({ kanjiData, deckFilter }: ReviewSessionProps) {
   const {
     phase,
     currentItem,
@@ -27,7 +28,8 @@ export function ReviewSession({ kanjiData }: ReviewSessionProps) {
     endSession,
     retryStruggled,
     startNewSession,
-  } = useReviewSession(kanjiData)
+    undoLast,
+  } = useReviewSession(kanjiData, deckFilter)
   const { t } = useTranslation()
 
   if (phase === 'summary' && summary) {
@@ -99,6 +101,18 @@ export function ReviewSession({ kanjiData }: ReviewSessionProps) {
               onRate={rateCard}
             />
           </>
+        )}
+
+        {currentIndex > 0 && !isFlipped && (
+          <button
+            type="button"
+            className={styles.undoButton}
+            onClick={undoLast}
+            aria-label="Undo last review"
+            title="Undo last review (Ctrl+Z)"
+          >
+            ↶ Undo last
+          </button>
         )}
       </div>
     </div>

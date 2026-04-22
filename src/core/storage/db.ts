@@ -11,7 +11,7 @@ const DB_NAME = 'kanji-renshuu'
 
 let dbPromise: Promise<IDBPDatabase<KanjiRenshuuDB>> | null = null
 
-function getDB(): Promise<IDBPDatabase<KanjiRenshuuDB>> {
+export function getDB(): Promise<IDBPDatabase<KanjiRenshuuDB>> {
   if (!dbPromise) {
     dbPromise = openDB<KanjiRenshuuDB>(DB_NAME, LATEST_DB_VERSION, {
       upgrade(db, oldVersion, newVersion, tx) {
@@ -78,6 +78,26 @@ export async function addReviewLog(log: ReviewLogEntry): Promise<void> {
 export async function getReviewLogsByDate(date: string): Promise<ReviewLogEntry[]> {
   const db = await getDB()
   return db.getAllFromIndex('reviewLogs', 'by-date', date)
+}
+
+/** Fetch the most recent review log entry, or undefined if none exist. */
+export async function getLastReviewLog(): Promise<ReviewLogEntry | undefined> {
+  const db = await getDB()
+  const all = await db.getAll('reviewLogs')
+  if (all.length === 0) return undefined
+  return all.reduce((latest, entry) => (entry.timestamp > latest.timestamp ? entry : latest))
+}
+
+/** Remove a single review log entry by id. */
+export async function deleteReviewLog(id: string): Promise<void> {
+  const db = await getDB()
+  await db.delete('reviewLogs', id)
+}
+
+/** Remove a card state entirely (used when undoing a brand-new introduction). */
+export async function deleteCardState(kanjiLiteral: string): Promise<void> {
+  const db = await getDB()
+  await db.delete('cards', kanjiLiteral)
 }
 
 // --- Daily Stats ---

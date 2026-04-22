@@ -1,5 +1,5 @@
 import type { IDBPDatabase, IDBPTransaction } from 'idb'
-import type { CardState, ReviewLogEntry, DailyStats, UserStats } from '@/core/srs/types'
+import type { CardState, ReviewLogEntry, DailyStats, UserStats, Deck } from '@/core/srs/types'
 
 /**
  * Schema description for the IndexedDB instance. Update this in lock-step with
@@ -28,6 +28,11 @@ export interface KanjiRenshuuDB {
   userStats: {
     key: string
     value: UserStats
+  }
+  decks: {
+    key: string
+    value: Deck
+    indexes: { 'by-createdAt': number }
   }
 }
 
@@ -120,6 +125,17 @@ export const migrations: Migration[] = [
         freezes: 0,
         updatedAt: Date.now(),
       } satisfies UserStats)
+    },
+  },
+  {
+    from: 3,
+    to: 4,
+    description: 'Add decks store for user-defined custom queues',
+    run: (db) => {
+      if (!db.objectStoreNames.contains('decks')) {
+        const store = db.createObjectStore('decks', { keyPath: 'id' })
+        store.createIndex('by-createdAt', 'createdAt')
+      }
     },
   },
 ]

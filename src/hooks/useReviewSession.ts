@@ -7,8 +7,10 @@ import type {
   SessionSummaryData,
   QueueStatus,
   KanjiEntry,
+  DeckFilter,
 } from '@/core/srs/types'
 import { buildReviewQueue, processReview, computeSessionSummary } from '@/core/srs/session'
+import { undoLastReview } from '@/core/srs/undo'
 import { checkMilestones } from '@/core/srs/milestones'
 import { showToast } from '@/hooks/useToast'
 import { loadSettings } from '@/core/storage/settings'
@@ -28,7 +30,7 @@ interface ReviewSessionState {
   queueStatus: QueueStatus | null
 }
 
-export function useReviewSession(kanjiData: KanjiEntry[]) {
+export function useReviewSession(kanjiData: KanjiEntry[], deckFilter?: DeckFilter) {
   const [state, setState] = useState<ReviewSessionState>({
     phase: 'idle',
     queue: [],
@@ -57,17 +59,17 @@ export function useReviewSession(kanjiData: KanjiEntry[]) {
   useEffect(() => {
     if (kanjiData.length === 0) return
     const settings = loadSettings()
-    buildReviewQueue(kanjiData, settings.dailyNewCards, settings.dailyReviewLimit).then(queueStatus => {
+    buildReviewQueue(kanjiData, settings.dailyNewCards, settings.dailyReviewLimit, { deckFilter, learningPath: settings.learningPath, perGradeNewCaps: settings.perGradeNewCaps, pauseNewCards: settings.pauseSrs }).then(queueStatus => {
       setState(prev => {
         if (prev.phase !== 'idle') return prev
         return { ...prev, queueStatus }
       })
     })
-  }, [kanjiData])
+  }, [kanjiData, deckFilter])
 
   const startSession = useCallback(async () => {
     const settings = loadSettings()
-    const queueStatus = await buildReviewQueue(kanjiData, settings.dailyNewCards, settings.dailyReviewLimit)
+    const queueStatus = await buildReviewQueue(kanjiData, settings.dailyNewCards, settings.dailyReviewLimit, { deckFilter, learningPath: settings.learningPath, perGradeNewCaps: settings.perGradeNewCaps, pauseNewCards: settings.pauseSrs })
 
     if (queueStatus.items.length === 0) {
       setState(prev => ({ ...prev, phase: 'idle', summary: null, queueStatus }))
@@ -89,7 +91,7 @@ export function useReviewSession(kanjiData: KanjiEntry[]) {
       queueStatus,
     })
     cardStartTimeRef.current = Date.now()
-  }, [kanjiData])
+  }, [kanjiData, deckFilter])
 
   const flipCard = useCallback(() => {
     setState(prev => {
@@ -200,7 +202,7 @@ export function useReviewSession(kanjiData: KanjiEntry[]) {
   // 5B-1: Start a fresh session
   const startNewSession = useCallback(async () => {
     const settings = loadSettings()
-    const queueStatus = await buildReviewQueue(kanjiData, settings.dailyNewCards, settings.dailyReviewLimit)
+    const queueStatus = await buildReviewQueue(kanjiData, settings.dailyNewCards, settings.dailyReviewLimit, { deckFilter, learningPath: settings.learningPath, perGradeNewCaps: settings.perGradeNewCaps, pauseNewCards: settings.pauseSrs })
     if (queueStatus.items.length === 0) {
       setState(prev => ({ ...prev, phase: 'idle', summary: null, queueStatus }))
       return
@@ -219,7 +221,33 @@ export function useReviewSession(kanjiData: KanjiEntry[]) {
       queueStatus,
     })
     cardStartTimeRef.current = Date.now()
-  }, [kanjiData])
+  }, [kanjiData, deckFilter])
+
+  const undoLast = useCallback(async () => {
+    if (state.phase !== 'reviewing' || state.ratings.length === 0) return
+    const result = await undoLastReview()
+    if (!result.undone) {
+      showToast({
+        title: 'Nothing to undo',
+        body: result.reason === 'no-snapshot' ? 'Older review entries can\u2019t be undone' : 'No prior review found',
+        icon: '\u26a0\ufe0f',
+      })
+      return
+    }
+    if (flipBackTimerRef.current) {
+      clearTimeout(flipBackTimerRef.current)
+      flipBackTimerRef.current = null
+    }
+    setState(prev => ({
+      ...prev,
+      ratings: prev.ratings.slice(0, -1),
+      reviewedCards: prev.reviewedCards.slice(0, -1),
+      currentIndex: Math.max(0, prev.currentIndex - 1),
+      isFlipped: false,
+    }))
+    cardStartTimeRef.current = Date.now()
+    showToast({ title: 'Review undone', body: 'Previous card restored', icon: '\u21b6' })
+  }, [state.phase, state.ratings.length])
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -231,6 +259,9 @@ export function useReviewSession(kanjiData: KanjiEntry[]) {
         if (!state.isFlipped) {
           flipCard()
         }
+      } else if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+        e.preventDefault()
+        void undoLast()
       } else if (state.isFlipped) {
         const keyMap: Record<string, RatingValue> = { '1': 1, '2': 2, '3': 3, '4': 4 }
         const rating = keyMap[e.key]
@@ -243,7 +274,7 @@ export function useReviewSession(kanjiData: KanjiEntry[]) {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [state.phase, state.isFlipped, flipCard, rateCard])
+  }, [state.phase, state.isFlipped, flipCard, rateCard, undoLast])
 
   const currentItem = state.queue[state.currentIndex] ?? null
 
@@ -263,5 +294,6 @@ export function useReviewSession(kanjiData: KanjiEntry[]) {
     endSession,
     retryStruggled: hasStruggledCards ? retryStruggled : null,
     startNewSession,
+    undoLast,
   }
 }

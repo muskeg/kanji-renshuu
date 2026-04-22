@@ -10,7 +10,7 @@ interface HeaderProps {
   onNavigate: (view: string) => void
 }
 
-const STUDY_VIEWS = ['review', 'meaning-quiz', 'reading-quiz', 'writing']
+const STUDY_VIEWS = ['review', 'meaning-quiz', 'reading-quiz', 'writing', 'cloze-quiz']
 
 export function Header({ currentView, onNavigate }: HeaderProps) {
   const [studyOpen, setStudyOpen] = useState(false)
@@ -93,6 +93,12 @@ export function Header({ currentView, onNavigate }: HeaderProps) {
               >
                 {t('mode.writingPractice')}
               </button>
+              <button
+                className={`${styles.dropdownItem} ${currentView === 'cloze-quiz' ? styles.dropdownItemActive : ''}`}
+                onClick={() => { onNavigate('cloze-quiz'); setStudyOpen(false) }}
+              >
+                {t('mode.clozeQuiz')}
+              </button>
             </div>
           )}
         </div>
@@ -101,6 +107,12 @@ export function Header({ currentView, onNavigate }: HeaderProps) {
           onClick={() => onNavigate('browse')}
         >
           {t('nav.browse')}
+        </button>
+        <button
+          className={`${styles.navButton} ${currentView === 'decks' ? styles.navButtonActive : ''}`}
+          onClick={() => onNavigate('decks')}
+        >
+          Decks
         </button>
         <button
           className={`${styles.navButton} ${currentView === 'progress' ? styles.navButtonActive : ''}`}

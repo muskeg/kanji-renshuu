@@ -7,7 +7,7 @@ interface BottomNavProps {
   onNavigate: (view: string) => void
 }
 
-const STUDY_VIEWS = ['review', 'meaning-quiz', 'reading-quiz', 'writing']
+const STUDY_VIEWS = ['review', 'meaning-quiz', 'reading-quiz', 'writing', 'cloze-quiz']
 
 export function BottomNav({ currentView, onNavigate }: BottomNavProps) {
   const [sheetOpen, setSheetOpen] = useState(false)
@@ -20,6 +20,7 @@ export function BottomNav({ currentView, onNavigate }: BottomNavProps) {
     { view: 'meaning-quiz', icon: '🔤', label: t('mode.meaningQuiz'), desc: t('mode.meaningQuiz.desc') },
     { view: 'reading-quiz', icon: '🗣️', label: t('mode.readingQuiz'), desc: t('mode.readingQuiz.desc') },
     { view: 'writing', icon: '✍️', label: t('mode.writing'), desc: t('mode.writingPractice.desc') },
+    { view: 'cloze-quiz', icon: '◯', label: t('mode.clozeQuiz'), desc: t('mode.clozeQuiz.desc') },
   ]
 
   function handleStudyTap() {

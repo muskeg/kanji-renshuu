@@ -61,6 +61,12 @@ export interface ReviewLogEntry {
   date: string
   responseTimeMs: number
   fsrsLog: FSRSReviewLog
+  /** Snapshot of the CardState *before* this review was applied (D.5 undo). */
+  previousCardState?: CardState
+  /** XP awarded by this review (D.5 undo will subtract). */
+  xpAwarded?: number
+  /** Whether this review introduced the kanji for the first time. */
+  introducedHere?: boolean
 }
 
 /** Aggregated daily statistics */
@@ -83,7 +89,30 @@ export interface UserStats {
   updatedAt: number
 }
 
+/** Filter spec shared by browse view and decks. */
+export interface DeckFilter {
+  grades: number[]
+  jlptLevels: number[]
+  /** When non-empty, restrict to these literals (overrides other filters). */
+  literals?: string[]
+}
+
+/** A user-defined collection of kanji used as an alternate review queue source. */
+export interface Deck {
+  id: string
+  name: string
+  /** CSS color string for visual chip; falls back to default theme color. */
+  color: string
+  filter: DeckFilter
+  /** Created-at timestamp (ms). */
+  createdAt: number
+  /** Last-modified timestamp (ms). */
+  updatedAt: number
+}
+
 /** User-configurable settings */
+export type LearningPath = 'byGrade' | 'byJlpt' | 'byFrequency' | 'radicalFirst' | 'byStrokeCount'
+
 export interface AppSettings {
   dailyNewCards: number
   dailyReviewLimit: number
@@ -97,6 +126,11 @@ export interface AppSettings {
   uiScale: number
   guidedWriting: boolean
   ttsEnabled: boolean
+  learningPath: LearningPath
+  /** Per-grade caps on new-card introductions per day (D.5). Empty/missing = no cap. */
+  perGradeNewCaps?: Record<number, number>
+  /** When true, SRS scheduling is paused — no new cards introduced and reviews don't progress. (D.5) */
+  pauseSrs: boolean
 }
 
 /** Default settings */
@@ -113,6 +147,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
   uiScale: 100,
   guidedWriting: true,
   ttsEnabled: false,
+  learningPath: 'byGrade',
+  pauseSrs: false,
 }
 
 /** Review session state */

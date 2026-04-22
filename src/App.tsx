@@ -21,16 +21,18 @@ import { SearchBar } from '@/components/browse/SearchBar'
 import { Dashboard } from '@/components/progress/Dashboard'
 import { SettingsPage } from '@/components/settings/SettingsPage'
 import { HomePage } from '@/components/home/HomePage'
+import { DeckList } from '@/components/decks/DeckList'
 import { useKanjiData } from '@/hooks/useKanjiData'
 import { useCardStatus } from '@/hooks/useCardStatus'
-import type { KanjiEntry } from '@/core/srs/types'
+import type { KanjiEntry, Deck } from '@/core/srs/types'
 import { katakanaToHiragana, normalizeReading } from '@/utils/japanese'
 
-export type AppView = 'home' | 'review' | 'browse' | 'meaning-quiz' | 'reading-quiz' | 'writing' | 'cloze-quiz' | 'detail' | 'progress' | 'settings'
+export type AppView = 'home' | 'review' | 'browse' | 'meaning-quiz' | 'reading-quiz' | 'writing' | 'cloze-quiz' | 'detail' | 'progress' | 'settings' | 'decks'
 
 export function App() {
   const [currentView, setCurrentView] = useState<AppView>('home')
   const [selectedKanji, setSelectedKanji] = useState<KanjiEntry | null>(null)
+  const [activeDeck, setActiveDeck] = useState<Deck | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [filter, setFilter] = useState<KanjiFilter>({ grades: [], jlptLevels: [], status: [] })
   const { kanji, loading, error } = useKanjiData()
@@ -51,6 +53,13 @@ export function App() {
   const handleSelectKanji = useCallback((k: KanjiEntry) => {
     setSelectedKanji(k)
     setCurrentView('detail')
+  }, [])
+
+  const handleNavigate = useCallback((view: AppView) => {
+    if (view !== 'review') {
+      setActiveDeck(null)
+    }
+    setCurrentView(view)
   }, [])
 
   const handleBack = useCallback(() => {
@@ -86,7 +95,7 @@ export function App() {
 
   return (
     <I18nProvider locale={language}>
-      <Header currentView={currentView} onNavigate={(v) => setCurrentView(v as AppView)} />
+      <Header currentView={currentView} onNavigate={(v) => handleNavigate(v as AppView)} />
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 'var(--spacing-lg)' }}>
         <PageTransition viewKey={currentView}>
         {error && (
@@ -102,11 +111,11 @@ export function App() {
         )}
 
         {!loading && !error && currentView === 'home' && (
-          <HomePage kanjiData={kanji} onNavigate={(v) => setCurrentView(v as AppView)} />
+          <HomePage kanjiData={kanji} onNavigate={(v) => handleNavigate(v as AppView)} />
         )}
 
         {!loading && !error && currentView === 'review' && (
-          <ReviewSession kanjiData={kanji} />
+          <ReviewSession kanjiData={kanji} deckFilter={activeDeck?.filter} />
         )}
 
         {!loading && !error && currentView === 'meaning-quiz' && (
@@ -144,12 +153,22 @@ export function App() {
         {!loading && !error && currentView === 'settings' && (
           <SettingsPage />
         )}
+
+        {!loading && !error && currentView === 'decks' && (
+          <DeckList
+            kanjiData={kanji}
+            onStudyDeck={(deck) => {
+              setActiveDeck(deck)
+              setCurrentView('review')
+            }}
+          />
+        )}
         </PageTransition>
       </main>
       <ToastContainer toasts={toasts} onDismiss={dismissToast} />
       <UpdatePrompt />
       <LevelUpModal />
-      <BottomNav currentView={currentView} onNavigate={(v) => setCurrentView(v as AppView)} />
+      <BottomNav currentView={currentView} onNavigate={(v) => handleNavigate(v as AppView)} />
     </I18nProvider>
   )
 }

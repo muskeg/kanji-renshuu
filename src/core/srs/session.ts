@@ -10,6 +10,8 @@ import type {
   KanjiEntry,
   DailyStats,
   QuizMode,
+  DeckFilter,
+  LearningPath,
 } from './types'
 import { createNewCardState, isDue, reviewCard } from './scheduler'
 import { addXp, xpForReview } from '@/core/gamification/xp'
@@ -22,13 +24,35 @@ import {
   todayDateString,
   generateId,
 } from '@/core/storage/db'
+import { applyDeckFilter } from '@/core/storage/decks'
+import { sortByPath } from '@/core/learning/paths'
+import { awardLessonBonusIfDue } from '@/core/learning/lessons'
+
+/** Options passed to {@link buildReviewQueue}. */
+export interface BuildQueueOptions {
+  /** When set, restrict the queue to kanji matching this deck filter. */
+  deckFilter?: DeckFilter
+  /** Strategy for ordering new-card candidates. Defaults to `byGrade`. */
+  learningPath?: LearningPath
+  /** Per-grade daily caps on newly-introduced cards. Empty = no per-grade cap. */
+  perGradeNewCaps?: Record<number, number>
+  /** When true, do not introduce any new cards (reviews still surface). */
+  pauseNewCards?: boolean
+}
 
 /** Build the review queue: due cards first, then new cards up to daily limit */
 export async function buildReviewQueue(
   kanjiData: KanjiEntry[],
   dailyNewLimit: number,
   dailyReviewLimit: number = 0,
+  options: BuildQueueOptions = {},
 ): Promise<QueueStatus> {
+  const { deckFilter, learningPath = 'byGrade', perGradeNewCaps, pauseNewCards } = options
+  // Restrict the kanji pool to the deck's filter when one is provided. This
+  // affects both the candidate pool for new cards AND the introduced cards we
+  // consider as "due", so deck-scoped sessions only surface deck-scoped kanji.
+  const pool = deckFilter ? applyDeckFilter(kanjiData, deckFilter) : kanjiData
+  const poolLiterals = deckFilter ? new Set(pool.map(k => k.literal)) : null
   const now = new Date()
   const today = todayDateString()
   const todayStats = await getDailyStats(today)
@@ -43,8 +67,9 @@ export async function buildReviewQueue(
 
   // Gather due reviews
   for (const cardState of introduced) {
+    if (poolLiterals && !poolLiterals.has(cardState.kanjiLiteral)) continue
     if (isDue(cardState.fsrsCard, now)) {
-      const kanji = kanjiData.find(k => k.literal === cardState.kanjiLiteral)
+      const kanji = pool.find(k => k.literal === cardState.kanjiLiteral)
       if (kanji) {
         allDueItems.push({ cardState, kanji })
       }
@@ -73,22 +98,39 @@ export async function buildReviewQueue(
 
   // Gather new cards
   const newItems: ReviewItem[] = []
-  const remainingNew = Math.max(0, dailyNewLimit - newCardsToday)
+  const remainingNew = pauseNewCards ? 0 : Math.max(0, dailyNewLimit - newCardsToday)
 
   if (remainingNew > 0) {
     const introducedSet = new Set(introduced.map(c => c.kanjiLiteral))
 
-    // Sort by grade then frequency for learning order
-    const candidates = kanjiData
-      .filter(k => !introducedSet.has(k.literal))
-      .sort((a, b) => {
-        if (a.grade !== b.grade) return a.grade - b.grade
-        const aFreq = a.frequency ?? 9999
-        const bFreq = b.frequency ?? 9999
-        return aFreq - bFreq
-      })
+    // Per-grade caps: count today's introductions per grade so we can stop
+    // adding new cards from a grade once its quota is reached.
+    const perGradeUsed = new Map<number, number>()
+    if (perGradeNewCaps) {
+      const todayMs = Date.parse(today)
+      for (const c of introduced) {
+        if (c.introducedAt !== null && c.introducedAt >= todayMs) {
+          const k = pool.find(p => p.literal === c.kanjiLiteral) ?? kanjiData.find(p => p.literal === c.kanjiLiteral)
+          if (k) perGradeUsed.set(k.grade, (perGradeUsed.get(k.grade) ?? 0) + 1)
+        }
+      }
+    }
 
-    for (const kanji of candidates.slice(0, remainingNew)) {
+    const candidates = sortByPath(
+      pool.filter(k => !introducedSet.has(k.literal)),
+      learningPath,
+    )
+
+    for (const kanji of candidates) {
+      if (newItems.length >= remainingNew) break
+      if (perGradeNewCaps) {
+        const cap = perGradeNewCaps[kanji.grade]
+        if (typeof cap === 'number' && cap >= 0) {
+          const used = perGradeUsed.get(kanji.grade) ?? 0
+          if (used >= cap) continue
+          perGradeUsed.set(kanji.grade, used + 1)
+        }
+      }
       const cardState = createNewCardState(kanji.literal)
       newItems.push({ cardState, kanji })
     }
@@ -97,8 +139,6 @@ export async function buildReviewQueue(
   const items = [...dueItems, ...newItems]
   const totalIntroduced = introduced.length
   const totalKanji = kanjiData.length
-
-  // Determine reason for empty/non-empty queue
   let reason: QueueStatus['reason']
   if (items.length > 0) {
     reason = 'has-cards'
@@ -170,6 +210,7 @@ export async function processReview(
 
   // Save review log
   const today = todayDateString()
+  const xpAwarded = xpForReview(ratingValue, isNew)
   const logEntry: ReviewLogEntry = {
     id: generateId(),
     kanjiLiteral: item.cardState.kanjiLiteral,
@@ -179,6 +220,9 @@ export async function processReview(
     date: today,
     responseTimeMs,
     fsrsLog: result.log,
+    previousCardState: item.cardState,
+    introducedHere: isNew,
+    xpAwarded,
   }
   await addReviewLog(logEntry)
 
@@ -193,9 +237,14 @@ export async function processReview(
   }
   await putDailyStats(stats)
 
-  // Award XP
-  const xpAwarded = xpForReview(ratingValue, isNew)
+  // Award XP (xpAwarded already computed above for the log entry)
   const xpResult = await addXp(xpAwarded)
+
+  // D.4: Lesson checkpoint — every Nth newly-introduced kanji awards a bonus.
+  if (isNew) {
+    const totalIntroducedAfter = (await getIntroducedCards()).length
+    await awardLessonBonusIfDue(totalIntroducedAfter)
+  }
 
   return {
     cardState: updatedState,

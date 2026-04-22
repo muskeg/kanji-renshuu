@@ -42,6 +42,8 @@ describe('export/import', () => {
         uiScale: 100,
         guidedWriting: true,
         ttsEnabled: false,
+        learningPath: 'byGrade',
+        pauseSrs: false,
       })
 
       const json = await exportData()

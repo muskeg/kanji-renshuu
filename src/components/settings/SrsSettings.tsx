@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { AppSettings, QuizMode } from '@/core/srs/types'
+import type { AppSettings, QuizMode, LearningPath } from '@/core/srs/types'
 import { DEFAULT_SETTINGS } from '@/core/srs/types'
 import { loadSettings, saveSettings } from '@/core/storage/settings'
 import { updateSchedulerSettings } from '@/core/srs/scheduler'
@@ -120,6 +120,77 @@ export function SrsSettings() {
           <option value="on">{t('appearance.on')}</option>
           <option value="off">{t('appearance.off')}</option>
         </select>
+      </div>
+
+      <div className={styles.group}>
+        <label className={styles.label}>
+          Learning path
+          <span className={styles.hint}>Order in which new kanji are introduced.</span>
+        </label>
+        <select
+          className={styles.select}
+          value={settings.learningPath}
+          onChange={e => handleChange('learningPath', e.target.value as LearningPath)}
+        >
+          <option value="byGrade">By school grade (default)</option>
+          <option value="byJlpt">By JLPT level (N5 → N1)</option>
+          <option value="byFrequency">By frequency (most common first)</option>
+          <option value="radicalFirst">Radicals first</option>
+          <option value="byStrokeCount">By stroke count (fewest first)</option>
+        </select>
+      </div>
+
+      <div className={styles.group}>
+        <label className={styles.label}>
+          Pause SRS
+          <span className={styles.hint}>Stop introducing new cards. Existing reviews still surface.</span>
+        </label>
+        <select
+          className={styles.select}
+          value={settings.pauseSrs ? 'on' : 'off'}
+          onChange={e => handleChange('pauseSrs', e.target.value === 'on')}
+        >
+          <option value="off">Off</option>
+          <option value="on">On (paused)</option>
+        </select>
+      </div>
+
+      <div className={styles.group}>
+        <label className={styles.label}>
+          Per-grade daily caps
+          <span className={styles.hint}>
+            Optional caps on how many new kanji from each grade can be introduced per day.
+            Leave blank for no cap on that grade.
+          </span>
+        </label>
+        <div className={styles.gradeCapGrid}>
+          {[1, 2, 3, 4, 5, 6, 8].map(grade => {
+            const value = settings.perGradeNewCaps?.[grade]
+            return (
+              <div key={grade} className={styles.gradeCapItem}>
+                <span className={styles.gradeCapLabel}>Grade {grade}</span>
+                <input
+                  type="number"
+                  className={styles.gradeCapInput}
+                  min={0}
+                  max={50}
+                  placeholder="∞"
+                  value={value === undefined ? '' : value}
+                  onChange={e => {
+                    const raw = e.target.value
+                    const next = { ...(settings.perGradeNewCaps ?? {}) }
+                    if (raw === '') {
+                      delete next[grade]
+                    } else {
+                      next[grade] = Math.max(0, Math.min(50, Number(raw) || 0))
+                    }
+                    handleChange('perGradeNewCaps', next)
+                  }}
+                />
+              </div>
+            )
+          })}
+        </div>
       </div>
 
       <div className={styles.actions}>

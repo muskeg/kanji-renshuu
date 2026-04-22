@@ -8,6 +8,7 @@ import type {
   QueueStatus,
   KanjiEntry,
   QuizMode,
+  DeckFilter,
 } from '@/core/srs/types'
 import { buildReviewQueue, processReview, computeSessionSummary } from '@/core/srs/session'
 import { checkMilestones } from '@/core/srs/milestones'
@@ -28,7 +29,7 @@ interface QuizSessionState {
   queueStatus: QueueStatus | null
 }
 
-export function useQuizSession(kanjiData: KanjiEntry[], mode: QuizMode) {
+export function useQuizSession(kanjiData: KanjiEntry[], mode: QuizMode, deckFilter?: DeckFilter) {
   const [state, setState] = useState<QuizSessionState>({
     phase: 'idle',
     queue: [],
@@ -47,17 +48,17 @@ export function useQuizSession(kanjiData: KanjiEntry[], mode: QuizMode) {
   useEffect(() => {
     if (kanjiData.length === 0) return
     const settings = loadSettings()
-    buildReviewQueue(kanjiData, settings.dailyNewCards, settings.dailyReviewLimit).then(queueStatus => {
+    buildReviewQueue(kanjiData, settings.dailyNewCards, settings.dailyReviewLimit, { deckFilter, learningPath: settings.learningPath, perGradeNewCaps: settings.perGradeNewCaps, pauseNewCards: settings.pauseSrs }).then(queueStatus => {
       setState(prev => {
         if (prev.phase !== 'idle') return prev
         return { ...prev, queueStatus }
       })
     })
-  }, [kanjiData])
+  }, [kanjiData, deckFilter])
 
   const startSession = useCallback(async () => {
     const settings = loadSettings()
-    const queueStatus = await buildReviewQueue(kanjiData, settings.dailyNewCards, settings.dailyReviewLimit)
+    const queueStatus = await buildReviewQueue(kanjiData, settings.dailyNewCards, settings.dailyReviewLimit, { deckFilter, learningPath: settings.learningPath, perGradeNewCaps: settings.perGradeNewCaps, pauseNewCards: settings.pauseSrs })
 
     if (queueStatus.items.length === 0) {
       setState(prev => ({ ...prev, phase: 'idle', summary: null, queueStatus }))
@@ -78,7 +79,7 @@ export function useQuizSession(kanjiData: KanjiEntry[], mode: QuizMode) {
       queueStatus,
     })
     cardStartTimeRef.current = Date.now()
-  }, [kanjiData])
+  }, [kanjiData, deckFilter])
 
   const rateCard = useCallback(async (rating: RatingValue) => {
     const currentItem = state.queue[state.currentIndex]
